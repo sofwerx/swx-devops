@@ -23,15 +23,15 @@ Installing the `jq` package on Linux should be as simple as one of:
 
 We need this to allow our scripts to process json output. Learn this tool, you really want to.
 
-# aws-cli
+# awscli
 
-If you are on a mac, you can install `aws-cli` with Homebrew:
+If you are on a mac, you can install `awscli` with Homebrew:
 
-    brew install aws-cli
+    brew install awscli
 
 Alternatively, or under Linux, you can use python `pip` to install it as well:
 
-    pip install aws-cli
+    pip install awscli
 
 # ~/.aws/
 
