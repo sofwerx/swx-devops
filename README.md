@@ -4,10 +4,24 @@ This project contains documentation and infrastructure as code for our internal 
 
 There are a number of tools that will need to be installed:
 
+- jq
 - aws-cli
 - terraform
-- gnupg
+- gnupg 2.0
 - trousseau
+
+# jq
+
+If you are on a mac, you can install `jq` with Homebrew:
+
+    brew install jq
+
+Installing the `jq` package on Linux should be as simple as one of:
+
+    apt-get install jq
+    yum install jq
+
+We need this to allow our scripts to process json output. Learn this tool, you really want to.
 
 # aws-cli
 
@@ -99,20 +113,22 @@ I am presently running the latest terraform: `0.10.7`.
 
 We will be using an AWS bucket named `sofwerx-terraform` for the shared `.tfstate` files.
 
-## gnupg
+## gnupg 2.0
 
 You will need a gnupg key for `trousseau` below.
 
-To install the `gpg` command on a mac, install `gnupg` with HomeBrew:
+If you happened to install `gnupg` already, just unlink first.
 
-    brew install gnupg
+    brew unlink gnupg
 
-Installing the `gnupg` package on Linux should be as simple as one of:
+To install the `gpg` command on a mac, install `gnupg@2.0` with HomeBrew:
 
-    apt-get install gnupg
-    yum install gnupg
+    brew install gnupg@2.0
+    brew link --force gnupg@2.0
 
-After installing gnupg, you will want to generate a private/public keypair:
+The reason for gnupg 2.0 is that trousseau reads directly from `~/.gnupg/pubring.gpg`, and they did away with that file in gnupg 2.1
+
+After installing gnupg 2.0, you will want to generate a private/public keypair:
 
     gpg --gen-key
 
@@ -122,11 +138,13 @@ If you're like me, you'll want more than the default 2048 bits. For that, use `-
 
 After doing this, please export your public key into this repo under the `gnupg/` folder with a Github Pull-Request so that everyone has access to it.
 
-    gpg --export --armor > gnupg/ian@sofwerx.org.gpg
+    gpg --export --armor > gpg/ian@sofwerx.org
+
+The filename _must_ be your email address, to make trousseau management easier.
 
 You can import all of our public keys at any time by running:
 
-    gpg --import < gnupg/*
+    gpg --import < gpg/*
 
 It's probably a good idea to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repo.
 
@@ -148,5 +166,34 @@ The trousseau project is here:
 Trousseau uses gnupg to encrypt a JSON file for a number of administrators that stores "key=value" secrets.
 Trousseau can use various cloud storage platforms to share these encrypted secrets between administrators.
 
-We will be using an AWS bucket named `sofwerx-trousseau` for the scriptable shared encrypted trousseau store.
+The result of any trousseau commands will act ion the `.trousseau` file in the current proect.
+This file is under .git management, and is entirely safe as the contents of the file are encrypted.
+This is far easier than dealing with a shared s3 bucket or other shared repository.
+
+## Using trousseau
+
+After your gpg/ PR is merged, you need to get someone else who is already a trusted trousseau recipient to add your public key to their keychain and then run `trousseau add-recipient` for your email address:
+
+    trousseau add-recipient ian@sofwerx.org
+
+After this, they need to:
+
+    git add .trousseau
+    git commit -a -m 'Added ian@sofwerx.org to recipients'
+
+Now future trousseau operations will also be encrypted for you to be able to see with your gpg key.
+
+To set a trousseau key:
+
+    trousseau set myvariable somevalue
+
+To retrieve the value for a key:
+
+    trousseau get myvariable
+
+To delete a key:
+
+    trousseau del myvariable
+
+Running `trousseau` on its own will show the other usable commands.
 

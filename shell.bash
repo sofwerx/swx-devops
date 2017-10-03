@@ -1,4 +1,6 @@
 #!/bin/bash
+devops=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+
 export AWS_CONFIG_FILE=${AWS_CONFIG_FILE:-~/.aws/config}
 export AWS_PROFILE=${AWS_PROFILE:-sofwerx}
 export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-$(aws configure get aws_access_key_id --profile $AWS_PROFILE)}
@@ -17,7 +19,7 @@ export TF_VAR_aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
 
 # The trousseau and terraform commands need buckets
 export TROUSSEAU_BUCKET="${TROUSSEAU_BUCKET:-sofwerx-trousseau}"
-export TERRAFORM_BUCKET="${TERRAFORM_BUCKET:-sofwerx-terraform}"
+export TROUSSEAU_STORE="${TROUSSEAU_STORE:-${devops}/.trousseau}"
 
 if [ -z "${TROUSSEAU_PASSPHRASE}" ] ; then
   echo "To save yourself some passphrase prompting pain, you probably want to:"
