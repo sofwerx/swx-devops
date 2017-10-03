@@ -56,7 +56,7 @@ You will then be prompted for:
 
     AWS Access Key ID [None]: AWS_ACCESS_KEY
     AWS Secret Access Key [None]: AWS_SECRET_ACCESS_KEY
-    Default region name [None]: us-east-2
+    Default region name [None]: us-east-1
     Default output format [None]: json
 
 After entering these, you can examine your updated files:
@@ -64,7 +64,7 @@ After entering these, you can examine your updated files:
     $ cat ~/.aws/config
     [profile sofwerx]
     output = json
-    region = us-east-2
+    region = us-east-1
 
     $ cat ~/.aws/credentials
     [sofwerx]
