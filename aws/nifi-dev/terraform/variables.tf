@@ -72,34 +72,38 @@ variable "ami" {
     }
 }
 
-variable aws_instance_count_docker {
-    description = "The number of docker instances to create"
+variable aws_instance_count {
+    description = "The number of instances to create"
     default = "1"
 }
 
-variable aws_instance_type_docker {
-    description = "AWS instance type to use for docker servers"
+variable aws_instance_type {
+    description = "AWS instance type to use"
     default = "m4.large"
 }
 
-variable linux_distro_name_docker {
-    description = "AWS instance linux distro name to use for docker servers"
+variable linux_distro_name {
+    description = "AWS instance linux distro name to use"
     default = "ubuntu"
 }
 
-variable linux_distro_version_docker {
-    description = "AWS instance linux distro version to use for docker servers"
+variable linux_distro_version {
+    description = "AWS instance linux distro version to use"
     default = "16.04"
 }
 
-variable ssh_key_path_docker {
+variable ssh_key_path {
     description = "Path to ssh private key file"
     default = "~/.ssh/id_rsa.sofwerx"
 }
 
-variable ebs_root_volume_size_docker {
-    description = "EBS Root Volume Size for docker servers"
-    default = "100"
+variable ebs_root_volume_size {
+    description = "EBS Root Volume Size"
+    default = "20"
 }
 
+variable ebs_data_volume_size {
+    description = "EBS Data Volume Size"
+    default = "100"
+}
 
