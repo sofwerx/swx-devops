@@ -1,10 +1,30 @@
 #!/bin/bash
-#
-## Discover public and private IP for this instance
-#PUBLIC_IPV4="$(curl -qs http://169.254.169.254/2014-11-05/meta-data/public-ipv4)"
-#[ -n "$PUBLIC_IPV4" ] || PUBLIC_IPV4="$(curl -qs ipinfo.io/ip)"
-#PRIVATE_IPV4="$(curl -qs http://169.254.169.254/2014-11-05/meta-data/local-ipv4)"
-#[ -n "$PRIVATE_IPV4" ] || PRIVATE_IPV4="$(ip addr show eth0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)"
+
+while ! dmesg | grep xvdh ; do
+  echo "Waiting for EBS volume to attach"
+  sleep 1
+done
+
+# Mount the EBS /data volume
+if [ ! -f /data/.created ]; then
+  mkdir -p /data
+  if ! mount /dev/xvdh4 /data; then
+    mkfs -t ext4 /dev/xvdh4
+    mount /dev/xvdh4 /data
+    touch /data/.created
+  fi
+fi
+
+# Install dokku if it hasn't been yet
+if ! id dokku; then
+  wget https://raw.githubusercontent.com/dokku/dokku/v0.10.5/bootstrap.sh;
+  sudo DOKKU_TAG=v0.10.5 bash bootstrap.sh
+fi
+
+## Discover public and private IPv4 addresses for this instance
+PUBLIC_IPV4="$(curl -qs http://169.254.169.254/2014-11-05/meta-data/public-ipv4)"
+PRIVATE_IPV4="$(curl -qs http://169.254.169.254/2014-11-05/meta-data/local-ipv4)"
+
 #PUBLIC_IPV6="$(printf '2002:%02x%02x:%02x%02x' $(echo $PUBLIC_IPV4 | tr '.' ' '))"
 #
 ## Generate a 6to4 interface config

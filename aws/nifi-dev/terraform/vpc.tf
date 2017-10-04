@@ -4,11 +4,18 @@
  *
  ******************************************************************************/
 
+provider "aws" {
+  region = "${var.aws_region}"
+  access_key = "${var.aws_access_key_id}"
+  secret_key = "${var.aws_secret_access_key}"
+}
+
 resource "aws_vpc" "vpc" {
 
     cidr_block = "${var.vpc_network_cidr}"
     enable_dns_support = "true"
     enable_dns_hostnames = "true"
+    assign_generated_ipv6_cidr_block = true
 
     tags {
         Name = "vpc-${var.Project}-${var.Environment}"
@@ -16,6 +23,12 @@ resource "aws_vpc" "vpc" {
         Environment = "${var.Environment}"
     }
 }
+
+/*
+resource "aws_egress_only_internet_gateway" "ipv6_egress" {
+  vpc_id = "${aws_vpc.vpc.id}"
+}
+*/
 
 resource "aws_subnet" "subnet" {
   count = "${var.vpc_subnet_count}"
@@ -80,6 +93,29 @@ resource "aws_security_group_rule" "sg_ingress_ssh" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+
+    security_group_id = "${aws_security_group.sg.id}"
+}
+
+resource "aws_security_group_rule" "sg_ingress_web" {
+    type = "ingress"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+
+    security_group_id = "${aws_security_group.sg.id}"
+}
+
+resource "aws_security_group_rule" "sg_ingress_dokkusetup" {
+    type = "ingress"
+    from_port = 2000
+    to_port = 2000
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
 
     security_group_id = "${aws_security_group.sg.id}"
 }
@@ -90,6 +126,7 @@ resource "aws_security_group_rule" "sg_ingress_docker" {
     to_port = 2376
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
 
     security_group_id = "${aws_security_group.sg.id}"
 }
@@ -104,12 +141,23 @@ resource "aws_security_group_rule" "sg_ingress_all_icmp" {
     security_group_id = "${aws_security_group.sg.id}"
 }
 
+resource "aws_security_group_rule" "sg_ingress_all_icmpv6" {
+    type = "ingress"
+    from_port = -1
+    to_port = -1
+    protocol = "icmpv6"
+    ipv6_cidr_blocks = ["::/0"]
+
+    security_group_id = "${aws_security_group.sg.id}"
+}
+
 resource "aws_security_group_rule" "sg_ingress_nifi" {
     type = "ingress"
     from_port = 8080
     to_port = 8080
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
 
     security_group_id = "${aws_security_group.sg.id}"
 }
@@ -249,10 +297,37 @@ resource "aws_volume_attachment" "instance-attachment" {
   force_detach = true
 }
 
-resource "aws_eip" "ip" {
+data "aws_route53_zone" "selected" {
+  name         = "${var.dns_zone}"
+  private_zone = false
+}
+
+/* Define a project-environment-instance.zone A record */
+resource "aws_route53_record" "instance" {
   count = "${var.aws_instance_count}"
-  instance = "${element(aws_instance.instance.*.id, count.index)}"
-  vpc      = true
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
+  name    = "${var.Project}-${var.Environment}-${count.index}.devwerx.org"
+  type    = "A"
+  ttl     = "300"
+  records = ["${element(aws_instance.instance.*.public_ip, count.index)}"]
+}
+
+/* Define a project-environment.zone round-robin of A records */
+resource "aws_route53_record" "project-name" {
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
+  name    = "${var.Project}-${var.Environment}.devwerx.org"
+  type    = "A"
+  ttl     = "300"
+  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+}
+
+/* Define a project-environment.zone wildcard of round-robin A records */
+resource "aws_route53_record" "wildcard-project-name" {
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
+  name    = "*.${var.Project}-${var.Environment}.devwerx.org"
+  type    = "A"
+  ttl     = "300"
+  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
 }
 
 output "hostname_list" {
@@ -263,11 +338,15 @@ output "ec2_ids" {
   value = "${join(",", aws_instance.instance.*.id)}"
 }
 
-output "ec2_ips" {
+output "ec2_ipv4" {
   value = "${join(",", aws_instance.instance.*.public_ip)}"
 }
 
-output "public_ips" {
-  value = "${join(",", aws_eip.ip.*.public_ip)}"
+output "ec2_ipv6" {
+  value = "${join(",", aws_instance.instance.*.ipv6_addresses)}"
+}
+
+output "fqdns" {
+  value = "${join(",", aws_route53_record.instance.*.fqdn)}"
 }
 

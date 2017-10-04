@@ -8,6 +8,11 @@ variable Environment {
   default = "dev"
 }
 
+variable dns_zone {
+  description = "DNS Zone"
+  default = "devwerx.org."
+}
+
 variable aws_access_key_id {
   description = "AWS Access Key"
 }
