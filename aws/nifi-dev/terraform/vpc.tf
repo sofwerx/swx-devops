@@ -179,7 +179,7 @@ resource "aws_iam_policy_attachment" "iam_policy_attachment" {
 
 resource "aws_iam_instance_profile" "iam_instance_profile" {
     name = "${var.Project}-${var.Environment}-instance_profile"
-    roles = ["${aws_iam_role.iam_role.name}"]
+    role = "${aws_iam_role.iam_role.name}"
 }
 
 resource "aws_key_pair" "ssh_key" {
@@ -195,8 +195,11 @@ resource "aws_ebs_volume" "ebs" {
   size = "${var.ebs_data_volume_size}"
   type = "gp2"
 
+  encrypted = true
+
   tags {
-    Name = "${var.Project}-${var.Environment}-${count.index}-data"
+    Name = "${var.Project}-${var.Environment}-${count.index}"
+    Purpose = "data"
   }
 }
 
@@ -232,10 +235,13 @@ resource "aws_instance" "instance" {
     volume_size = "${var.ebs_root_volume_size}"
   }
 
+  volume_tags {
+    Name = "${var.Project}-${var.Environment}-${count.index}"
+  }
   user_data = "${file("../user-env.sh")}"
 }
 
-resource "aws_volume_attachment" "instance-lvm-attachment" {
+resource "aws_volume_attachment" "instance-attachment" {
   count = "${var.aws_instance_count}"
   device_name = "xvdh"
   instance_id = "${element(aws_instance.instance.*.id, count.index)}"
@@ -243,15 +249,25 @@ resource "aws_volume_attachment" "instance-lvm-attachment" {
   force_detach = true
 }
 
-#output "hostname_list" {
-#  value = "${join(\",\", aws_instance.instance.*.tags.Name)}"
-#}
-#
-#output "ec2_ids" {
-#  value = "${join(\",\", aws_instance.instance.*.id)}"
-#}
-#
-#output "ec2_ips" {
-#  value = "${join(\",\", aws_instance.instance.*.public_ip)}"
-#}
-#
+resource "aws_eip" "ip" {
+  count = "${var.aws_instance_count}"
+  instance = "${element(aws_instance.instance.*.id, count.index)}"
+  vpc      = true
+}
+
+output "hostname_list" {
+  value = "${join(",", aws_instance.instance.*.tags.Name)}"
+}
+
+output "ec2_ids" {
+  value = "${join(",", aws_instance.instance.*.id)}"
+}
+
+output "ec2_ips" {
+  value = "${join(",", aws_instance.instance.*.public_ip)}"
+}
+
+output "public_ips" {
+  value = "${join(",", aws_eip.ip.*.public_ip)}"
+}
+
