@@ -5,13 +5,13 @@ while ! dmesg | grep xvdh ; do
   sleep 1
 done
 
-# Mount the EBS /data volume
-if [ ! -f /data/.created ]; then
-  mkdir -p /data
-  if ! mount /dev/xvdh4 /data; then
+# Mount the EBS /var/lib/docker volume
+if [ ! -f /var/lib/docker/.created ]; then
+  mkdir -p /var/lib/docker
+  if ! mount /dev/xvdh4 /var/lib/docker; then
     mkfs -t ext4 /dev/xvdh4
-    mount /dev/xvdh4 /data
-    touch /data/.created
+    mount /dev/xvdh4 /var/lib/docker
+    touch /var/lib/docker/.created
   fi
 fi
 

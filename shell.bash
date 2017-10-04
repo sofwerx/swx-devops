@@ -18,13 +18,14 @@ export TF_VAR_aws_access_key_id=${AWS_ACCESS_KEY_ID}
 export TF_VAR_aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
 
 # The trousseau and terraform commands need buckets
-export TROUSSEAU_BUCKET="${TROUSSEAU_BUCKET:-sofwerx-trousseau}"
 export TROUSSEAU_STORE="${TROUSSEAU_STORE:-${devops}/.trousseau}"
 
 if [ -z "${TROUSSEAU_PASSPHRASE}" ] ; then
   echo "To save yourself some passphrase prompting pain, you probably want to:"
   echo "    export TROUSSEAU_PASSPHRASE={your pgp passphrase}"
 fi
+
+export MACHINE_STORAGE_PATH=${devops}/secrets/
 
 # Spawn a subshell
 exec bash $@

@@ -37,6 +37,9 @@ resource "aws_subnet" "subnet" {
   cidr_block = "${cidrsubnet(var.vpc_network_cidr, var.vpc_subnet_network_bits, count.index)}"
   availability_zone = "${element(split(",",lookup(var.aws_availability_zones, var.aws_region)), count.index % length(split(",",lookup(var.aws_availability_zones, var.aws_region))))}"
 
+  ipv6_cidr_block = "${cidrsubnet(aws_vpc.vpc.ipv6_cidr_block, 8, count.index)}"
+  assign_ipv6_address_on_creation = true
+
   tags {
     Name = "subnet${count.index}-${var.Project}-${var.Environment}"
     Project = "${var.Project}"
@@ -54,12 +57,24 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-resource "aws_route_table" "route" {
+resource "aws_route_table" "default" {
   vpc_id = "${aws_vpc.vpc.id}"
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.igw.id}"
   }
+
+  route {
+    ipv6_cidr_block = "::/0"
+    gateway_id = "${aws_internet_gateway.igw.id}"
+  }
+
+/*
+  route {
+    ipv6_cidr_block = "::/0"
+    egress_only_gateway_id = "${aws_egress_only_internet_gateway.ipv6_egress.id}"
+  }
+*/
 
   tags {
     Name = "route-${var.Project}-${var.Environment}"
@@ -72,7 +87,7 @@ resource "aws_route_table_association" "rta" {
   count = "${var.vpc_subnet_count}"
   
   subnet_id = "${element(aws_subnet.subnet.*.id, count.index)}"
-  route_table_id = "${aws_route_table.route.id}"
+  route_table_id = "${aws_route_table.default.id}"
 }
 
 resource "aws_security_group" "sg" {
@@ -177,6 +192,7 @@ resource "aws_security_group_rule" "sg_egress_all_out" {
     to_port = 0
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
     security_group_id = "${aws_security_group.sg.id}"
 }
 
