@@ -247,7 +247,6 @@ resource "aws_ebs_volume" "ebs" {
 
   tags {
     Name = "${var.Project}-${var.Environment}-${count.index}"
-    Purpose = "data"
   }
 }
 
