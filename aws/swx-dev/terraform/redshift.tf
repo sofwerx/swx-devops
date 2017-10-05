@@ -24,7 +24,6 @@ resource "aws_redshift_cluster" "default" {
   final_snapshot_identifier = "${var.Project}-${var.Lifecycle}"
   skip_final_snapshot = false
   enable_logging = false
-  s3_key_prefix = "/${var.Project}-${var.Lifecycle}/redshift"
 
   tags {
     Name = "${var.Project}-${var.Lifecycle}"
@@ -45,12 +44,23 @@ resource "aws_redshift_subnet_group" "default" {
 }
 
 resource "aws_redshift_parameter_group" "default" {
-  name   = "parameter-group-test-terraform"
+  name   = "${var.Project}-${var.Lifecycle}"
   family = "redshift-1.0"
 
   parameter {
     name  = "require_ssl"
     value = "true"
   }
-
 }
+
+resource "aws_security_group_rule" "sg_ingress_redshift" {
+  type = "ingress"
+  from_port = 5439
+  to_port = 5439
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+
+  security_group_id = "${aws_security_group.sg.id}"
+}
+
