@@ -63,7 +63,7 @@ The AWS documentation for this can be found here:
 
 - http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
 
-# Running
+## Running `aws`
 
 To find out what AWS IAM user you are currently using the credentials for:
 
@@ -82,7 +82,6 @@ To find out what AWS IAM user you are currently using the credentials for:
 We use `terraform` to deploy and converge our cloud resources.
 
 - https://www.terraform.io/
-
 
 ## terraform
 
