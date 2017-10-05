@@ -84,12 +84,12 @@ To find out what AWS IAM user you are currently using the credentials for:
     $ aws iam get-user
     {
         "User": {
-            "UserName": "Ianblenke",
+            "UserName": "ianblenke",
             "PasswordLastUsed": "2017-10-03T13:51:54Z",
             "CreateDate": "2017-10-03T12:49:28Z",
-            "UserId": "AIDAIBZNZKYZ7ISZ57FRA",
+            "UserId": "AIDAREDACTED2REDACTED",
             "Path": "/",
-            "Arn": "arn:aws:iam::094013511888:user/Ianblenke"
+            "Arn": "arn:aws:iam::123456789012:user/ianblenke"
         }
     }
 
@@ -196,4 +196,8 @@ To delete a key:
     trousseau del myvariable
 
 Running `trousseau` on its own will show the other usable commands.
+
+# Project Environments
+
+- [swx-dev](aws/swx-dev/README.md)
 
