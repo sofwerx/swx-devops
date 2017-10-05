@@ -4,7 +4,7 @@ This project contains documentation and infrastructure as code for our internal 
 
 There are a number of tools that will need to be installed:
 
-- aws-cli
+- awscli
 - terraform
 - gnupg 2.0
 - trousseau
@@ -23,10 +23,10 @@ Alternatively, or under Linux, you can use python `pip` to install it as well:
 
 The ~/.aws/ folder contains two files: `config` and `credentials`.
 
-The `config` file contains aws-cli configurations.
+The `config` file contains awscli configurations.
 The `credentials` file contains your `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` credentials.
 
-By default, aws-cli likes to use the "default" `AWS_PROFILE`.
+By default, awscli likes to use the "default" `AWS_PROFILE`.
 Our `shell.bash` assumes that you will be using an `AWS_PROFILE` name of "sofwerx".
 
 The reasoning here is that you can manage multiple profiles for different AWS credentials under different profiles.
