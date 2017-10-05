@@ -23,8 +23,7 @@ resource "aws_redshift_cluster" "default" {
   encrypted  = true
   final_snapshot_identifier = "${var.Project}-${var.Lifecycle}"
   skip_final_snapshot = false
-  bucket_name = "sofwerx-logs"
-  enable_logging = true
+  enable_logging = false
   s3_key_prefix = "/${var.Project}-${var.Lifecycle}/redshift"
 
   tags {
@@ -54,13 +53,4 @@ resource "aws_redshift_parameter_group" "default" {
     value = "true"
   }
 
-  parameter {
-    name  = "query_group"
-    value = "example"
-  }
-
-  parameter {
-    name  = "enable_user_activity_logging"
-    value = "true"
-  }
 }
