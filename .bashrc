@@ -80,5 +80,24 @@ fi
 
 alias trousseau="$(which trousseau) --gnupg-home $GNUPGHOME --store $TROUSSEAU_STORE"
 
+secret_decrypt ()
+{
+  secret="$@"
+  trousseau get "file:$secret" | openssl enc -base64 -d -A > "./$secret"
+}
+
+secret_encrypt ()
+{
+  secret="$@"
+  trousseau set "file:$1" "$(openssl enc -base64 -A -in $1)"
+}
+
+secrets_pull ()
+{
+  trousseau keys | grep -e '^file:secrets/' | sed -e 's/^file://' | while read file; do
+    secret_decrypt "$file"
+  done
+}
+
 # Docker variables
 export MACHINE_STORAGE_PATH=${devops}/secrets/docker
