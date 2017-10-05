@@ -1,6 +1,6 @@
 variable Project {
   description = "Project name"
-  default = "nifi"
+  default = "swx"
 }
 
 variable Environment {

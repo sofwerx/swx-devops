@@ -11,4 +11,4 @@ apply:
 	terraform apply
 
 .terraform:
-	terraform init --backend-config="key=nifi/dev/terraform.tfstate"
+	terraform init --backend-config="key=swx/dev/terraform.tfstate"
