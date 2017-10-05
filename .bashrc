@@ -57,8 +57,6 @@ fi
 # The trousseau and terraform commands need buckets
 export TROUSSEAU_STORE="${TROUSSEAU_STORE:-${devops}/.trousseau}"
 
-# TROUSSEAU_KEYRING_SERVICE
-# TROUSSEAU_MASTER_GPG_ID
 # TROUSSEAU_PRIVATE_KEY
 if [ -z "${TROUSSEAU_PASSPHRASE}" ] &&
    [ -z "${TROUSSEAU_KEYRING_SERVICE}" ] &&
