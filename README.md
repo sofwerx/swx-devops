@@ -4,24 +4,10 @@ This project contains documentation and infrastructure as code for our internal 
 
 There are a number of tools that will need to be installed:
 
-- jq
 - aws-cli
 - terraform
 - gnupg 2.0
 - trousseau
-
-# jq
-
-If you are on a mac, you can install `jq` with Homebrew:
-
-    brew install jq
-
-Installing the `jq` package on Linux should be as simple as one of:
-
-    apt-get install jq
-    yum install jq
-
-We need this to allow our scripts to process json output. Learn this tool, you really want to.
 
 # awscli
 
