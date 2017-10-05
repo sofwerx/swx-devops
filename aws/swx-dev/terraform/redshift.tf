@@ -7,7 +7,7 @@ resource "aws_route53_record" "redshift" {
   name    = "redshift-${var.Project}-${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_eip.redshift.public_ip)}"]
+  records = ["${aws_eip.redshift.public_ip}"]
 }
 
 resource "aws_redshift_cluster" "default" {
@@ -18,8 +18,8 @@ resource "aws_redshift_cluster" "default" {
   cluster_type = "single_node"
   node_type = "dc1.large"
   cluster_type = "single-node"
-  availability_zone = "us-east-1"
-  elastic_ip = "${aws_eip.redshift.id}"
+  availability_zone = "us-east-1a"
+  elastic_ip = "${aws_eip.redshift.public_ip}"
   encrypted  = true
   final_snapshot_identifier = "${var.Project}-${var.Lifecycle}"
   skip_final_snapshot = false
