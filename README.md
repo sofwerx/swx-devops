@@ -211,7 +211,11 @@ To encrypt a file under secrets, I would use the following function:
 
 After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
 
-## aliases
+## .bashrc
+
+The "glue" of this harness is currently in the `.bashrc` file.
+
+This will eventually get broken out into a script directory as simplicity demands it.
 
 The current reasoning behind using aliases is so that running `alias` at any time will show you a list of our "special" commands unique to this project.
 
