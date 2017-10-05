@@ -1,17 +1,35 @@
 #!/bin/bash
 
 while ! dmesg | grep xvdh ; do
-  echo "Waiting for EBS volume to attach"
+  echo "Waiting for home EBS volume to attach"
   sleep 1
 done
 
+while ! dmesg | grep xvdi ; do
+  echo "Waiting for docker EBS volume to attach"
+  sleep 1
+done
+
+# Mount the EBS /home volume
+if [ ! -f /home/.donotdeleteme ]; then
+  mkdir -p /home
+  if ! mount /dev/xvdh /home; then
+    mkfs -t ext4 /dev/xvdh
+    mount /dev/xvdh /mnt
+    rsync -SHPaxv /home/ /mnt/
+    umount /mnt
+    mount /dev/xvdh /home
+    touch /home/.donotdeleteme
+  fi
+fi
+
 # Mount the EBS /var/lib/docker volume
-if [ ! -f /var/lib/docker/.created ]; then
+if [ ! -f /var/lib/docker/.donotdeleteme ]; then
   mkdir -p /var/lib/docker
-  if ! mount /dev/xvdh4 /var/lib/docker; then
-    mkfs -t ext4 /dev/xvdh4
-    mount /dev/xvdh4 /var/lib/docker
-    touch /var/lib/docker/.created
+  if ! mount /dev/xvdi /var/lib/docker; then
+    mkfs -t ext4 /dev/xvdi
+    mount /dev/xvdi /var/lib/docker
+    touch /var/lib/docker/.donotdeleteme
   fi
 
   ## Discover public and private IPv4 addresses for this instance
@@ -27,25 +45,7 @@ if [ ! -f /var/lib/docker/.created ]; then
   ## Install some extra things
   sudo apt-get update
   export DEBIAN_FRONTEND=noninteractive
-  sudo -E apt-get install -y fail2ban radvd dnsmasq
-
-## Prepare a radvd config, in case we want to announce a /64 to a VPN overlay
-#cat << EOR
-## AWS Does not allow broadcasts, so NDP isn't going to work
-## This needs to be an internal vpn overlay interface
-#interface vpn0
-#{
-#    AdvSendAdvert on;
-#    prefix 0:0:0:D00D::/64
-#    {
-#        AdvOnLink on;
-#        AdvAutonomous on;
-#        Base6to4Interface 6to4;
-#    };
-#};
-#EOR
-
-  /etc/init.d/radvd restart
+  sudo -E apt-get install -y fail2ban dnsmasq
 
   # Deal with AWS split-horizon DNS and using both IPV4 and IPV6 DNS servers
 
@@ -85,7 +85,6 @@ EOC
   cat <<EOR > /etc/resolv.conf
 search $domains
 nameserver $PRIVATE_IPV4
-nameserver ${PUBLIC_IPV6}::1
 EOR
 
   /etc/init.d/dnsmasq restart
@@ -105,26 +104,5 @@ EOR
     sudo DOKKU_TAG=v0.10.5 bash bootstrap.sh
   fi
 
-  #service docker stop
-
-  # https://docs.docker.com/engine/userguide/networking/default_network/ipv6/
-  cat <<EOD > /etc/default/docker
-# Docker Upstart and SysVinit configuration file
-
-# Customize location of Docker binary (especially for development testing).
-#DOCKER="/usr/local/bin/docker"
-
-# Use DOCKER_OPTS to modify the daemon startup options.
-#DOCKER_OPTS="--dns 8.8.8.8 --dns 8.8.4.4"
-DOCKER_OPTS="--ipv6 --fixed-cidr-v6=${PUBLIC_IPV6}:D0CC::/80 --bip=172.17.0.1/16 --fixed-cidr=172.17.0.1/16"
-
-# If you need Docker to use an HTTP proxy, it can also be specified here.
-#export http_proxy="http://127.0.0.1:3128/"
-
-# This is also a handy place to tweak where Docker's temporary files go.
-#export TMPDIR="/mnt/bigdrive/docker-tmp"
-EOD
-
-  service docker restart
 fi
 
