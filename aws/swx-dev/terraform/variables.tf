@@ -99,7 +99,7 @@ variable linux_distro_version {
 
 variable ssh_key_path {
     description = "Path to ssh private key file"
-    default = "~/.ssh/id_rsa.sofwerx"
+    default = "../../../secrets/ssh/sofwerx"
 }
 
 variable ebs_root_volume_size {
