@@ -155,6 +155,26 @@ The result of any trousseau commands will act ion the `.trousseau` file in the c
 This file is under .git management, and is entirely safe as the contents of the file are encrypted.
 This is far easier than dealing with a shared s3 bucket or other shared repository.
 
+## Sourcing `shell.bash`
+
+Before running trousseau or any other tools against a project environment, you will need to obtain a shell using `shell.bash` first:
+
+    icbmbp:swx-devops ianblenke$ . shell.bash
+
+Instead of using the dot (.) command, you can also use the `source` command. Both accomplish the same thing:
+
+    icbmbp:swx-devops ianblenke$ source shell.bash
+
+After doing this, you will get a prompt that tells you the `AWS_PROFILE` and `SWX_ENVIRONMENT`, like so:
+
+    [sofwerx:] icbvtcmbp:swx-devops ianblenke$
+
+Note that there is no selected `SWX_ENVIRONMENT` yet. To select `swx-dev`, you would use this function:
+
+    switch_environment swx-dev
+
+If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
+
 ## Using trousseau
 
 After your gpg/ PR is merged, you need to get someone else who is already a trusted trousseau recipient to add your public key to their keychain and then run `trousseau add-recipient` for your email address:
@@ -194,6 +214,7 @@ After your gpg key is added, and you are added as a trousseau reciepient, you wi
 Our key naming convention will evolve over time.
 
 - `file:` prefixed trousseau keys hold base64 encoded values of the content of the files.
+- `environment:` prefixed trousseau keys hold enviroment variables for terraform to use
 
 There are 2 functions and an alias presently defined in the `.bashrc` to automate this process.
 

@@ -18,9 +18,9 @@ resource "aws_vpc" "vpc" {
     assign_generated_ipv6_cidr_block = true
 
     tags {
-        Name = "vpc-${var.Project}-${var.Environment}"
+        Name = "vpc-${var.Project}-${var.Lifecycle}"
         Project = "${var.Project}"
-        Environment = "${var.Environment}"
+        Lifecycle = "${var.Lifecycle}"
     }
 }
 
@@ -36,9 +36,9 @@ resource "aws_subnet" "instances" {
   assign_ipv6_address_on_creation = true
 
   tags {
-    Name = "subnet${count.index}-${var.Project}-${var.Environment}-instances"
+    Name = "subnet${count.index}-${var.Project}-${var.Lifecycle}-instances"
     Project = "${var.Project}"
-    Environment = "${var.Environment}"
+    Lifecycle = "${var.Lifecycle}"
   }
 }
 
@@ -46,9 +46,9 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = "${aws_vpc.vpc.id}"
 
   tags {
-    Name = "igw-${var.Project}-${var.Environment}"
+    Name = "igw-${var.Project}-${var.Lifecycle}"
     Project = "${var.Project}"
-    Environment = "${var.Environment}"
+    Lifecycle = "${var.Lifecycle}"
   }
 }
 
@@ -65,9 +65,9 @@ resource "aws_route_table" "default" {
   }
 
   tags {
-    Name = "route-${var.Project}-${var.Environment}-default"
+    Name = "route-${var.Project}-${var.Lifecycle}-default"
     Project = "${var.Project}"
-    Environment = "${var.Environment}"
+    Lifecycle = "${var.Lifecycle}"
   }
 }
 
@@ -79,14 +79,14 @@ resource "aws_route_table_association" "default" {
 }
 
 resource "aws_security_group" "sg" {
-  name = "${var.Project}-${var.Environment}"
-  description = "Security Group for ${var.Project}-${var.Environment}"
+  name = "${var.Project}-${var.Lifecycle}"
+  description = "Security Group for ${var.Project}-${var.Lifecycle}"
   vpc_id = "${aws_vpc.vpc.id}"
 
   tags {
-      Name = "sg-${var.Project}-${var.Environment}"
+      Name = "sg-${var.Project}-${var.Lifecycle}"
       Project = "${var.Project}"
-      Environment = "${var.Environment}"
+      Lifecycle = "${var.Lifecycle}"
   }
 }
 
@@ -197,7 +197,7 @@ resource "aws_security_group_rule" "sg_egress_all_out" {
 }
 
 resource "aws_iam_role" "iam_role" {
-    name = "${var.Project}-${var.Environment}-instance_role"
+    name = "${var.Project}-${var.Lifecycle}-instance_role"
     assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -216,7 +216,7 @@ EOF
 }
 
 resource "aws_iam_policy" "iam_policy" {
-    name = "${var.Project}-${var.Environment}-instance_policy"
+    name = "${var.Project}-${var.Lifecycle}-instance_policy"
     path = "/"
     description = "Platform IAM Policy"
     policy = <<EOF
@@ -236,18 +236,18 @@ EOF
 }
 
 resource "aws_iam_policy_attachment" "iam_policy_attachment" {
-    name = "${var.Project}-${var.Environment}-policy_attach"
+    name = "${var.Project}-${var.Lifecycle}-policy_attach"
     roles = ["${aws_iam_role.iam_role.name}"]
     policy_arn = "${aws_iam_policy.iam_policy.arn}"
 }
 
 resource "aws_iam_instance_profile" "iam_instance_profile" {
-    name = "${var.Project}-${var.Environment}-instance_profile"
+    name = "${var.Project}-${var.Lifecycle}-instance_profile"
     role = "${aws_iam_role.iam_role.name}"
 }
 
 resource "aws_key_pair" "ssh_key" {
-  key_name = "${var.Project}-${var.Environment}" 
+  key_name = "${var.Project}-${var.Lifecycle}" 
   public_key = "${file("${var.ssh_key_path}.pub")}"
 }
 
@@ -262,7 +262,7 @@ resource "aws_ebs_volume" "home" {
   encrypted = true
 
   tags {
-    Name = "${var.Project}-${var.Environment}-${count.index}"
+    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
   }
 }
 
@@ -277,7 +277,7 @@ resource "aws_ebs_volume" "docker" {
   encrypted = true
 
   tags {
-    Name = "${var.Project}-${var.Environment}-${count.index}"
+    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
   }
 }
 
@@ -303,9 +303,9 @@ resource "aws_instance" "instance" {
   }
 
   tags {
-    Name = "${var.Project}-${var.Environment}-${count.index}"
+    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
     Project = "${var.Project}"
-    Environment = "${var.Environment}"
+    Lifecycle = "${var.Lifecycle}"
   }
     
   root_block_device {
@@ -315,7 +315,7 @@ resource "aws_instance" "instance" {
   }
 
   volume_tags {
-    Name = "${var.Project}-${var.Environment}-${count.index}"
+    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
   }
   user_data = "${file("../user-env.sh")}"
 }
@@ -345,7 +345,7 @@ data "aws_route53_zone" "selected" {
 resource "aws_route53_record" "instance" {
   count = "${var.aws_instance_count}"
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "${var.Project}-${var.Environment}-${count.index}.devwerx.org"
+  name    = "${var.Project}-${var.Lifecycle}-${count.index}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
   records = ["${element(aws_instance.instance.*.public_ip, count.index)}"]
@@ -354,7 +354,7 @@ resource "aws_route53_record" "instance" {
 /* Define a project-environment.zone round-robin of A records */
 resource "aws_route53_record" "project-name" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "${var.Project}-${var.Environment}.devwerx.org"
+  name    = "${var.Project}-${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
   records = ["${join(",", aws_instance.instance.*.public_ip)}"]
@@ -363,7 +363,7 @@ resource "aws_route53_record" "project-name" {
 /* Define a project-environment.zone wildcard of round-robin A records */
 resource "aws_route53_record" "wildcard-project-name" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "*.${var.Project}-${var.Environment}.devwerx.org"
+  name    = "*.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
   records = ["${join(",", aws_instance.instance.*.public_ip)}"]

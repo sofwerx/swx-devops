@@ -3,7 +3,7 @@ variable Project {
   default = "swx"
 }
 
-variable Environment {
+variable Lifecycle {
   description = "Lifecycle (dev, qa, prod)"
   default = "dev"
 }
@@ -115,5 +115,13 @@ variable ebs_home_volume_size {
 variable ebs_docker_volume_size {
     description = "EBS Docker Volume Size"
     default = "100"
+}
+
+variable redshift_master_username {
+    description = "AWS Redshift master username"
+}
+
+variable redshift_master_password {
+    description = "AWS Redshift master password"
 }
 

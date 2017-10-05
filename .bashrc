@@ -12,7 +12,7 @@ export AWS_DEFAULT_REGION=${AWS_REGION}
 export AWS_DEFAULT_OUTPUT=$(aws configure get output --profile $AWS_PROFILE)
 
 # Set the bash prompt to show our $AWS_PROFILE
-export PS1='[$AWS_PROFILE] \h:\W \u\$ '
+export PS1='[$AWS_PROFILE:$SWX_ENVIRONMENT] \h:\W \u\$ '
 
 # These variables become available for terraform to use
 export TF_VAR_aws_region=${AWS_REGION}
@@ -92,6 +92,28 @@ secret_encrypt ()
 
 alias secrets_pull='trousseau keys | grep -e ^file:secrets/ | sed -e s/^file:// | while read file; do secret_decrypt "$file"; done'
 alias recipients_add='ls -1 gpg | while read recipient; do trousseau add-recipient $recipient; done'
+
+switch_environment ()
+{
+  environment=$1
+
+  # Undefine any variables from an already sourced environment
+  if [ -n $SWX_ENVIRONMENT ]; then
+    trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://" | while read variable ; do
+      set -x
+      unset $variable
+      set +x
+    done
+  fi
+
+  # Define variables from the newly selected environment
+  export SWX_ENVIRONMENT=$environment
+  trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://" | while read variable ; do
+      set -x
+      export "${variable}=$(trousseau get environment:${SWX_ENVIRONMENT}:${variable})"
+      set +x
+  done
+}
 
 # Docker variables
 export MACHINE_STORAGE_PATH=${devops}/secrets/docker
