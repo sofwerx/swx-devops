@@ -79,11 +79,11 @@ To find out what AWS IAM user you are currently using the credentials for:
         }
     }
 
+## terraform
+
 We use `terraform` to deploy and converge our cloud resources.
 
 - https://www.terraform.io/
-
-## terraform
 
 To install the Hashicorp `terraform` command on a mac, install it with HomeBrew:
 
@@ -195,21 +195,27 @@ Our key naming convention will evolve over time.
 
 - `file:` prefixed trousseau keys hold base64 encoded values of the content of the files.
 
-There are 3 functions presently defined in the `.bashrc` to automate this process.
+There are 2 functions and an alias presently defined in the `.bashrc` to automate this process.
 
-To automatically pull all of the latest trousseau `file:secrets/` prefixed files, you can use:
+To automatically pull all of the latest trousseau `file:secrets/` prefixed files, you can use the alias:
 
     secrets_pull
 
-To decrypt a specific file under secrets, I would use the following command:
+To decrypt a specific file under secrets, I would use the following function:
 
     secret_decrypt secrets/ssh/sofwerx
 
-To encrypt a file under secrets, I would use the following command:
+To encrypt a file under secrets, I would use the following function:
 
     secret_encrypt secrets/ssh/sofwerx
 
 After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
+
+## aliases
+
+The current reasoning behind using aliases is so that running `alias` at any time will show you a list of our "special" commands unique to this project.
+
+This will likely evolve over time toward functions and a proper command wrapper.
 
 # Project Environments
 

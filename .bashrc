@@ -90,12 +90,8 @@ secret_encrypt ()
   trousseau set "file:$1" "$(openssl enc -base64 -A -in $1)"
 }
 
-secrets_pull ()
-{
-  trousseau keys | grep -e '^file:secrets/' | sed -e 's/^file://' | while read file; do
-    secret_decrypt "$file"
-  done
-}
+alias secrets_pull='trousseau keys | grep -e ^file:secrets/ | sed -e s/^file:// | while read file; do secret_decrypt "$file"; done'
+alias recipients_add='ls -1 gpg | while read recipient; do trousseau add-recipient $recipient; done'
 
 # Docker variables
 export MACHINE_STORAGE_PATH=${devops}/secrets/docker
