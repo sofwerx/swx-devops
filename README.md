@@ -197,6 +197,35 @@ To delete a key:
 
 Running `trousseau` on its own will show the other usable commands.
 
+The `.trousseau` file in this project is the actual gpg encrypted contents used to manage our environments.
+If you fork this repo to use yourself, you will need to remove `.trousseau` and create a new one with `trousseau create {gpg key email or id}`
+
+## secrets/
+
+The `secrets/` folder is in `.gitignore` for a reason: this holds unencrypted files that contain credentials.
+
+After your gpg key is added, and you are added as a trousseau reciepient, you will then be able to use the trousseau command.
+
+Our key naming convention will evolve over time.
+
+- `file:` prefixed trousseau keys hold base64 encoded values of the content of the files.
+
+There are 3 functions presently defined in the `.bashrc` to automate this process.
+
+To automatically pull all of the latest trousseau `file:secrets/` prefixed files, you can use:
+
+    secrets_pull
+
+To decrypt a specific file under secrets, I would use the following command:
+
+    secret_decrypt secrets/ssh/sofwerx
+
+To encrypt a file under secrets, I would use the following command:
+
+    secret_encrypt secrets/ssh/sofwerx
+
+After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
+
 # Project Environments
 
 - [swx-dev](aws/swx-dev/README.md)
