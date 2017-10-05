@@ -30,22 +30,43 @@ resource "aws_egress_only_internet_gateway" "ipv6_egress" {
 }
 */
 
-resource "aws_subnet" "subnet" {
+resource "aws_subnet" "instances" {
   count = "${var.vpc_subnet_count}"
   
   vpc_id = "${aws_vpc.vpc.id}"
-  cidr_block = "${cidrsubnet(var.vpc_network_cidr, var.vpc_subnet_network_bits, count.index)}"
+  cidr_block = "${cidrsubnet(var.vpc_network_cidr, var.vpc_subnet_network_bits, (count.index+1) * 2)}"
   availability_zone = "${element(split(",",lookup(var.aws_availability_zones, var.aws_region)), count.index % length(split(",",lookup(var.aws_availability_zones, var.aws_region))))}"
 
-  ipv6_cidr_block = "${cidrsubnet(aws_vpc.vpc.ipv6_cidr_block, 8, count.index)}"
+  map_public_ip_on_launch = true
+  ipv6_cidr_block = "${cidrsubnet(aws_vpc.vpc.ipv6_cidr_block, 8, (count.index+1) * 2)}" /* Even numbered /64 networks are for instances eth0 */
   assign_ipv6_address_on_creation = true
 
   tags {
-    Name = "subnet${count.index}-${var.Project}-${var.Environment}"
+    Name = "subnet${count.index}-${var.Project}-${var.Environment}-instances"
     Project = "${var.Project}"
     Environment = "${var.Environment}"
   }
 }
+
+/*
+resource "aws_subnet" "dockers" {
+  count = "${var.vpc_subnet_count}"
+  
+  vpc_id = "${aws_vpc.vpc.id}"
+  cidr_block = "${cidrsubnet(var.vpc_network_cidr, var.vpc_subnet_network_bits, ((count.index+1) * 2) + 1)}"
+  availability_zone = "${element(split(",",lookup(var.aws_availability_zones, var.aws_region)), count.index % length(split(",",lookup(var.aws_availability_zones, var.aws_region))))}"
+
+  map_public_ip_on_launch = true
+  ipv6_cidr_block = "${cidrsubnet(aws_vpc.vpc.ipv6_cidr_block, 8, ((count.index+1) * 2) + 1)}" /* Odd numbered /64 networks are for docker0 */
+  assign_ipv6_address_on_creation = false
+
+  tags {
+    Name = "subnet${count.index}-${var.Project}-${var.Environment}-docker"
+    Project = "${var.Project}"
+    Environment = "${var.Environment}"
+  }
+}
+*/
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = "${aws_vpc.vpc.id}"
@@ -77,18 +98,51 @@ resource "aws_route_table" "default" {
 */
 
   tags {
-    Name = "route-${var.Project}-${var.Environment}"
+    Name = "route-${var.Project}-${var.Environment}-default"
     Project = "${var.Project}"
     Environment = "${var.Environment}"
   }
 }
 
-resource "aws_route_table_association" "rta" {
+resource "aws_route_table_association" "default" {
   count = "${var.vpc_subnet_count}"
   
-  subnet_id = "${element(aws_subnet.subnet.*.id, count.index)}"
+  subnet_id = "${element(aws_subnet.instances.*.id, count.index)}"
   route_table_id = "${aws_route_table.default.id}"
 }
+
+/* Create a route table for each docker segment through to its instance */
+/*
+resource "aws_route_table" "dockers" {
+  count = "${var.vpc_subnet_count}"
+  vpc_id = "${aws_vpc.vpc.id}"
+
+
+  tags {
+    Name = "route-${var.Project}-${var.Environment}-docker"
+    Project = "${var.Project}"
+    Environment = "${var.Environment}"
+  }
+}
+
+resource "aws_route" "docker" {
+  route_table_id = "${aws_vpc.vpc.default_route_table_id}"
+  count = "${var.vpc_subnet_count}"
+  destination_ipv6_cidr_block = "${cidrsubnet(aws_vpc.vpc.ipv6_cidr_block, 8, ((count.index+1) * 2) + 1)}" /* Odd numbered /64 networks are for docker0 */
+  instance_id = "${element(aws_instance.instance.*.id, count.index)}"
+}
+*/
+
+/* Associate each docker subnet with its own route table */
+/*
+resource "aws_route_table_association" "dockers" {
+  default_route_table_id = "${aws_vpc.vpc.default_route_table_id}"
+  count = "${var.vpc_subnet_count}"
+  
+  subnet_id = "${element(aws_subnet.dockers.*.id, count.index)}"
+  route_table_id = "${element(aws_route_table.dockers.*.id, count.index)}"
+}
+*/
 
 resource "aws_security_group" "sg" {
   name = "${var.Project}-${var.Environment}"
@@ -276,8 +330,9 @@ resource "aws_instance" "instance" {
   
   iam_instance_profile = "${aws_iam_instance_profile.iam_instance_profile.id}"
   vpc_security_group_ids = [ "${aws_security_group.sg.id}" ]
-  subnet_id = "${element(aws_subnet.subnet.*.id, count.index)}"
+  subnet_id = "${element(aws_subnet.instances.*.id, count.index)}"
   associate_public_ip_address = "true"
+  ipv6_address_count = 1
   
   key_name = "${aws_key_pair.ssh_key.key_name}"
 
