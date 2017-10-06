@@ -1,7 +1,7 @@
 # .bash_profile
 # Prepare our devops environment with variables, useful functions, and aliases.
 
-devops=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+devops="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 alias ch="cd ${devops}"
 
 export AWS_CONFIG_FILE=${AWS_CONFIG_FILE:-~/.aws/config}
@@ -28,31 +28,41 @@ else
   fi
 fi
 
-if [ -f "$HOME/.gpg-agent-info" ]; then
-  . "$HOME/.gpg-agent-info"
-  export GPG_AGENT_INFO
-  export SSH_AUTH_SOCK
-  export SSH_AGENT_PID
-fi
-
 if [ -d /usr/local/opt/gpg-agent ]; then
   export PATH="/usr/local/opt/gpg-agent/bin:$PATH"
   export PATH="/usr/local/opt/gpg-agent/libexec:$PATH"
 fi
 
+if [ -f "$HOME/.gpg-agent-info" ]; then
+  . "$HOME/.gpg-agent-info"
+  export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
+fi
+
 if [ -d $GNUPGHOME ] ; then
   KEYGRIP=$(gpg --fingerprint --fingerprint | grep fingerprint | tail -1 | cut -d= -f2 | sed -e 's/ //g')
-  alias gpg_remember="echo -n 'Please enter your gpg key passphrase: '; gpg-preset-passphrase --preset $KEYGRIP"
+  alias gpg_remember="echo -n 'Please enter your gpg key passphrase: '; stty -echo; gpg-preset-passphrase --preset $KEYGRIP ; stty echo ; echo ''"
   alias gpg_forget="gpg-preset-passphrase --forget $KEYGRIP"
   if [ -z "$GPG_AGENT_INFO" ]; then
     if which gpg-agent > /dev/null ; then
       GPG_TTY=$(tty)
       export GPG_TTY
 
-      gpg-agent --daemon --enable-ssh-support --write-env-file $HOME/.gpg-agent-info --allow-preset-passphrase
+      eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $HOME/.gpg-agent-info --allow-preset-passphrase)
     fi
   fi
   export TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1)
+fi
+
+# Use pinentry-mac if it is available
+if which pinentry-mac > /dev/null ; then
+  if ! grep pinentry-program $GNUPGHOME/gpg-agent.conf > /dev/null ; then
+    echo "pinentry-program /usr/local/bin/pinentry-mac" >> $GNUPGHOME/gpg-agent.conf
+  fi
+fi
+
+if gpg-agent --use-standard-socket-p ; then
+  echo "WARNING: Your gpg build/version/configuration is not compatible with trousseau: $(gpg --version | head -1)"
+  echo "If gpg is running with --use-standard-socket, GPG_AGENT_INFO will not be set, which trousseau needs to operate correctly"
 fi
 
 # The trousseau and terraform commands need buckets

@@ -111,6 +111,10 @@ To install the `gpg` command on a mac, install `gnupg@2.0` with HomeBrew:
     brew install gnupg@2.0
     brew link --force gnupg@2.0
 
+If you also install pinentry, you will get a nice pop-up dialog box for your gpg passphrase:
+
+    brew install pinentry
+
 The reason for gnupg 2.0 is that trousseau reads directly from `~/.gnupg/pubring.gpg`, and they did away with that file in gnupg 2.1
 
 After installing gnupg 2.0, you will want to generate a private/public keypair:
