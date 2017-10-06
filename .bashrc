@@ -36,21 +36,23 @@ fi
 if [ -f "$HOME/.gpg-agent-info" ]; then
   . "$HOME/.gpg-agent-info"
   export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
+else
+  if which gpg-agent > /dev/null ; then
+    GPG_TTY=$(tty)
+    export GPG_TTY
+
+    eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $HOME/.gpg-agent-info --allow-preset-passphrase)
+  fi
 fi
 
 if [ -d $GNUPGHOME ] ; then
+  export TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1)
   KEYGRIP=$(gpg --fingerprint --fingerprint | grep fingerprint | tail -1 | cut -d= -f2 | sed -e 's/ //g')
   alias gpg_remember="echo -n 'Please enter your gpg key passphrase: '; stty -echo; gpg-preset-passphrase --preset $KEYGRIP ; stty echo ; echo ''"
   alias gpg_forget="gpg-preset-passphrase --forget $KEYGRIP"
-  if [ -z "$GPG_AGENT_INFO" ]; then
-    if which gpg-agent > /dev/null ; then
-      GPG_TTY=$(tty)
-      export GPG_TTY
-
-      eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $HOME/.gpg-agent-info --allow-preset-passphrase)
-    fi
-  fi
-  export TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1)
+else
+  echo 'You may need to first generate a gpg key:'
+  echo '    gpg --gen-key'
 fi
 
 # Use pinentry-mac if it is available
@@ -72,15 +74,10 @@ export TROUSSEAU_STORE="${TROUSSEAU_STORE:-${devops}/.trousseau}"
 if [ -z "${TROUSSEAU_PASSPHRASE}" ] &&
    [ -z "${TROUSSEAU_KEYRING_SERVICE}" ] &&
    [ -z "${GPG_AGENT_INFO}" ] ; then
-  if [ -d $GNUPGHOME ]; then
-    echo 'To save yourself some passphrase prompting pain, you may want to:'
-    echo '    export TROUSSEAU_PASSPHRASE={your pgp passphrase}'
-    echo 'Alternatively, you may want to add a password to your keyring service for trousseau to use:'
-    echo '    export TROUSSEAU_KEYRING_SERVICE=trouseau'
-  else
-    echo 'You may need to first generate a gpg key:'
-    echo '    gpg --gen-key'
-  fi
+  echo 'To save yourself some passphrase prompting pain, you may want to:'
+  echo '    export TROUSSEAU_PASSPHRASE={your pgp passphrase}'
+  echo 'Alternatively, you may want to add a password to your keyring service for trousseau to use:'
+  echo '    export TROUSSEAU_KEYRING_SERVICE=trouseau'
 fi
 
 if [ -n "${GPG_AGENT_INFO}" -a -z "$TROUSSEAU_KEYRING_SERVICE" ]; then
