@@ -2,6 +2,7 @@
 # Prepare our devops environment with variables, useful functions, and aliases.
 
 devops=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+alias ch="cd ${devops}"
 
 export AWS_CONFIG_FILE=${AWS_CONFIG_FILE:-~/.aws/config}
 export AWS_PROFILE=${AWS_PROFILE:-sofwerx}
@@ -97,23 +98,26 @@ switch_environment ()
 {
   environment=$1
 
-  # Undefine any variables from an already sourced environment
-  if [ -n $SWX_ENVIRONMENT ]; then
-    trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://" | while read variable ; do
-      set -x
-      unset $variable
-      set +x
-    done
-  fi
+  if trousseau keys | grep -e "^environment:${environment}:" > /dev/null ; then
 
-  # Define variables from the newly selected environment
-  export SWX_ENVIRONMENT=$environment
-  trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://" | while read variable ; do
-      set -x
-      export "${variable}=$(trousseau get environment:${SWX_ENVIRONMENT}:${variable})"
-      set +x
-  done
+    # Undefine any variables from an already sourced environment
+    if [ -n $SWX_ENVIRONMENT ]; then
+      for variable in $(trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"); do
+        unset "$variable"
+      done
+    fi
+
+    # Define variables from the newly selected environment
+    export SWX_ENVIRONMENT=$environment
+    for variable in $(trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"); do
+      export ${variable}="$(trousseau get environment:${SWX_ENVIRONMENT}:${variable})"
+    done
+  else
+    echo "No environment variables exist in trousseau for environment: $environment"
+  fi
 }
+
+alias list_environments='trousseau keys | grep -e ^environment: | cut -d: -f2 | sort | uniq'
 
 # Docker variables
 export MACHINE_STORAGE_PATH=${devops}/secrets/docker
