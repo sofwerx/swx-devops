@@ -1,0 +1,22 @@
+{
+  "name": "swx-devops",
+  "version": "1.0.0",
+  "description": "This project contains documentation and infrastructure as code for our internal devops efforts.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sofwerx/swx-devops.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sofwerx/swx-devops/issues"
+  },
+  "homepage": "https://github.com/sofwerx/swx-devops#readme",
+  "dependencies": {
+    "@mumbacloud/dmport": "0.0.16"
+  }
+}

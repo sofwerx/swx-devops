@@ -92,19 +92,19 @@ alias trousseau="$(which trousseau) --gnupg-home $GNUPGHOME --store $TROUSSEAU_S
 secret_decrypt ()
 {
   secret="$@"
-  trousseau get "file:$secret" | openssl enc -base64 -d -A > "./$secret"
+  trousseau get "file:$secret" | openssl enc -base64 -d -A > "${devops}/$secret"
 }
 
 secret_encrypt ()
 {
   secret="$@"
-  trousseau set "file:$1" "$(openssl enc -base64 -A -in $1)"
+  trousseau set "file:$1" "$(openssl enc -base64 -A -in ${devops}/$1)"
 }
 
 alias secrets_pull='trousseau keys | grep -e ^file:secrets/ | sed -e s/^file:// | while read file; do secret_decrypt "$file"; done'
 alias recipients_add='ls -1 gpg | while read recipient; do trousseau add-recipient $recipient; done'
 
-switch_environment ()
+fn_switch_environment ()
 {
   environment=$1
 
@@ -127,7 +127,58 @@ switch_environment ()
   fi
 }
 
+alias switch_environment="fn_switch_environment"
 alias list_environments='trousseau keys | grep -e ^environment: | cut -d: -f2 | sort | uniq'
 
-# Docker variables
-export MACHINE_STORAGE_PATH=${devops}/secrets/docker
+# Allow a secrets based local store of docker-machines... for Ian. You _probably_ don't want this directory.
+if [ -d ${devops}/secrets/docker/machines ]; then
+  export MACHINE_STORAGE_PATH=${devops}/secrets/docker
+fi
+
+# Install dmport if it has not been yet
+if which npm > /dev/null; then
+  if [ ! -d ${devops}/node_modules/ ]; then
+    npm install
+  fi
+  export PATH=$PATH:${devops}/node_modules/.bin
+fi
+
+docker-machine_import ()
+{
+  if which dmport > /dev/null ; then
+    dmport --export $1 > ${devops}/secrets/docker-machine/$1
+    secret_encrypt secrets/dm/$1
+  else
+    echo "You need to do a npm install of dmport to use this function."
+  fi
+}
+
+fn_dm_ls ()
+{
+  trousseau keys | grep -e ^file:secrets/dm/ | cut -d/ -f3-
+}
+alias dm_ls="fn_dm_ls"
+
+fn_dm_env ()
+{
+  if which dmport > /dev/null ; then
+    if trousseau get file:secrets/dm/$1 > /dev/null 2>&1 ; then
+      secret_decrypt secrets/dm/$1
+      if  [ -s ${devops}/secrets/dm/$1 ]; then
+        dm="$(cat ${devops}/secrets/dm/$1)"
+        eval $(dmport --import $dm)
+      fi
+    else
+      if [ -s ${devops}/secrets/dm/$1 ]; then
+        echo "dm $1 does not exist in trousseau, but does exist as a secrets file in ${devops}/secrets/dm/$1"
+        echo "you may want to run this: secret_encrypt secrets/dm/$1"
+      else
+        echo "dm $1 does not exist. try dm_ls"
+      fi
+    fi
+  else
+    echo "You need to do a npm install of dmport to use this function."
+  fi
+}
+alias dm_env="fn_dm_env"
+

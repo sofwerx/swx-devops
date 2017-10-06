@@ -250,3 +250,44 @@ This will likely evolve over time toward functions and a proper command wrapper.
 
 - [swx-dev](aws/swx-dev/README.md)
 
+# docker
+
+You will want to first install docker.
+
+For Mac, I use HomeBrew to make it easy to update to the latest:
+
+    brew install docker docker-machine docker-compose docker-machine-driver-xhyve
+
+That being said, I also recommend trying out Docker for Mac.
+
+   https://docs.docker.com/docker-for-mac/install/
+
+For Linux, it's just easiest to follow the directions for CE:
+
+- https://docs.docker.com/engine/installation/
+- https://docs.docker.com/machine/install-machine/#installing-machine-directly
+- https://docs.docker.com/compose/install/
+
+# docker-machine vs dm
+
+This project will import docker-machine configs into JSON "dm" objects stored in trousseau.
+
+There are two commands you will want to familiarize yourself with:
+
+    dm_ls
+
+This will list the dm file secrets stored in trousseau under `file:secrets/dm/*`
+
+In order to source one of the environments, you can use `dm_env` do source a specific dm:
+
+    dm_env swx-pi
+
+This acts just like an `eval $(docker-machine env {machinename})`.
+
+To create a dm, you would first create a machine with `docker-machine`, and then use the `docker-machine_import` function to export it:
+
+    docker-machine create -d generic --generic-ip-address 192.168.14.194 --generic-ssh-key $PWD/secrets/ssh/sofwerx --generic-ssh-user pi --engine-storage-driver overlay2 swx-pi
+    docker-machine_export swx-pi
+
+Then you would want to `git add .trousseau ; git commit` to save that newly added dm secret.
+
