@@ -112,17 +112,6 @@ resource "aws_security_group_rule" "sg_ingress_web" {
     security_group_id = "${aws_security_group.sg.id}"
 }
 
-resource "aws_security_group_rule" "sg_ingress_dokkusetup" {
-    type = "ingress"
-    from_port = 2000
-    to_port = 2000
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-
-    security_group_id = "${aws_security_group.sg.id}"
-}
-
 resource "aws_security_group_rule" "sg_ingress_docker" {
     type = "ingress"
     from_port = 2376
@@ -134,17 +123,17 @@ resource "aws_security_group_rule" "sg_ingress_docker" {
     security_group_id = "${aws_security_group.sg.id}"
 
 }
-resource "aws_security_group_rule" "sg_ingress_orient" {
+
+resource "aws_security_group_rule" "sg_ingress_rcloud" {
     type = "ingress"
-    from_port = 9999
-    to_port = 9999
+    from_port = 8080
+    to_port = 8080
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
 
     security_group_id = "${aws_security_group.sg.id}"
 }
-
 
 resource "aws_security_group_rule" "sg_ingress_all_icmp" {
     type = "ingress"
