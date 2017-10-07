@@ -143,7 +143,7 @@ fi
 docker-machine_import ()
 {
   if which dmport > /dev/null ; then
-    dmport --export $1 > ${devops}/secrets/docker-machine/$1
+    dmport --export $1 > ${devops}/secrets/dm/$1
     secret_encrypt secrets/dm/$1
   else
     echo "You need to do a npm install of dmport to use this function."
