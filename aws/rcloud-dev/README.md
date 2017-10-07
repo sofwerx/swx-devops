@@ -10,9 +10,9 @@ Before running `terraform apply` in the `terraform/` directory, or `docker-compo
 
 Example:
 
-    icbmbp:swx-dev ianblenke$ ../../shell.bash
-    [sofwerx:] icbmbp:swx-dev ianblenke$ switch_environment swx-dev
-    [sofwerx:swx-dev] icbmbp:swx-dev ianblenke$
+    icbmbp:rcloud-dev ianblenke$ ../../shell.bash
+    [sofwerx:] icbmbp:rcloud-dev ianblenke$ switch_environment rcloud-dev
+    [sofwerx:rcloud-dev] icbmbp:rcloud-dev ianblenke$
 
 # terraform
 
