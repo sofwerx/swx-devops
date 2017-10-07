@@ -163,11 +163,7 @@ This is far easier than dealing with a shared s3 bucket or other shared reposito
 
 Before running trousseau or any other tools against a project environment, you will need to obtain a shell using `shell.bash` first:
 
-    icbmbp:swx-devops ianblenke$ . shell.bash
-
-Instead of using the dot (.) command, you can also use the `source` command. Both accomplish the same thing:
-
-    icbmbp:swx-devops ianblenke$ source shell.bash
+    icbmbp:swx-devops ianblenke$ ./shell.bash
 
 After doing this, you will get a prompt that tells you the `AWS_PROFILE` and `SWX_ENVIRONMENT`, like so:
 
@@ -249,6 +245,7 @@ This will likely evolve over time toward functions and a proper command wrapper.
 # Project Environments
 
 - [swx-dev](aws/swx-dev/README.md)
+- [rcloud-dev](aws/rcloud-dev/README.md)
 
 # docker
 

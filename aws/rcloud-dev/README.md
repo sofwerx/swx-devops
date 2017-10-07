@@ -20,6 +20,15 @@ Please read the [terraform/README.md](terraform/README.md)
 
 # docker-compose
 
+Before using docker-compose, you will also need to switch to the dm enviroment for `rcloud-dev-0`:
+
+    [sofwerx:rcloud-dev] icbmbp:rcloud-dev ianblenke$ dm_env rcloud-dev-0
+
+Now you can look at the running containers using the `docker` or `docker-compose` commands:
+
+    docker ps -a
+    docker-compose ps -a
+
 This does a full rebuild of the rcloud container:
 
     docker-compose build rcloud &&
@@ -27,5 +36,9 @@ This does a full rebuild of the rcloud container:
     docker-compose rm -f rcloud &&
     docker-compose up -d
 
-The rcloud data is persistently stored in docker volumes, as defined at the top of the `docker-compose.yml`
+The rcloud data is persistently stored in docker volumes, as defined at the top of the `docker-compose.yml`:
+
+    docker volume ls
+
+This means that you can safely destroy and recreate the containers, they will pick back up from where they left off.
 
