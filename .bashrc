@@ -86,22 +86,96 @@ fi
 
 alias trousseau="$(which trousseau) --gnupg-home $GNUPGHOME --store $TROUSSEAU_STORE"
 
-secret_decrypt ()
-{
-  secret="$@"
-  trousseau get "file:$secret" | openssl enc -base64 -d -A > "${devops}/$secret"
-}
-
-secret_encrypt ()
-{
-  secret="$@"
-  trousseau set "file:$1" "$(openssl enc -base64 -A -in ${devops}/$1)"
-}
-
-alias secrets_pull='trousseau keys | grep -e ^file:secrets/ | sed -e s/^file:// | while read file; do secret_decrypt "$file"; done'
 alias recipients_add='ls -1 gpg | while read recipient; do trousseau add-recipient $recipient; done'
 
-fn_switch_environment ()
+# Allow a secrets based local store of docker-machines... for Ian. You _probably_ don't want this directory.
+if [ -d ${devops}/secrets/docker/machines ]; then
+  export MACHINE_STORAGE_PATH=${devops}/secrets/docker
+else
+  if [ -d ~/.docker/machine/machines ] ; then
+    export MACHINE_STORAGE_PATH=~/.docker/machine/machines
+  fi
+fi
+
+# Install dmport if it has not been yet
+if which npm > /dev/null; then
+  if [ ! -d ${devops}/node_modules/ ]; then
+    npm install
+  fi
+  export PATH=$PATH:${devops}/node_modules/.bin
+fi
+
+fn_tf ()
+{
+  if [ "$(basename $PWD)" = "terraform" ]; then
+    environment="$(basename $(echo $PWD | sed -e 's/\/terraform$//' ))"
+    fn_swx_environment_switch $environment
+  else
+    echo "This isn't a directory named 'terraform', please cd there and re-run this command"
+  fi
+  terraform $@
+}
+alias tf="fn_tf"
+
+fn_swx_dm_ls ()
+{
+  trousseau keys | grep -e ^file:secrets/dm/ | cut -d/ -f3-
+}
+
+fn_swx_dm_env ()
+{
+  if which dmport > /dev/null ; then
+    if trousseau get file:secrets/dm/$1 > /dev/null 2>&1 ; then
+      fn_swx_secrets_decrypt secrets/dm/$1
+      if  [ -s ${devops}/secrets/dm/$1 ]; then
+        dm="$(cat ${devops}/secrets/dm/$1)"
+        eval $(dmport --import $dm)
+      fi
+    else
+      if [ -s ${devops}/secrets/dm/$1 ]; then
+        echo "dm $1 does not exist in trousseau, but does exist as a secrets file in ${devops}/secrets/dm/$1"
+        echo "you may want to run this: swx secrets encrypt secrets/dm/$1"
+      else
+        echo "dm $1 does not exist. try dm_ls"
+      fi
+    fi
+  else
+    echo "You need to do a npm install of dmport to use this function."
+  fi
+}
+
+fn_swx_dm_import ()
+{
+  if which dmport > /dev/null ; then
+    dmport --export $1 > ${devops}/secrets/dm/$1
+    fn_swx_secrets_encrypt secrets/dm/$1
+  else
+    echo "You need to do a npm install of dmport to use this function."
+  fi
+}
+
+fn_swx_dm ()
+{
+  case $1 in
+ls) shift; fn_swx_dm_ls $@ ;;
+env) shift; fn_swx_dm_env $@ ;;
+import) shift; fn_swx_dm_import $@ ;;
+*) cat <<EOU
+Usage: swx dm {action}
+  ls     - List dm instances
+  env    - Source the environment to interact with a dm instance using docker
+  import - Import a docker-machine instance into a dm
+EOU
+  ;;
+  esac
+}
+
+fn_swx_environment_ls ()
+{
+  trousseau keys | grep -e ^environment: | cut -d: -f2 | sort | uniq
+}
+
+fn_swx_environment_switch ()
 {
   environment=$1
 
@@ -124,58 +198,105 @@ fn_switch_environment ()
   fi
 }
 
-alias switch_environment="fn_switch_environment"
-alias list_environments='trousseau keys | grep -e ^environment: | cut -d: -f2 | sort | uniq'
-
-# Allow a secrets based local store of docker-machines... for Ian. You _probably_ don't want this directory.
-if [ -d ${devops}/secrets/docker/machines ]; then
-  export MACHINE_STORAGE_PATH=${devops}/secrets/docker
-fi
-
-# Install dmport if it has not been yet
-if which npm > /dev/null; then
-  if [ ! -d ${devops}/node_modules/ ]; then
-    npm install
-  fi
-  export PATH=$PATH:${devops}/node_modules/.bin
-fi
-
-docker-machine_import ()
+fn_swx_environment ()
 {
-  if which dmport > /dev/null ; then
-    dmport --export $1 > ${devops}/secrets/dm/$1
-    secret_encrypt secrets/dm/$1
-  else
-    echo "You need to do a npm install of dmport to use this function."
-  fi
+  case $1 in
+ls) shift; fn_swx_environment_ls ;;
+switch) shift; fn_swx_environment_switch $@ ;;
+*) cat <<EOU
+Usage: swx dm environment {action}
+  ls     - List environments
+  switch - Switch to an environment
+EOU
+  ;;
+  esac
 }
 
-fn_dm_ls ()
+fn_swx_secrets_addrecipients ()
 {
-  trousseau keys | grep -e ^file:secrets/dm/ | cut -d/ -f3-
+  ls -1 $(devops)/gpg | while read recipient; do trousseau add-recipient $recipient; done
 }
-alias dm_ls="fn_dm_ls"
 
-fn_dm_env ()
+fn_swx_secrets_decrypt ()
 {
-  if which dmport > /dev/null ; then
-    if trousseau get file:secrets/dm/$1 > /dev/null 2>&1 ; then
-      secret_decrypt secrets/dm/$1
-      if  [ -s ${devops}/secrets/dm/$1 ]; then
-        dm="$(cat ${devops}/secrets/dm/$1)"
-        eval $(dmport --import $dm)
-      fi
-    else
-      if [ -s ${devops}/secrets/dm/$1 ]; then
-        echo "dm $1 does not exist in trousseau, but does exist as a secrets file in ${devops}/secrets/dm/$1"
-        echo "you may want to run this: secret_encrypt secrets/dm/$1"
-      else
-        echo "dm $1 does not exist. try dm_ls"
-      fi
-    fi
-  else
-    echo "You need to do a npm install of dmport to use this function."
-  fi
+  secret="$@"
+  trousseau get "file:$secret" | openssl enc -base64 -d -A > "${devops}/$secret"
 }
-alias dm_env="fn_dm_env"
+
+fn_swx_secrets_encrypt ()
+{
+  secret="$@"
+  trousseau set "file:$1" "$(openssl enc -base64 -A -in ${devops}/$1)"
+}
+
+fn_swx_secrets_pull ()
+{
+  trousseau keys | grep -e ^file:secrets/ | sed -e s/^file:// | while read file; do fn_swx_secrets_decrypt "$file"; done
+}
+
+fn_swx_secrets ()
+{
+  case $1 in
+addrecipients) shift; fn_swx_secrets_addrecipients $@ ;;
+decrypt) shift; fn_swx_secrets_decrypt $@ ;;
+encrypt) shift; fn_swx_secrets_encrypt $@ ;;
+pull) shift; fn_swx_secrets_pull ;;
+*) cat <<EOU
+Usage: swx secrets {action}
+  addrecipients - trousseau add recipients from the gpg/ folder
+  decrypt - decrypt a secrets/ file from trousseau
+  encrypt - encrypt a secrets/ file into trousseau
+  pull    - pull files stored in trousseau into secrets/ folder
+EOU
+  ;;
+  esac
+}
+
+_fn_swx ()
+{
+  local cur
+  COMPREPLY=()
+  cur=${COMP_WORDS[COMP_CWORD]}
+  case "${COMP_WORDS[*]}" in
+    "swx dm") COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
+    "swx dm ") COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
+    "swx dm ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx dm env"*) COMPREPLY=( $( compgen -W "$(fn_swx_dm_ls)" -- $cur ) ) ;;
+    "swx environment") COMPREPLY=( $( compgen -W "ls switch"  -- $cur ) ) ;;
+    "swx environment ") COMPREPLY=( $( compgen -W "ls switch"  -- $cur ) ) ;;
+    "swx environment ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx environment switch"*) COMPREPLY=( $( compgen -W "$(fn_swx_environment_ls)" -- $cur ) ) ;;
+    "swx secrets") COMPREPLY=( $( compgen -W "decrypt encrypt pull" -- $cur ) ) ;;
+    "swx secrets ") COMPREPLY=( $( compgen -W "decrypt encrypt pull" -- $cur ) ) ;;
+    "swx secrets addrecipients*") COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx secrets encrypt*") COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx secrets decrypt*") COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx secrets pull*") COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx secrets"*) COMPREPLY=( $( compgen -W "$(fn_swx_environment_ls)" -- $cur ) ) ;;
+    "swx tf") COMPREPLY=( $( compgen -W "apply destroy fmt get graph import init output plan push refresh remote show taint untaint validate version state" -- $cur ) ) ;;
+    *) COMPREPLY=( $( compgen -W 'dm env' -- $cur ) ) ;;
+  esac
+  return 0
+}
+complete -F _fn_swx fn_swx
+
+fn_swx ()
+{
+  case $1 in
+dm) shift; fn_swx_dm $@ ;;
+environment) shift; fn_swx_environment $@ ;;
+secrets) shift; fn_swx_secrets $@ ;;
+tf) shift; fn_tf $@ ;;
+*) cat <<EOU
+Usage: swx {command}
+  dm          - Manage dm (docker-machines)
+  environment - Source project-lifecycle environment variables
+  secrets     - Deal with secrets/ folder
+  tf          - Run Terraform for a project-lifecycle
+EOU
+  ;;
+  esac
+}
+alias swx="fn_swx"
+complete -F _fn_swx swx
 

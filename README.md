@@ -98,6 +98,8 @@ I am presently running the latest terraform: `0.10.7`.
 
 We will be using an AWS bucket named `sofwerx-terraform` for the shared `.tfstate` files.
 
+Instead of using `terraform` directly, I strongly suggest using the `swx tf` wrapper instead, as it will ensure that you have the correct environment sourced before running `terraform`.
+
 ## gnupg 2.0
 
 You will need a gnupg key for `trousseau` below.
@@ -156,7 +158,7 @@ Trousseau uses gnupg to encrypt a JSON file for a number of administrators that 
 Trousseau can use various cloud storage platforms to share these encrypted secrets between administrators.
 
 The result of any trousseau commands will act ion the `.trousseau` file in the current proect.
-This file is under .git management, and is entirely safe as the contents of the file are encrypted.
+This file is under git management, and is entirely safe as the contents of the file are encrypted.
 This is far easier than dealing with a shared s3 bucket or other shared repository.
 
 ## Sourcing `shell.bash`
@@ -171,7 +173,9 @@ After doing this, you will get a prompt that tells you the `AWS_PROFILE` and `SW
 
 Note that there is no selected `SWX_ENVIRONMENT` yet. To select `swx-dev`, you would use this function:
 
-    switch_environment swx-dev
+    swx environment switch swx-dev
+
+The `swx` command does have bash tab completion.
 
 If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
 
@@ -218,17 +222,17 @@ Our key naming convention will evolve over time.
 
 There are 2 functions and an alias presently defined in the `.bashrc` to automate this process.
 
-To automatically pull all of the latest trousseau `file:secrets/` prefixed files, you can use the alias:
+To automatically pull all of the latest trousseau `file:secrets/` prefixed files, you can use:
 
-    secrets_pull
+    swx secrets pull
 
 To decrypt a specific file under secrets, I would use the following function:
 
-    secret_decrypt secrets/ssh/sofwerx
+    swx secrets decrypt secrets/ssh/sofwerx
 
 To encrypt a file under secrets, I would use the following function:
 
-    secret_encrypt secrets/ssh/sofwerx
+    swx secrets encrypt secrets/ssh/sofwerx
 
 After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
 
@@ -236,11 +240,16 @@ After doing this, you will need to add `.trousseau` to git and commit your chang
 
 The "glue" of this harness is currently in the `.bashrc` file.
 
-This will eventually get broken out into a script directory as simplicity demands it.
+The `swx` command provides the interface to the functions that interact with this devops harness:
 
-The current reasoning behind using aliases is so that running `alias` at any time will show you a list of our "special" commands unique to this project.
+    $ swx
+    Usage: swx {command}
+      dm          - Manage dm (docker-machines)
+      environment - Source project-lifecycle environment variables
+      secrets     - Deal with secrets/ folder
+      tf          - Run Terraform for a project-lifecycle
 
-This will likely evolve over time toward functions and a proper command wrapper.
+This will eventually get broken out into a script directory tree as simplicity demands it.
 
 # Project Environments
 
@@ -269,22 +278,22 @@ For Linux, it's just easiest to follow the directions for CE:
 
 This project will import docker-machine configs into JSON "dm" objects stored in trousseau.
 
-There are two commands you will want to familiarize yourself with:
+The `swx dm` commands interact with these "dm" objects:
 
-    dm_ls
+    swx dm ls
 
 This will list the dm file secrets stored in trousseau under `file:secrets/dm/*`
 
-In order to source one of the environments, you can use `dm_env` do source a specific dm:
+In order to source one of the environments, you can use `swx dm env` do source a specific dm:
 
-    dm_env swx-pi
+    swx dm env rcloud-dev-00
 
-This acts just like an `eval $(docker-machine env {machinename})`.
+This acts similar to a `eval $(docker-machine env {machinename})`.
 
-To create a dm, you would first create a machine with `docker-machine`, and then use the `docker-machine_import` function to export it:
+To create a dm, you would first create a machine with `docker-machine`, and then use the `swx dm import` command to export it:
 
-    docker-machine create -d generic --generic-ip-address 192.168.14.194 --generic-ssh-key $PWD/secrets/ssh/sofwerx --generic-ssh-user pi --engine-storage-driver overlay2 swx-pi
-    docker-machine_export swx-pi
+    docker-machine create -d generic --generic-ip-address 192.168.14.194 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user pi --engine-storage-driver overlay2 swx-pi
+    swx dm import swx-pi
 
 Then you would want to `git add .trousseau ; git commit` to save that newly added dm secret.
 
