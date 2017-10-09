@@ -110,10 +110,11 @@ swx_tf ()
   if [ "$(basename $PWD)" = "terraform" ]; then
     environment="$(basename $(echo $PWD | sed -e 's/\/terraform$//' ))"
     swx_environment_switch $environment
+    terraform $@
   else
     echo "This isn't a directory named 'terraform', please cd there and re-run this command"
+    return 1
   fi
-  terraform $@
 }
 
 swx_dc ()
@@ -121,10 +122,14 @@ swx_dc ()
   if [ -f docker-compose.yml ]; then
     environment="$(basename $PWD)"
     swx_environment_switch $environment
+    if [ -f dc.sh ]; then
+      . dc.sh
+    fi
+    docker-compose $@
   else
     echo "There is no docker-compose.yml in this directory, please cd there first"
+    return 1
   fi
-  docker-compose $@
 }
 
 swx_dm_ls ()
@@ -293,6 +298,7 @@ complete -F _swx swx
 swx ()
 {
   case $1 in
+dc) shift; swx_dc $@ ;;
 dm) shift; swx_dm $@ ;;
 environment) shift; swx_environment $@ ;;
 secrets) shift; swx_secrets $@ ;;

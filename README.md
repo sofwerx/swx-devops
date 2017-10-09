@@ -297,3 +297,7 @@ To create a dm, you would first create a machine with `docker-machine`, and then
 
 Then you would want to `git add .trousseau ; git commit` to save that newly added dm secret.
 
+# docker-compose as `swx dc`
+
+Instead of using `docker-compose` directly, I strongly suggest using the `swx dc` wrapper instead, as it will ensure that you have the correct environment sourced before running `docker-compose.
+
