@@ -6,35 +6,36 @@ This rcloud deployment uses docker-compose to a single docker-engine host.
 
 ## environment
 
-Before running `terraform apply` in the `terraform/` directory, or `docker-compose up` in the current directory, please be sure to source the environment:
+Before running `terraform` in the `terraform/` directory, or `docker-compose` in the current directory, please be sure to source the environment:
 
 Example:
 
     icbmbp:rcloud-dev ianblenke$ ../../shell.bash
-    [sofwerx:] icbmbp:rcloud-dev ianblenke$ switch_environment rcloud-dev
+    [sofwerx:] icbmbp:rcloud-dev ianblenke$ swx environment switch rcloud-dev
     [sofwerx:rcloud-dev] icbmbp:rcloud-dev ianblenke$
+
+Before using `docker-compose` in the current directory, you will also need to switch to the dm enviroment for `rcloud-dev-0`:
+
+    [sofwerx:rcloud-dev] icbmbp:rcloud-dev ianblenke$ swx dm env rcloud-dev-0
+
+If you use the `swx tf` and `swx dc` wrappers instead, this will be taken care of for you.
 
 # terraform
 
 Please read the [terraform/README.md](terraform/README.md)
 
+Please use `swx tf` instead of `terraform`, to ensure the correct environment is sourced.
+
 # docker-compose
 
-Before using docker-compose, you will also need to switch to the dm enviroment for `rcloud-dev-0`:
-
-    [sofwerx:rcloud-dev] icbmbp:rcloud-dev ianblenke$ dm_env rcloud-dev-0
-
-Now you can look at the running containers using the `docker` or `docker-compose` commands:
-
-    docker ps -a
-    docker-compose ps -a
+Please use `swx dc` instead of `docker-compose`, to ensure the correct environment is sourced, and that the correct remote "dm" docker-engine is being used.
 
 This does a full rebuild of the rcloud container:
 
-    docker-compose build rcloud &&
-    docker-compose stop rcloud &&
-    docker-compose rm -f rcloud &&
-    docker-compose up -d
+    swx dc build rcloud &&
+    swx dc stop rcloud &&
+    swx dc rm -f rcloud &&
+    sex dc up -d
 
 The rcloud data is persistently stored in docker volumes, as defined at the top of the `docker-compose.yml`:
 

@@ -4,17 +4,19 @@ This is an AWS IPv6 enabled terraform deployment of a dokku instance for PaaS de
 
 ## environment
 
-Before running `terraform` in the `terraform/` directory, please be sure to source the environment:
+Before running `swx tf` in the `terraform/` directory, please be sure to source the environment:
 
 Example:
 
     icbmbp:swx-dev ianblenke$ ../../shell.bash
-    [sofwerx:] icbmbp:swx-dev ianblenke$ switch_environment swx-dev
+    [sofwerx:] icbmbp:swx-dev ianblenke$ swx environment switch swx-dev
     [sofwerx:swx-dev] icbmbp:swx-dev ianblenke$
 
 # terraform
 
 Please read the [terraform/README.md](terraform/README.md)
+
+Please use `swx tf` instead of `terraform`, to ensure the correct environment is sourced.
 
 # dokku
 
