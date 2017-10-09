@@ -11,4 +11,4 @@ apply:
 	terraform apply
 
 .terraform:
-	terraform init --backend-config="key=rcloud/dev/terraform.tfstate"
+	bash tf.sh

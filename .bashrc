@@ -110,6 +110,9 @@ swx_tf ()
   if [ "$(basename $PWD)" = "terraform" ]; then
     environment="$(basename $(echo $PWD | sed -e 's/\/terraform$//' ))"
     swx_environment_switch $environment
+    if [ -f tf.sh ]; then
+      . tf.sh
+    fi
     terraform $@
   else
     echo "This isn't a directory named 'terraform', please cd there and re-run this command" 1>&2
