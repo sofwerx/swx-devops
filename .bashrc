@@ -151,7 +151,7 @@ swx_dm_env ()
         echo "dm $1 does not exist in trousseau, but does exist as a secrets file in ${devops}/secrets/dm/$1"
         echo "you may want to run this: swx secrets encrypt secrets/dm/$1"
       else
-        echo "dm $1 does not exist. try dm_ls"
+        echo "dm $1 does not exist. try: swx dm ls"
       fi
     fi
   else
