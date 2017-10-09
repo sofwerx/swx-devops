@@ -280,6 +280,8 @@ _swx ()
   COMPREPLY=()
   cur=${COMP_WORDS[COMP_CWORD]}
   case "${COMP_WORDS[*]}" in
+    "swx dc") COMPREPLY=( $( compgen -W "build bundle config create down events exec help images kill logs pause port ps pull push restart rm run scale start stop top unpause up version" -- $cur ) ) ;;
+    "swx dc ") COMPREPLY=( $( compgen -W "build bundle config create down events exec help images kill logs pause port ps pull push restart rm run scale start stop top unpause up version" -- $cur ) ) ;;
     "swx dm") COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
     "swx dm ") COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
     "swx dm ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
@@ -296,6 +298,7 @@ _swx ()
     "swx secrets pull*") COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx secrets"*) COMPREPLY=( $( compgen -W "$(swx_environment_ls)" -- $cur ) ) ;;
     "swx tf") COMPREPLY=( $( compgen -W "apply destroy fmt get graph import init output plan push refresh remote show taint untaint validate version state" -- $cur ) ) ;;
+    "swx tf ") COMPREPLY=( $( compgen -W "apply destroy fmt get graph import init output plan push refresh remote show taint untaint validate version state" -- $cur ) ) ;;
     *) COMPREPLY=( $( compgen -W 'dm env' -- $cur ) ) ;;
   esac
   return 0
