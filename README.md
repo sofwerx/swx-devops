@@ -8,6 +8,20 @@ There are a number of tools that will need to be installed:
 - terraform
 - gnupg 2.0
 - trousseau
+- docker
+- docker-compose
+- docker-machine (optional)
+
+Or you can install Vagrant and spin up a VM:
+
+    https://www.vagrantup.com/
+
+There is a `Vagrantfile` in this project that should prepare a functional ubuntu environment using the `./dependencies/ubuntu.sh` script:
+
+    vagrant up
+    vagrant ssh
+
+The dependencies, and how to use them, are enumerated below.
 
 # awscli
 
@@ -117,19 +131,24 @@ If you also install pinentry, you will get a nice pop-up dialog box for your gpg
 
     brew install pinentry
 
-The reason for gnupg 2.0 is that trousseau reads directly from `~/.gnupg/pubring.gpg`, and they did away with that file in gnupg 2.1
+The reason for gnupg 2.0 is that trousseau reads directly from `pubring.gpg`, and they did away with that file in gnupg 2.1
+
+If you are using Vagrant, I strongly suggest creating a `secrets/gnupg` directory first:
+
+    mkdir -p secrets/gnupg
 
 After installing gnupg 2.0, you will want to generate a private/public keypair:
 
     gpg --gen-key
 
-If you're like me, you'll want more than the default 2048 bits. For that, use `--full-gen-key` and override:
-
-    gpg --full-gen-key
+When prompted for 2048 bits, it's a good idea to use 4096 instead.
+If your gpg does not prompt you for the number of bits, you're probably using a gnupg newer than 2.0 which will not work with trousseau.
 
 After doing this, please export your public key into this repo under the `gnupg/` folder with a Github Pull-Request so that everyone has access to it.
 
     gpg --export --armor > gpg/ian@sofwerx.org
+    git add gpg/ian@sofwerx.org
+    git commit -m 'Adding gpg/ian@sofwerx.org public key'
 
 The filename _must_ be your email address, to make trousseau management easier.
 

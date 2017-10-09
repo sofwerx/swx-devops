@@ -4,6 +4,11 @@
 devops="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 alias ch="cd ${devops}"
 
+if [ -d ${devops}/secrets/aws ] ; then
+  export AWS_SHARED_CREDENTIALS_FILE=${devops}/secrets/aws/credentials
+  export AWS_CONFIG_FILE=${devops}/secrets/aws/config
+fi
+export AWS_SHARED_CREDENTIALS_FILE=${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}
 export AWS_CONFIG_FILE=${AWS_CONFIG_FILE:-~/.aws/config}
 export AWS_PROFILE=${AWS_PROFILE:-sofwerx}
 export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id --profile $AWS_PROFILE)
