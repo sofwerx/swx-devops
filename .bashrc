@@ -116,6 +116,17 @@ swx_tf ()
   terraform $@
 }
 
+swx_dc ()
+{
+  if [ -f docker-compose.yml ]; then
+    environment="$(basename $PWD)"
+    swx_environment_switch $environment
+  else
+    echo "There is no docker-compose.yml in this directory, please cd there first"
+  fi
+  docker-compose $@
+}
+
 swx_dm_ls ()
 {
   trousseau keys | grep -e ^file:secrets/dm/ | cut -d/ -f3-
@@ -292,6 +303,7 @@ Usage: swx {command}
   environment - Source project-lifecycle environment variables
   secrets     - Deal with secrets/ folder
   tf          - Run Terraform for a project-lifecycle
+  dc          - Run docker-compose for a project-lifecycle
 EOU
   ;;
   esac
