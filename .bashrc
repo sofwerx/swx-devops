@@ -112,7 +112,7 @@ swx_tf ()
     swx_environment_switch $environment
     terraform $@
   else
-    echo "This isn't a directory named 'terraform', please cd there and re-run this command"
+    echo "This isn't a directory named 'terraform', please cd there and re-run this command" 1>&2
     return 1
   fi
 }
@@ -127,7 +127,7 @@ swx_dc ()
     fi
     docker-compose $@
   else
-    echo "There is no docker-compose.yml in this directory, please cd there first"
+    echo "There is no docker-compose.yml in this directory, please cd there first" 1>&2
     return 1
   fi
 }
@@ -153,9 +153,11 @@ swx_dm_env ()
       else
         echo "dm $1 does not exist. try: swx dm ls"
       fi
+      return 1
     fi
   else
     echo "You need to do a npm install of dmport to use this function."
+    return 1
   fi
 }
 
@@ -165,7 +167,8 @@ swx_dm_import ()
     dmport --export $1 > ${devops}/secrets/dm/$1
     swx_secrets_encrypt secrets/dm/$1
   else
-    echo "You need to do a npm install of dmport to use this function."
+    echo "You need to do a npm install of dmport to use this function." 1>&2
+    return 1
   fi
 }
 
@@ -175,12 +178,13 @@ swx_dm ()
 ls) shift; swx_dm_ls $@ ;;
 env) shift; swx_dm_env $@ ;;
 import) shift; swx_dm_import $@ ;;
-*) cat <<EOU
+*) cat <<EOU 1>&2
 Usage: swx dm {action}
   ls     - List dm instances
   env    - Source the environment to interact with a dm instance using docker
   import - Import a docker-machine instance into a dm
 EOU
+  return 1
   ;;
   esac
 }
@@ -209,7 +213,8 @@ swx_environment_switch ()
       export ${variable}="$(trousseau get environment:${SWX_ENVIRONMENT}:${variable})"
     done
   else
-    echo "No environment variables exist in trousseau for environment: $environment"
+    echo "No environment variables exist in trousseau for environment: $environment" 1>&2
+    return 1
   fi
 }
 
@@ -218,11 +223,12 @@ swx_environment ()
   case $1 in
 ls) shift; swx_environment_ls ;;
 switch) shift; swx_environment_switch $@ ;;
-*) cat <<EOU
+*) cat <<EOU 1>&2
 Usage: swx dm environment {action}
   ls     - List environments
   switch - Switch to an environment
 EOU
+  return 1
   ;;
   esac
 }
@@ -256,13 +262,14 @@ addrecipients) shift; swx_secrets_addrecipients $@ ;;
 decrypt) shift; swx_secrets_decrypt $@ ;;
 encrypt) shift; swx_secrets_encrypt $@ ;;
 pull) shift; swx_secrets_pull ;;
-*) cat <<EOU
+*) cat <<EOU 1>&2
 Usage: swx secrets {action}
   addrecipients - trousseau add recipients from the gpg/ folder
   decrypt - decrypt a secrets/ file from trousseau
   encrypt - encrypt a secrets/ file into trousseau
   pull    - pull files stored in trousseau into secrets/ folder
 EOU
+  return 1
   ;;
   esac
 }
@@ -303,7 +310,7 @@ dm) shift; swx_dm $@ ;;
 environment) shift; swx_environment $@ ;;
 secrets) shift; swx_secrets $@ ;;
 tf) shift; swx_tf $@ ;;
-*) cat <<EOU
+*) cat <<EOU 1>&2
 Usage: swx {command}
   dm          - Manage dm (docker-machines)
   environment - Source project-lifecycle environment variables
@@ -311,6 +318,7 @@ Usage: swx {command}
   tf          - Run Terraform for a project-lifecycle
   dc          - Run docker-compose for a project-lifecycle
 EOU
+  return 1
   ;;
   esac
 }
