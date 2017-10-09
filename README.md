@@ -299,5 +299,5 @@ Then you would want to `git add .trousseau ; git commit` to save that newly adde
 
 # docker-compose as `swx dc`
 
-Instead of using `docker-compose` directly, I strongly suggest using the `swx dc` wrapper instead, as it will ensure that you have the correct environment sourced before running `docker-compose.
+Instead of using `docker-compose` directly, I strongly suggest using the `swx dc` wrapper instead, as it will ensure that you have the correct environment sourced before running `docker-compose`.
 
