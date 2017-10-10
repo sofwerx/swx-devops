@@ -41,8 +41,6 @@ RUN python -m ipykernel.kernelspec
 RUN pip install tensorflow
 RUN pip3 install tensorflow
 
-ADD .Rprofile $HOME/.Rprofile
-
 # Install rstudio/tensorflow from CRAN
 RUN R -e 'install.packages("openssl")'
 RUN R -e 'install.packages("httr")'
