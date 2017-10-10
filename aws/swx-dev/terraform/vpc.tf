@@ -371,6 +371,24 @@ resource "aws_route53_record" "project-name" {
   records = ["${join(",", aws_instance.instance.*.public_ip)}"]
 }
 
+/* Define traefik.project-environment.zone round-robin A records */
+resource "aws_route53_record" "traefik" {
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
+  name    = "traefik.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+}
+
+/* Define orient.project-environment.zone round-robin A records */
+resource "aws_route53_record" "orient" {
+  zone_id = "${data.aws_route53_zone.selected.zone_id}"
+  name    = "orient.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+}
+
 /* Define a project-environment.zone wildcard of round-robin A records */
 resource "aws_route53_record" "wildcard-project-name" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"

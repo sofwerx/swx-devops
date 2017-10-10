@@ -1,0 +1,58 @@
+version: '2'
+
+networks: {}
+
+volumes:
+  traefik-ssl:
+    driver: local
+
+services:
+
+  traefik:
+    container_name: traefik
+    hostname: traefik
+    build: traefik/
+    image: swx-traefik
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
+      REST_PORT: "8080"
+      EMAIL: "ian@sofwerx.org"
+      DNS_DOMAIN: "swx-dev.devwerx.org"
+      SUBDOMAINS: '"swx-dev.devwerx.org", "orient.swx-dev.devwerx.org"'
+    volumes:
+      - traefik-ssl:/ssl
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - orient
+    labels:
+      - "traefik.backend=traefik"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:traefik.swx-dev.devwerx.org"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  orient:
+    build: orient/
+    image: orient
+    restart: always
+    container_name: orient
+    hostname: orient
+    environment:
+      PEER_CONFIG: "${PEER_CONFIG}"
+      NIFI_CONFIG: "{ enabled: true, url: '/nifi' }"
+      SECURE_PORT: 443
+      HTTP_PORT: 9999
+    ports:
+      - 9999:9999
+    labels:
+      - "traefik.backend=orient"
+      - "traefik.port=9999"
+      - "traefik.frontend.rule=Host:orient.swx-dev.devwerx.org"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+

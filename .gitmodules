@@ -1,0 +1,3 @@
+[submodule "aws/swx-dev/orient"]
+	path = aws/swx-dev/orient
+	url = https://github.com/sofwerx/orient
