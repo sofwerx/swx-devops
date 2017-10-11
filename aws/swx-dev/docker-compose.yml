@@ -5,6 +5,10 @@ networks: {}
 volumes:
   traefik-ssl:
     driver: local
+  postgres-data:
+    driver: local
+  guacamole-data:
+    driver: local
 
 services:
 
@@ -23,12 +27,10 @@ services:
       REST_PORT: "8080"
       EMAIL: "ian@sofwerx.org"
       DNS_DOMAIN: "swx-dev.devwerx.org"
-      SUBDOMAINS: '"swx-dev.devwerx.org", "orient.swx-dev.devwerx.org"'
+      SUBDOMAINS: '"swx-dev.devwerx.org", "orient.swx-dev.devwerx.org", "adminer.swx-dev.devwerx.org", "guacamole.swx-dev.devwerx.org"'
     volumes:
       - traefik-ssl:/ssl
       - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - orient
     labels:
       - "traefik.backend=traefik"
       - "traefik.port=8080"
@@ -53,6 +55,72 @@ services:
       - "traefik.backend=orient"
       - "traefik.port=9999"
       - "traefik.frontend.rule=Host:orient.swx-dev.devwerx.org"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  postgres:
+    image: postgres
+    restart: always
+    container_name: postgres
+    hostname: postgres
+    environment:
+      #PGDATA: /var/lib/postgresql/data
+      #POSTGRES_USER: postgres
+      #POSTGRES_DB: postgres
+      #POSTGRES_INITDB_ARGS: "--data-checksums"
+      #POSTGRES_INITDB_XLOGDIR: ...
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+
+  adminer:
+    image: adminer
+    restart: always
+    container_name: adminer
+    hostname: adminer
+    links:
+      - postgres:db
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    labels:
+      - "traefik.backend=adminer"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:adminer.swx-dev.devwerx.org"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  guacd:
+    image: guacamole/guacd
+    restart: always
+    container_name: guacd
+    hostname: guacd
+    ports:
+      - 4822:4822
+
+  guacamole:
+    build: guacamole/
+    image: guacamole
+    restart: always
+    container_name: guacamole
+    hostname: guacamole
+    links:
+      - guacd
+    volumes:
+      - guacamole-data:/data
+    environment:
+      POSTGRES_HOSTNAME: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      GUACD_HOSTNAME: guacd
+      GUACD_PORT: 4822
+    labels:
+      - "traefik.backend=guacamole"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:guacamole.swx-dev.devwerx.org"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
