@@ -120,7 +120,7 @@ services:
     labels:
       - "traefik.backend=guacamole"
       - "traefik.port=8080"
-      - "traefik.frontend.rule=Host:guacamole.swx-dev.devwerx.org"
+      - "traefik.frontend.rule=Host:guacamole.swx-dev.devwerx.org;AddPrefix:/guacamole"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
