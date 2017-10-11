@@ -92,10 +92,13 @@ services:
       - "traefik.frontend.entryPoints=http,https"
 
   guacd:
-    image: guacamole/guacd
+    build: guacd
+    image: guacd
     restart: always
     container_name: guacd
     hostname: guacd
+    volumes:
+      - traefik-ssl:/ssl
     ports:
       - 4822:4822
 
@@ -109,6 +112,7 @@ services:
       - guacd
     volumes:
       - guacamole-data:/data
+      - traefik-ssl:/ssl
     environment:
       POSTGRES_HOSTNAME: postgres
       POSTGRES_PORT: 5432

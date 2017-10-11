@@ -15,4 +15,11 @@ fi
 
 export POSTGRES_DATABASE=guacamole
 
+mkdir -p /ssl
+
+export GUACD_SSL=false
+if [ -f /ssl/acme.json ]; then
+  export GUACD_SSL=true
+fi
+
 exec /opt/guacamole/bin/start.sh
