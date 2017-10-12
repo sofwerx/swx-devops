@@ -38,16 +38,30 @@ if [ -d /usr/local/opt/gpg-agent ]; then
   export PATH="/usr/local/opt/gpg-agent/libexec:$PATH"
 fi
 
-if [ -f "$HOME/.gpg-agent-info" ]; then
-  . "$HOME/.gpg-agent-info"
+if [ -f "$GNUPGHOME/.gpg-agent-info" ]; then
+  . "$GNUPGHOME/.gpg-agent-info"
   export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
-else
+fi
+
+# If the GPG_AGENT_INFO points to a unix domain socket that doesn't exist, unset it
+if [ -n "$GPG_AGENT_INFO" -a ! -e "$(echo $GPG_AGENT_INFO | cut -d: -f1)" ]; then
+  if [ -f "$GNUPGHOME/.gpg-agent-info" ]; then
+    rm -f "$GNUPGHOME/.gpg-agent-info"
+  fi
+  unset GPG_AGENT_INFO gpg_agent_info
+fi
+
+if [ -z "${GPG_AGENT_INFO}" ]; then
   if which gpg-agent > /dev/null ; then
     GPG_TTY=$(tty)
     export GPG_TTY
 
-    eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $HOME/.gpg-agent-info --allow-preset-passphrase)
+    eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $GNUPGHOME/.gpg-agent-info --allow-preset-passphrase)
   fi
+fi
+
+if [ -n "${GPG_AGENT_INFO}" ]; then
+  export gpg_agent_info="${GPG_AGENT_INFO}"
 fi
 
 if [ -d $GNUPGHOME ] ; then
