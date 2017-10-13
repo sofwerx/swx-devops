@@ -1,0 +1,121 @@
+version: '2'
+
+networks: 
+  default:
+    driver: bridge
+  tor:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+
+volumes:
+  moneroredis-data:
+    driver: local
+  tor-hidden_services:
+    driver: local
+  monero-data:
+    driver: local
+
+services:
+
+  # Enable docker to auto-run any architecture image using qemu
+  #     docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  multiarch:
+    container_name: multiarch
+    image: multiarch/qemu-user-static:register
+    privileged: true
+
+  tor:
+    container_name: tor
+    hostname: tor
+    build: tor/
+    image: sofwerx/tor
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - tor-hidden_services:/var/lib/tor/hidden_services
+    #ports:
+      #- 9001:9001
+      #- 9030:9030
+      #- 9050:9050
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - "default"
+      - "tor"
+    environment:
+      ONIONBOAT_HOSTNAME: tor
+      ONIONBOAT_PORT: "9050"
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    logging:
+      driver: json-file
+      options: 
+        max-size: "20k"
+
+  monero:
+    container_name: monero
+    hostname: monero
+    build: monero/
+    image: sofwerx/monero
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - 18080:18080
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - monero-data:/home/monero/.bitmonero
+    networks:
+      - "tor"
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    logging:
+      driver: json-file
+      options: 
+        max-size: "20k"
+
+  moneroredis:
+    container_name: moneroredis
+    hostname: moneroredis
+    image: redis:3
+    volumes:
+      - moneroredis-data:/data
+    networks:
+      - "tor"
+    command: redis-server --appendonly yes
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    logging:
+      driver: json-file
+      options: 
+        max-size: "20k"
+
+  moneropool:
+    container_name: moneropool
+    hostname: moneropool
+    build: moneropool/
+    image: sofwerx/moneropool
+    networks:
+      - "tor"
+#    restart: always
+    ports:
+      - 3333
+      - 5555
+      - 7777
+    environment:
+      HIDDENSERVICE_NAME: moneropool
+      HIDDENSERVICE_PORT: 3000
+      PORT: 3000
+      API_PORT: 8117
+      POOL_ADDRESS: ${POOL_ADDRESS}
+      ADMIN_PASSWORD: ${MONEROPOOL_ADMIN_PASSWORD}
+    labels:
+      - "traefik.enable=false"
+    logging:
+      driver: json-file
+      options: 
+        max-size: "20k"
+
+
