@@ -1,9 +1,19 @@
 version: '2'
 
-networks: {}
+networks: 
+  default:
+    driver: bridge
+  tor:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
 
 volumes:
   traefik-ssl:
+    driver: local
+  tor-hidden_services:
+    driver: local
+  monero-data:
     driver: local
   postgres-data:
     driver: local
@@ -16,7 +26,7 @@ services:
     container_name: traefik
     hostname: traefik
     build: traefik/
-    image: swx-traefik
+    image: sofwerx/traefik
     restart: always
     ports:
       - 80:80
@@ -40,7 +50,7 @@ services:
 
   orient:
     build: orient/
-    image: orient
+    image: sofwerx/orient
     restart: always
     container_name: orient
     hostname: orient
@@ -92,8 +102,8 @@ services:
       - "traefik.frontend.entryPoints=http,https"
 
   guacd:
-    build: guacd
-    image: guacd
+    build: guacd/
+    image: sofwerx/guacd
     restart: always
     container_name: guacd
     hostname: guacd
@@ -104,7 +114,7 @@ services:
 
   guacamole:
     build: guacamole/
-    image: guacamole
+    image: sofwerx/guacamole
     restart: always
     container_name: guacamole
     hostname: guacamole
@@ -127,4 +137,54 @@ services:
       - "traefik.frontend.rule=Host:guacamole.swx-dev.devwerx.org;AddPrefix:/guacamole"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  tor:
+    container_name: tor
+    hostname: tor
+    build: tor/
+    image: sofwerx/tor
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - tor-hidden_services:/var/lib/tor/hidden_services
+    #ports:
+      #- 9001:9001
+      #- 9030:9030
+      #- 9050:9050
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - "default"
+      - "tor"
+    environment:
+      ONIONBOAT_HOSTNAME: tor
+      ONIONBOAT_PORT: "9050"
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    logging:
+      driver: json-file
+      options: 
+        max-size: "20k"
+
+  monero:
+    container_name: monero
+    hostname: monero
+    build: monero/
+    image: sofwerx/monero
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - 18080:18080
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - monero-data:/home/monero/.bitmonero
+    networks:
+      - "tor"
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    logging:
+      driver: json-file
+      options: 
+        max-size: "20k"
 
