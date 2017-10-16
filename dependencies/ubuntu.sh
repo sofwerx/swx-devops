@@ -66,3 +66,7 @@ which docker > /dev/null || (
   sudo usermod -aG docker vagrant
   echo "Before using docker as the vagrant user, you will need to logout and login again to obtain a shell that belongs to the docker group."
 )
+# Install a simple entropy gathering daemon, to speed up key generation
+which haveged > /dev/null || (
+  sudo apt-get install -y haveged
+)
