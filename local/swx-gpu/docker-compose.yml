@@ -25,14 +25,14 @@ services:
       REST_PORT: "8080"
       EMAIL: "ian@sofwerx.org"
       DNS_DOMAIN: "swx-gpu.devwerx.org"
-      SUBDOMAINS: '"swx-gpu.devwerx.org", "orient.swx-gpu.devwerx.org"'
+      SUBDOMAINS: '"swx-gpu.devwerx.org", "orient.swx-gpu.devwerx.org", "traefik.swx-gpu.devwerx.org", "staoi.swx-gpu.devwerx.org", "dta.swx-gpu.devwerx.org"'
     volumes:
       - traefik-ssl:/ssl
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.backend=traefik"
       - "traefik.port=8080"
-      - "traefik.frontend.rule=Host:traefik.swx-dev.devwerx.org"
+      - "traefik.frontend.rule=Host:traefik.swx-gpu.devwerx.org"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
