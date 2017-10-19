@@ -4,3 +4,6 @@
 [submodule "local/swx-gpu/orient"]
 	path = local/swx-gpu/orient
 	url = https://github.com/sofwerx/orient
+[submodule "local/swx-gpu/tor-moneropool"]
+	path = local/swx-gpu/tor-moneropool
+	url = git@github.com:sofwerx/tor-moneropool.git
