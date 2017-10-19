@@ -44,7 +44,8 @@ services:
     hostname: orient
     environment:
       PEER_CONFIG: "${PEER_CONFIG}"
-      NIFI_CONFIG: "{ enabled: true, url: 'http:///nifi' }"
+      NIFI_CONFIG: "{ enabled: true, url: '/nifi' }"
+#      STAOI_URL: "http://staoi.swx-gpu.devwerx.org:8080"
       SECURE_PORT: 443
       HTTP_PORT: 9999
     ports:
