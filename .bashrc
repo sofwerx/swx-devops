@@ -65,8 +65,8 @@ if [ -n "${GPG_AGENT_INFO}" ]; then
 fi
 
 if [ -d $GNUPGHOME ] ; then
-  export TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1)
-  KEYGRIP=$(gpg --fingerprint --fingerprint | grep fingerprint | tail -1 | cut -d= -f2 | sed -e 's/ //g')
+  export TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1 | head -1)
+  KEYGRIP=$(gpg --fingerprint --fingerprint | grep fingerprint | head -2 | tail -1 | cut -d= -f2 | sed -e 's/ //g')
   alias gpg_remember="echo -n 'Please enter your gpg key passphrase: '; stty -echo; gpg-preset-passphrase --preset $KEYGRIP ; stty echo ; echo ''"
   alias gpg_forget="gpg-preset-passphrase --forget $KEYGRIP"
 else
