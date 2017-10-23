@@ -23,9 +23,9 @@ services:
       HTTP_PORT: "80"
       HTTPS_PORT: "443"
       REST_PORT: "8080"
-      EMAIL: "ian@sofwerx.org"
-      DNS_DOMAIN: "swx-gpu.devwerx.org"
-      SUBDOMAINS: '"swx-gpu.devwerx.org", "orient.swx-gpu.devwerx.org", "traefik.swx-gpu.devwerx.org", "staoi.swx-gpu.devwerx.org", "dta.swx-gpu.devwerx.org"'
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
     volumes:
       - traefik-ssl:/ssl
       - /var/run/docker.sock:/var/run/docker.sock
