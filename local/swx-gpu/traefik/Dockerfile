@@ -94,22 +94,6 @@ RUN git clone -b ${TRAEFIK_BRANCH} \
 WORKDIR ${GOPATH}/src/${TRAEFIK_PATH}
 RUN glide install --strip-vendor
 
-WORKDIR webui
-
-RUN apt-get install -y curl gnupg gnupg2 apt-transport-https lsb-release
-
-##RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
-#RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
-#RUN echo 'deb https://deb.nodesource.com/node_8.x stretch main' > /etc/apt/sources.list.d/nodesource.list
-#RUN echo 'deb-src https://deb.nodesource.com/node_8.x stretch main' >> /etc/apt/sources.list.d/nodesource.list
-#RUN apt-get update
-
-#RUN apt-get install -y nodejs
-#RUN dpkg --list nodejs \
-# && dpkg --listfiles nodejs | grep npm
-#RUN npm install --quiet
-#RUN npm run build 
-
 RUN groupadd --gid 1000 node \
  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
 
@@ -168,6 +152,37 @@ RUN set -ex \
  && ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn \
  && ln -s /opt/yarn/bin/yarn /usr/local/bin/yarnpkg \
  && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
+
+WORKDIR ${GOPATH}/src/${TRAEFIK_PATH}/webui
+
+RUN apt-get install -y curl gnupg gnupg2 apt-transport-https lsb-release
+
+##RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+#RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+#RUN echo 'deb https://deb.nodesource.com/node_8.x stretch main' > /etc/apt/sources.list.d/nodesource.list
+#RUN echo 'deb-src https://deb.nodesource.com/node_8.x stretch main' >> /etc/apt/sources.list.d/nodesource.list
+#RUN apt-get update
+
+#RUN apt-get install -y nodejs
+#RUN dpkg --list nodejs \
+# && dpkg --listfiles nodejs | grep npm
+RUN apt-get install -y jq
+RUN set -x ; npm install $( jq -r '.devDependencies | keys | join(" ")' package.json | sed -e 's/phantomjs-prebuilt //' -e 's/karma-phantomjs-shim //' -e 's/karma-phantomjs-launcher //' )
+RUN npm run build
+
+#RUN apt-get install -y build-essential g++ flex bison gperf ruby perl \
+#  libsqlite3-dev libfontconfig1-dev libicu-dev libfreetype6 libssl-dev \
+#  libpng-dev libjpeg-dev python libx11-dev libxext-dev qtbase5-dev
+#
+#RUN git clone git://github.com/ariya/phantomjs.git
+#RUN cd phantomjs \
+# && git checkout 2.1.1 \
+# && git submodule init \
+# && git submodule update \
+# && python build.py
+
+#RUN yarn install
+#RUN make generate-webui
 
 WORKDIR ${GOPATH}/src/${TRAEFIK_PATH}
 
