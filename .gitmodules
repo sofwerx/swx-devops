@@ -3,7 +3,10 @@
 	url = https://github.com/sofwerx/orient
 [submodule "local/swx-gpu/tor-moneropool"]
 	path = local/swx-gpu/tor-moneropool
-	url = git@github.com:sofwerx/tor-moneropool.git
+	url = https://github.com/sofwerx/tor-moneropool
 [submodule "local/swx-gpu/synthetic-target-area-of-interest"]
 	path = local/swx-gpu/synthetic-target-area-of-interest
-	url = git@github.com:sofwerx/synthetic-target-area-of-interest.git
+	url = https://github.com/sofwerx/synthetic-target-area-of-interest
+[submodule "local/geo/synthetic-target-area-of-interest"]
+	path = local/geo/synthetic-target-area-of-interest
+	url = https://github.com/sofwerx/synthetic-target-area-of-interest
