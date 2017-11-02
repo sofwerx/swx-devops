@@ -35,7 +35,7 @@ This does a full rebuild of the rcloud container:
     swx dc build rcloud &&
     swx dc stop rcloud &&
     swx dc rm -f rcloud &&
-    sex dc up -d
+    swx dc up -d
 
 The rcloud data is persistently stored in docker volumes, as defined at the top of the `docker-compose.yml`:
 
