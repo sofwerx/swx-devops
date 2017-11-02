@@ -71,8 +71,18 @@ which docker > /dev/null || (
     stable"
   sudo apt-get update
   sudo apt-get install -y docker-ce
-  sudo usermod -aG docker vagrant
-  echo "Before using docker as the vagrant user, you will need to logout and login again to obtain a shell that belongs to the docker group."
+  if id vagrant ; then
+    sudo usermod -aG docker vagrant
+    echo "Before using docker as the vagrant user, you will need to logout and login again to obtain a shell that belongs to the docker group."
+  fi
+)
+which docker-compose > /dev/null || (
+  sudo curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+  sudo chmod ugo+rx /usr/local/bin/docker-machine
+)
+which docker-machine > /dev/null || (
+  sudo curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` -o /usr/local/bin/docker-machine
+  sudo chmod ugo+rx /usr/local/bin/docker-machine
 )
 # Install a simple entropy gathering daemon, to speed up key generation
 which haveged > /dev/null || (
