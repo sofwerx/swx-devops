@@ -26,13 +26,16 @@ services:
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
     volumes:
       - traefik-ssl:/ssl
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.backend=traefik"
       - "traefik.port=8080"
-      - "traefik.frontend.rule=Host:traefik.swx-gpu.devwerx.org"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
