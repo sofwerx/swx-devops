@@ -23,100 +23,34 @@ There is a `Vagrantfile` in this project that should prepare a functional ubuntu
 
 The dependencies, and how to use them, are enumerated below.
 
-# awscli
+# Project Environments
 
-If you are on a mac, you can install `awscli` with Homebrew:
+- [local/dev](local/dev/README.md) - Your local `dev` environment
+- [local/geo](local/geo/README.md) - Our `geo` mintpc in our Data Science pit
+- [local/swx-pi](local/swx-pi/README.md) - A shared raspberry-pi docker host in our Data Science pit
+- [local/swx-gpu](local/swx-gpu/README.md) - Our shared IBM Minsky ppc64le GPU server in our datacenter
+- [aws/swx-dev](aws/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing
+- [aws/rcloud-dev](aws/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation
 
-    brew install awscli
+# Secrets
 
-Alternatively, or under Linux, you can use python `pip` to install it as well:
+This git repo stores the secrets for the above Project Environments in the `.trousseau` file in this git repository.
 
-    pip install awscli
+This file is `gpg` encrypted using `trousseau`. To use these secrets, you will need to have your gpg public key listed in the `gpg/` folder. How to do accomplish that is enumerated in detail below.
 
-# ~/.aws/
+## secrets/
 
-The ~/.aws/ folder contains two files: `config` and `credentials`.
+The `secrets/` folder is in `.gitignore` for a reason: this holds unencrypted files that contain credentials.
 
-The `config` file contains awscli configurations.
-The `credentials` file contains your `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` credentials.
-
-By default, awscli likes to use the "default" `AWS_PROFILE`.
-Our `shell.bash` assumes that you will be using an `AWS_PROFILE` name of "sofwerx".
-
-The reasoning here is that you can manage multiple profiles for different AWS credentials under different profiles.
-
-You can either create these files with a text editor (they are in an .ini file format internally) as decribed below,
-or you can use the following commands to prompt you:
-
-    mkdir ~/.aws
-    touch ~/.aws/config ~/.aws/credentials
-    aws configure --profile sofwerx
-
-You will then be prompted for:
-
-    AWS Access Key ID [None]: AWS_ACCESS_KEY
-    AWS Secret Access Key [None]: AWS_SECRET_ACCESS_KEY
-    Default region name [None]: us-east-1
-    Default output format [None]: json
-
-After entering these, you can examine your updated files:
-
-    $ cat ~/.aws/config
-    [profile sofwerx]
-    output = json
-    region = us-east-1
-
-    $ cat ~/.aws/credentials
-    [sofwerx]
-    aws_access_key_id = AWS_ACCESS_KEY
-    aws_secret_access_key = AWS_SECRET_ACCESS_KEY
-
-Where the `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` are the credentials you obtained by creating a key under the AWS console in IAM services for your user account.
-
-The AWS documentation for this can be found here:
-
-- http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
-
-## Running `aws`
-
-To find out what AWS IAM user you are currently using the credentials for:
-
-    $ aws iam get-user
-    {
-        "User": {
-            "UserName": "ianblenke",
-            "PasswordLastUsed": "2017-10-03T13:51:54Z",
-            "CreateDate": "2017-10-03T12:49:28Z",
-            "UserId": "AIDAREDACTED2REDACTED",
-            "Path": "/",
-            "Arn": "arn:aws:iam::123456789012:user/ianblenke"
-        }
-    }
-
-## terraform
-
-We use `terraform` to deploy and converge our cloud resources.
-
-- https://www.terraform.io/
-
-To install the Hashicorp `terraform` command on a mac, install it with HomeBrew:
-
-    brew install terraform
-
-The Hashicorp Terraform site is here:
-
-    https://www.terraform.io/
-
-Note: It is very important that we track the same version of terraform between ourselves, and that we upgrade terraform in unison, as resources tend to change between terraform versions.
-I am presently running the latest terraform: `0.10.7`.
-
-We will be using an AWS bucket named `sofwerx-terraform` for the shared `.tfstate` files.
-
-Instead of using `terraform` directly, I strongly suggest using the `swx tf` wrapper instead, as it will ensure that you have the correct environment sourced before running `terraform`.
+No files under `secrets/` should ever be committed to this git repo. Any secrets will be pulled out of `trousseau` by the `swx` commands as necessary.
 
 ## gnupg 2.0
 
 You will need a gnupg key for `trousseau` below.
+
+The reason for gnupg 2.0 is that trousseau reads directly from `pubring.gpg`, and they did away with that file in gnupg 2.1 and newer.
+
+### On a Mac
 
 If you happened to install `gnupg` already, just unlink first.
 
@@ -131,7 +65,45 @@ If you also install pinentry, you will get a nice pop-up dialog box for your gpg
 
     brew install pinentry
 
-The reason for gnupg 2.0 is that trousseau reads directly from `pubring.gpg`, and they did away with that file in gnupg 2.1
+### On Ubuntu 16.04
+
+Try running:
+
+    ./dependencies/ubuntu.sh
+
+That should install the correct versions of all of your dependencies.
+
+### On 64-bit Windows 10 Anniversary Update or later (build 1607+)
+
+You will want to run the Windows Subsystem for Linux:
+
+- https://msdn.microsoft.com/en-us/commandline/wsl/about
+- https://msdn.microsoft.com/en-us/commandline/wsl/install-win10
+
+This will run linux binaries natively without having to run a virtual machine for a linux kernel.
+
+To enable the Windows Subsystem for Linux:
+
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+
+After selecting Ubuntu as your favorite Linux distribution, and following the prompts and rebooting, you should be able to open a Command Prompt and run `bash`:
+
+    C:\> bash
+
+Now you can `cd` into the directory where you cloned this git repo, and run:
+
+    bash$ ./dependencies/ubuntu.sh
+
+### On other operating systems
+
+For general compatiblity and ease of developer station convergence, this project has a Vagrantfile that defines a Vagrant machine to run an Ubuntu virtual machine and install our dependencies.
+
+Install Vagrant for your operating system:
+
+- https://www.vagrantup.com/downloads.html
+
+The biggest challenge managing Vagrant persistence will be syncing or sharing a folder between your host and the virtual machine.
+This differs based on the virtual machine engine you use with Vagrant (VirtualBox, VMWare Workstation, VMWare Fusion, Parallels, xhyve, etc).
 
 If you are using Vagrant, I strongly suggest creating a `secrets/gnupg` directory first:
 
@@ -142,7 +114,7 @@ After installing gnupg 2.0, you will want to generate a private/public keypair:
     gpg --gen-key
 
 When prompted for 2048 bits, it's a good idea to use 4096 instead.
-If your gpg does not prompt you for the number of bits, you're probably using a gnupg newer than 2.0 which will not work with trousseau.
+If your `gpg` does not prompt you for the number of bits, you're probably using a gnupg newer than 2.0 which will not work with trousseau.
 
 After doing this, please export your public key into this repo under the `gnupg/` folder with a Github Pull-Request so that everyone has access to it.
 
@@ -150,15 +122,23 @@ After doing this, please export your public key into this repo under the `gnupg/
     git add gpg/ian@sofwerx.org
     git commit -m 'Adding gpg/ian@sofwerx.org public key'
 
-The filename _must_ be your email address, to make trousseau management easier.
+Our convention in this repository is that the filename must be your email address, to make trousseau management easier.
 
 You can import all of our public keys at any time by running:
 
-    gpg --import < gpg/*
+    cat gpg/* | gpg --import
 
 It's probably a good idea to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repo.
 
 ## trousseau
+
+Trousseau uses gnupg to encrypt a JSON file for a number of administrators that stores "key=value" secrets.
+
+Trousseau can use various cloud storage platforms to share these encrypted secrets between administrators.
+
+The result of any trousseau commands will alter the `.trousseau` file in the current proect.
+This file is under git management, and is entirely safe as the contents of the file are encrypted.
+This is far easier than dealing with a shared s3 bucket or other shared repository.
 
 To install the `trousseau` command on a mac, install it with HomeBrew:
 
@@ -172,31 +152,6 @@ Installing the `trousseau` package on Linux should be as simple as one of:
 The trousseau project is here:
 
     https://github.com/oleiade/trousseau 
-
-Trousseau uses gnupg to encrypt a JSON file for a number of administrators that stores "key=value" secrets.
-Trousseau can use various cloud storage platforms to share these encrypted secrets between administrators.
-
-The result of any trousseau commands will act ion the `.trousseau` file in the current proect.
-This file is under git management, and is entirely safe as the contents of the file are encrypted.
-This is far easier than dealing with a shared s3 bucket or other shared repository.
-
-## Sourcing `shell.bash`
-
-Before running trousseau or any other tools against a project environment, you will need to obtain a shell using `shell.bash` first:
-
-    icbmbp:swx-devops ianblenke$ ./shell.bash
-
-After doing this, you will get a prompt that tells you the `AWS_PROFILE` and `SWX_ENVIRONMENT`, like so:
-
-    [sofwerx:] icbvtcmbp:swx-devops ianblenke$
-
-Note that there is no selected `SWX_ENVIRONMENT` yet. To select `swx-dev`, you would use this function:
-
-    swx environment switch swx-dev
-
-The `swx` command does have bash tab completion.
-
-If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
 
 ## Using trousseau
 
@@ -227,10 +182,6 @@ Running `trousseau` on its own will show the other usable commands.
 
 The `.trousseau` file in this project is the actual gpg encrypted contents used to manage our environments.
 If you fork this repo to use yourself, you will need to remove `.trousseau` and create a new one with `trousseau create {gpg key email or id}`
-
-## secrets/
-
-The `secrets/` folder is in `.gitignore` for a reason: this holds unencrypted files that contain credentials.
 
 After your gpg key is added, and you are added as a trousseau reciepient, you will then be able to use the trousseau command.
 
@@ -270,12 +221,164 @@ The `swx` command provides the interface to the functions that interact with thi
 
 This will eventually get broken out into a script directory tree as simplicity demands it.
 
-# Project Environments
+## `shell.bash`
 
-- [swx-dev](aws/swx-dev/README.md)
-- [rcloud-dev](aws/rcloud-dev/README.md)
+Before running trousseau or any other tools against a project environment, you will need to obtain a shell using `shell.bash` first:
 
-# docker
+    icbmbp:swx-devops ianblenke$ ./shell.bash
+
+After doing this, you will get a prompt that tells you the `AWS_PROFILE`, `SWX_ENVIRONMENT`, and `DOCKER_MACHINE_NAME` variables like so:
+
+    [sofwerx::] icbvtcmbp:swx-devops ianblenke$
+
+## `swx`
+
+Your primary interaction will be through the `swx` function. You can run a command and it should show usage for that command:
+
+    $ swx
+    Usage: swx {command}
+      dm          - Manage dm (docker-machines)
+      environment - Source project-lifecycle environment variables
+      secrets     - Deal with secrets/ folder
+      tf          - Run Terraform for a project-lifecycle
+      dc          - Run docker-compose for a project-lifecycle
+
+The `swx` command also has very helpful bash tab completion.
+
+Note that there is no selected `SWX_ENVIRONMENT` yet. To select `swx-dev`, you would use this function:
+
+    swx environment switch swx-dev
+
+This would look something like:
+
+    [sofwerx::] icbvtcmbp:swx-devops ianblenke$ swx environment switch swx-dev
+    [sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$
+
+Also note that there is no selected `DOCKER_MACHINE_NAME` yet. To select `swx-dev`, you would use this function:
+
+    swx dm env swx-dev-0
+
+Which would look something like:
+
+    [sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$ swx dm env swx-dev
+    [sofwerx:swx-dev:swx-dev-0] icbvtcmbp:swx-devops ianblenke$
+
+Now I am ready to run any `docker-compose` commands in the correct folders.
+
+If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
+
+# AWS
+
+This project models some cloud resources under the `aws/` folder.
+
+## awscli
+
+If you are on a mac, you can install `awscli` with Homebrew:
+
+    brew install awscli
+
+Alternatively, or under Linux, you can use python `pip` to install it as well:
+
+    pip install awscli
+
+# `~/.aws/` or `secrets/aws`
+
+If you make a `secrets/aws` folder, your secrets will be stored there, instead of `~/.aws/`:
+
+    mkdir secrets/aws
+
+The `~/.aws/` folder, or `secrets/aws` folder, contains two files: `config` and `credentials`.
+
+The `config` file contains awscli configurations.
+The `credentials` file contains your `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` credentials.
+
+By default, awscli likes to use the "default" `AWS_PROFILE`.
+Our `shell.bash` assumes that you will be using an `AWS_PROFILE` name of "sofwerx".
+
+The reasoning here is that you can manage multiple profiles for different AWS credentials under different profiles.
+
+You can either create these files with a text editor (they are in an .ini file format internally) as decribed below,
+or you can use the following commands to prompt you:
+
+    mkdir ~/.aws
+    touch ~/.aws/config ~/.aws/credentials
+    aws configure --profile sofwerx
+
+or
+
+    mkdir secrets/aws
+    touch secrets/aws/config secrets/aws/credentials
+    aws configure --profile sofwerx
+
+You will then be prompted for:
+
+    AWS Access Key ID [None]: AWS_ACCESS_KEY
+    AWS Secret Access Key [None]: AWS_SECRET_ACCESS_KEY
+    Default region name [None]: us-east-1
+    Default output format [None]: json
+
+After entering these, you can examine your updated files:
+
+    $ cat ~/.aws/config secrets/aws/config
+    [profile sofwerx]
+    output = json
+    region = us-east-1
+
+    $ cat ~/.aws/credentials secrets/aws/credentials
+    [sofwerx]
+    aws_access_key_id = AWS_ACCESS_KEY
+    aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+
+Where the `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` are the credentials you obtained by creating a key under the AWS console in IAM services for your user account.
+
+After doing this, you should exit your `shell.bash` and run it again to pick up these environment variables in your shell.
+
+The AWS documentation for this can be found here:
+
+- http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
+
+## Running `aws`
+
+To find out what AWS IAM user you are currently using the credentials for:
+
+    $ aws iam get-user
+    {
+        "User": {
+            "UserName": "ianblenke",
+            "PasswordLastUsed": "2017-10-03T13:51:54Z",
+            "CreateDate": "2017-10-03T12:49:28Z",
+            "UserId": "AIDAREDACTED2REDACTED",
+            "Path": "/",
+            "Arn": "arn:aws:iam::123456789012:user/ianblenke"
+        }
+    }
+
+## terraform
+
+We use `terraform` to deploy and converge our cloud resources.
+
+- https://www.terraform.io/
+
+To install the Hashicorp `terraform` command on a mac, install it with HomeBrew:
+
+    brew install terraform
+
+The Hashicorp Terraform site is here:
+
+    https://www.terraform.io/
+
+Note: It is very important that we track the same version of terraform between ourselves, and that we upgrade terraform in unison, as resources tend to change between terraform versions.
+I am presently running the latest terraform: `0.10.7`.
+
+Internally, we use an AWS bucket named `sofwerx-terraform` for the shared `.tfstate` files. You will see how to set those up in the README.md for each environment.
+
+Instead of using `terraform` directly, I strongly suggest using the `swx tf` wrapper instead, as it will ensure that you have the correct environment sourced before running `terraform`.
+
+# Docker
+
+This project uses docker heavily. You will find `docker-compose.yml` files in the environment directories.
+
+## docker
 
 You will want to first install docker.
 
@@ -287,13 +390,18 @@ That being said, I also recommend trying out Docker for Mac.
 
    https://docs.docker.com/docker-for-mac/install/
 
-For Linux, it's just easiest to follow the directions for CE:
+For Windows and Linux, it's just easiest to follow the directions for CE:
 
 - https://docs.docker.com/engine/installation/
 - https://docs.docker.com/machine/install-machine/#installing-machine-directly
 - https://docs.docker.com/compose/install/
 
-# docker-machine vs dm
+Note: For the Linux Subsystem for Windows:
+- It is not possible to run a linux docker-engine without a linux kernel.
+- You are installing docker-engine natively on Windows so that you have a local Hyper-V linux virtual machine to run that kernel.
+- Installing `./dependencies/ubuntu.sh` earlier should have already installed the docker/docker-compose/docker-machine command-line tools for you in your bash shell for talking to remote docker engines.
+
+## docker-machine vs dm
 
 This project will import docker-machine configs into JSON "dm" objects stored in trousseau.
 
@@ -319,4 +427,6 @@ Then you would want to `git add .trousseau ; git commit` to save that newly adde
 # docker-compose as `swx dc`
 
 Instead of using `docker-compose` directly, I strongly suggest using the `swx dc` wrapper instead, as it will ensure that you have the correct environment sourced before running `docker-compose`.
+
+You can still run `docker-compose` directly of course, so long as your environment variables are correct for the docker engine you are deploying to.
 
