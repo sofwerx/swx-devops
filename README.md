@@ -144,18 +144,26 @@ The result of any trousseau commands will alter the `.trousseau` file in the cur
 This file is under git management, and is entirely safe as the contents of the file are encrypted.
 This is far easier than dealing with a shared s3 bucket or other shared repository.
 
-To install the `trousseau` command on a mac, install it with HomeBrew:
-
-    brew install trousseau
-
-Installing the `trousseau` package on Linux should be as simple as one of:
-
-    apt-get install trousseau
-    yum install trousseau
-
 The trousseau project is here:
 
-    https://github.com/oleiade/trousseau 
+- https://github.com/oleiade/trousseau 
+
+To install the `trousseau` command, you can download pre-built binaries from the releases page:
+
+- https://github.com/oleiade/trousseau/releases
+
+You can build from the Go source by following the build instructions, summarized here:
+
+    mkdir ~/go/bin
+    export GOPATH=~/go
+    export PATH=~/go/bin:$PATH 
+    go get github.com/tools/godep
+    go get github.com/urfave/cli
+    go get github.com/oleiade/trousseau
+    cd $GOPATH/src/github.com/oleiade/trousseau
+    godep
+    make
+    cp $GOPATH/go/bin/trousseau /usr/local/bin/trousseau
 
 ## Using trousseau
 
