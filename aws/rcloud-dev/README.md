@@ -1,6 +1,6 @@
 # rcloud-dev
 
-This is an AWS IPv6 enabled terraform deployment of rcloud.
+This _was_ an AWS IPv6 enabled terraform deployment of AT&T's Rcloud. It is no longer deployed.
 
 This rcloud deployment uses docker-compose to a single docker-engine host.
 
@@ -11,12 +11,13 @@ Before running `terraform` in the `terraform/` directory, or `docker-compose` in
 Example:
 
     icbmbp:rcloud-dev ianblenke$ ../../shell.bash
-    [sofwerx:] icbmbp:rcloud-dev ianblenke$ swx environment switch rcloud-dev
-    [sofwerx:rcloud-dev] icbmbp:rcloud-dev ianblenke$
+    [sofwerx::] icbmbp:rcloud-dev ianblenke$ swx environment switch rcloud-dev
+    [sofwerx:rcloud-dev:] icbmbp:rcloud-dev ianblenke$
 
 Before using `docker-compose` in the current directory, you will also need to switch to the dm enviroment for `rcloud-dev-0`:
 
-    [sofwerx:rcloud-dev] icbmbp:rcloud-dev ianblenke$ swx dm env rcloud-dev-0
+    [sofwerx:rcloud-dev:] icbmbp:rcloud-dev ianblenke$ swx dm env rcloud-dev-0
+    [sofwerx:rcloud-dev:rcloud-dev-0] icbmbp:rcloud-dev ianblenke$
 
 If you use the `swx tf` and `swx dc` wrappers instead, this will be taken care of for you.
 
