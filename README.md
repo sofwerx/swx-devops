@@ -52,7 +52,11 @@ The reason for gnupg 2.0 is that trousseau reads directly from `pubring.gpg`, an
 
 ### On a Mac
 
-If you happened to install `gnupg` already, just unlink first.
+There is a `gpg` built-in to MacOS in `/usr/bin/gpg`, and that is too new for `trousseau` now.
+
+We want to install `gpg` v2.0 to /usr/local/bin (until we can submit a PR to fix this in trousseau).
+
+If you happened to `brew install gnupg` already, just unlink first.
 
     brew unlink gnupg
 
