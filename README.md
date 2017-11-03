@@ -120,7 +120,7 @@ After installing gnupg 2.0, you will want to generate a private/public keypair:
 When prompted for 2048 bits, it's a good idea to use 4096 instead.
 If your `gpg` does not prompt you for the number of bits, you're probably using a gnupg newer than 2.0 which will not work with trousseau.
 
-After doing this, please export your public key into this repo under the `gnupg/` folder with a Github Pull-Request so that everyone has access to it.
+After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
 
     gpg --export --armor > gpg/ian@sofwerx.org
     git add gpg/ian@sofwerx.org
