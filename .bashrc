@@ -11,11 +11,13 @@ fi
 export AWS_SHARED_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}"
 export AWS_CONFIG_FILE="${AWS_CONFIG_FILE:-~/.aws/config}"
 export AWS_PROFILE="${AWS_PROFILE:-sofwerx}"
-export AWS_ACCESS_KEY_ID="$(aws configure get aws_access_key_id --profile $AWS_PROFILE)"
-export AWS_SECRET_ACCESS_KEY="$(aws configure get aws_secret_access_key --profile $AWS_PROFILE)"
-export AWS_REGION=${AWS_REGION:-"$(aws configure get region --profile $AWS_PROFILE)}"
-export AWS_DEFAULT_REGION="${AWS_REGION}"
-export AWS_DEFAULT_OUTPUT="$(aws configure get output --profile $AWS_PROFILE)"
+if grep $AWS_PROFILE $AWS_CONFIG_FILE > /dev/null 2>&1 ; then
+  export AWS_ACCESS_KEY_ID="$(aws configure get aws_access_key_id --profile $AWS_PROFILE)"
+  export AWS_SECRET_ACCESS_KEY="$(aws configure get aws_secret_access_key --profile $AWS_PROFILE)"
+  export AWS_REGION="${AWS_REGION:-$(aws configure get region --profile $AWS_PROFILE)}"
+  export AWS_DEFAULT_REGION="${AWS_REGION}"
+  export AWS_DEFAULT_OUTPUT="$(aws configure get output --profile $AWS_PROFILE)"
+fi
 
 # Set the bash prompt to show our $AWS_PROFILE
 export PS1='[$AWS_PROFILE:$SWX_ENVIRONMENT:$DOCKER_MACHINE_NAME] \h:\W \u\$ '
