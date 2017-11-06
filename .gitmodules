@@ -10,3 +10,6 @@
 [submodule "local/geo/synthetic-target-area-of-interest"]
 	path = local/geo/synthetic-target-area-of-interest
 	url = https://github.com/sofwerx/synthetic-target-area-of-interest
+[submodule "local/geo/docker-geoserver"]
+	path = local/geo/docker-geoserver
+	url = git@github.com:sofwerx/docker-geoserver.git
