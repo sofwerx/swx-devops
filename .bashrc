@@ -34,7 +34,7 @@ else
     export GNUPGHOME="$HOME/.gnupg"
   fi
 fi
-chmod go-rwx $GNUPGHOME
+chmod go-rwx "$GNUPGHOME"
 
 if [ -d /usr/local/opt/gpg-agent ]; then
   export PATH="/usr/local/opt/gpg-agent/bin:$PATH"
