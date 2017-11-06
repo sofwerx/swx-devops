@@ -4,18 +4,18 @@
 devops="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 alias ch="cd ${devops}"
 
-if [ -d ${devops}/secrets/aws ] ; then
-  export AWS_SHARED_CREDENTIALS_FILE=${devops}/secrets/aws/credentials
-  export AWS_CONFIG_FILE=${devops}/secrets/aws/config
+if [ -d "${devops}/secrets/aws" ] ; then
+  export AWS_SHARED_CREDENTIALS_FILE="${devops}/secrets/aws/credentials"
+  export AWS_CONFIG_FILE="${devops}/secrets/aws/config"
 fi
-export AWS_SHARED_CREDENTIALS_FILE=${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}
-export AWS_CONFIG_FILE=${AWS_CONFIG_FILE:-~/.aws/config}
-export AWS_PROFILE=${AWS_PROFILE:-sofwerx}
-export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id --profile $AWS_PROFILE)
-export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile $AWS_PROFILE)
-export AWS_REGION=${AWS_REGION:-$(aws configure get region --profile $AWS_PROFILE)}
-export AWS_DEFAULT_REGION=${AWS_REGION}
-export AWS_DEFAULT_OUTPUT=$(aws configure get output --profile $AWS_PROFILE)
+export AWS_SHARED_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}"
+export AWS_CONFIG_FILE="${AWS_CONFIG_FILE:-~/.aws/config}"
+export AWS_PROFILE="${AWS_PROFILE:-sofwerx}"
+export AWS_ACCESS_KEY_ID="$(aws configure get aws_access_key_id --profile $AWS_PROFILE)"
+export AWS_SECRET_ACCESS_KEY="$(aws configure get aws_secret_access_key --profile $AWS_PROFILE)"
+export AWS_REGION=${AWS_REGION:-"$(aws configure get region --profile $AWS_PROFILE)}"
+export AWS_DEFAULT_REGION="${AWS_REGION}"
+export AWS_DEFAULT_OUTPUT="$(aws configure get output --profile $AWS_PROFILE)"
 
 # Set the bash prompt to show our $AWS_PROFILE
 export PS1='[$AWS_PROFILE:$SWX_ENVIRONMENT:$DOCKER_MACHINE_NAME] \h:\W \u\$ '
@@ -25,8 +25,8 @@ export TF_VAR_aws_region=${AWS_REGION}
 export TF_VAR_aws_access_key_id=${AWS_ACCESS_KEY_ID}
 export TF_VAR_aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
 
-if [ -d ${devops}/secrets/gnupg ] ; then
-  export GNUPGHOME=${devops}/secrets/gnupg
+if [ -d "${devops}/secrets/gnupg" ] ; then
+  export GNUPGHOME="${devops}/secrets/gnupg"
 else
   if [ -d "$HOME/.gnupg" ]; then
     export GNUPGHOME="$HOME/.gnupg"
@@ -56,7 +56,7 @@ if [ -z "${GPG_AGENT_INFO}" ]; then
     GPG_TTY=$(tty)
     export GPG_TTY
 
-    eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $GNUPGHOME/.gpg-agent-info --allow-preset-passphrase)
+    eval $(gpg-agent --daemon --enable-ssh-support --write-env-file "$GNUPGHOME/.gpg-agent-info" --allow-preset-passphrase)
   fi
 fi
 
@@ -64,7 +64,7 @@ if [ -n "${GPG_AGENT_INFO}" ]; then
   export gpg_agent_info="${GPG_AGENT_INFO}"
 fi
 
-if [ -d $GNUPGHOME ] ; then
+if [ -d "$GNUPGHOME" ] ; then
   export TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1 | head -1)
   KEYGRIP=$(gpg --fingerprint --fingerprint | grep fingerprint | head -2 | tail -1 | cut -d= -f2 | sed -e 's/ //g')
   alias gpg_remember="echo -n 'Please enter your gpg key passphrase: '; stty -echo; gpg-preset-passphrase --preset $KEYGRIP ; stty echo ; echo ''"
@@ -76,8 +76,8 @@ fi
 
 # Use pinentry-mac if it is available
 if which pinentry-mac > /dev/null ; then
-  if ! grep pinentry-program $GNUPGHOME/gpg-agent.conf > /dev/null ; then
-    echo "pinentry-program /usr/local/bin/pinentry-mac" >> $GNUPGHOME/gpg-agent.conf
+  if ! grep pinentry-program "$GNUPGHOME/gpg-agent.conf" > /dev/null ; then
+    echo "pinentry-program /usr/local/bin/pinentry-mac" >> "$GNUPGHOME/gpg-agent.conf"
   fi
 fi
 
@@ -106,8 +106,8 @@ fi
 alias trousseau="$(which trousseau) --gnupg-home $GNUPGHOME --store $TROUSSEAU_STORE"
 
 # Allow a secrets based local store of docker-machines... for Ian. You _probably_ don't want this directory.
-if [ -d ${devops}/secrets/docker/machines ]; then
-  export MACHINE_STORAGE_PATH=${devops}/secrets/docker
+if [ -d "${devops}/secrets/docker/machines" ]; then
+  export MACHINE_STORAGE_PATH="${devops}/secrets/docker"
 else
   if [ -d ~/.docker/machine/machines ] ; then
     export MACHINE_STORAGE_PATH=~/.docker/machine/machines
@@ -116,10 +116,10 @@ fi
 
 # Install dmport if it has not been yet
 if which npm > /dev/null; then
-  if [ ! -d ${devops}/node_modules/ ]; then
+  if [ ! -d "${devops}/node_modules/" ]; then
     npm install
   fi
-  export PATH=$PATH:${devops}/node_modules/.bin
+  export PATH=$PATH:"${devops}/node_modules/.bin"
 fi
 
 # The swx command functions are defined below.
@@ -164,12 +164,12 @@ swx_dm_env ()
   if which dmport > /dev/null ; then
     if trousseau get file:secrets/dm/$1 > /dev/null 2>&1 ; then
       swx_secrets_decrypt secrets/dm/$1
-      if  [ -s ${devops}/secrets/dm/$1 ]; then
+      if  [ -s "${devops}/secrets/dm/$1" ]; then
         dm="$(cat ${devops}/secrets/dm/$1)"
         eval $(dmport --import $dm)
       fi
     else
-      if [ -s ${devops}/secrets/dm/$1 ]; then
+      if [ -s "${devops}/secrets/dm/$1" ]; then
         echo "dm $1 does not exist in trousseau, but does exist as a secrets file in ${devops}/secrets/dm/$1"
         echo "you may want to run this: swx secrets encrypt secrets/dm/$1"
       else
@@ -186,7 +186,7 @@ swx_dm_env ()
 swx_dm_import ()
 {
   if which dmport > /dev/null ; then
-    dmport --export $1 > ${devops}/secrets/dm/$1
+    dmport --export $1 > "${devops}/secrets/dm/$1"
     swx_secrets_encrypt secrets/dm/$1
   else
     echo "You need to do a npm install of dmport to use this function." 1>&2
@@ -257,7 +257,7 @@ EOU
 
 swx_secrets_addrecipients ()
 {
-  ls -1 $(devops)/gpg | while read recipient; do trousseau add-recipient $recipient; done
+  ls -1 "$(devops)/gpg" | while read recipient; do trousseau add-recipient $recipient; done
 }
 
 swx_secrets_decrypt ()
