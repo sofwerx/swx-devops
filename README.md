@@ -165,120 +165,6 @@ You can build from the Go source by following the build instructions, summarized
     make
     cp $GOPATH/go/bin/trousseau /usr/local/bin/trousseau
 
-## Using trousseau
-
-After your gpg/ PR is merged, you need to get someone else who is already a trusted trousseau recipient to add your public key to their keychain and then run `trousseau add-recipient` for your email address:
-
-    trousseau add-recipient ian@sofwerx.org
-
-After this, they need to:
-
-    git add .trousseau
-    git commit -a -m 'Added ian@sofwerx.org to recipients'
-
-Now future trousseau operations will also be encrypted for you to be able to see with your gpg key.
-
-To set a trousseau key:
-
-    trousseau set myvariable somevalue
-
-To retrieve the value for a key:
-
-    trousseau get myvariable
-
-To delete a key:
-
-    trousseau del myvariable
-
-Running `trousseau` on its own will show the other usable commands.
-
-The `.trousseau` file in this project is the actual gpg encrypted contents used to manage our environments.
-If you fork this repo to use yourself, you will need to remove `.trousseau` and create a new one with `trousseau create {gpg key email or id}`
-
-After your gpg key is added, and you are added as a trousseau reciepient, you will then be able to use the trousseau command.
-
-Our key naming convention will evolve over time.
-
-- `file:` prefixed trousseau keys hold base64 encoded values of the content of the files.
-- `environment:` prefixed trousseau keys hold enviroment variables for terraform to use
-
-There are 2 functions and an alias presently defined in the `.bashrc` to automate this process.
-
-To automatically pull all of the latest trousseau `file:secrets/` prefixed files, you can use:
-
-    swx secrets pull
-
-To decrypt a specific file under secrets, I would use the following function:
-
-    swx secrets decrypt secrets/ssh/sofwerx
-
-To encrypt a file under secrets, I would use the following function:
-
-    swx secrets encrypt secrets/ssh/sofwerx
-
-After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
-
-## .bashrc
-
-The "glue" of this harness is currently in the `.bashrc` file.
-
-The `swx` command provides the interface to the functions that interact with this devops harness:
-
-    $ swx
-    Usage: swx {command}
-      dm          - Manage dm (docker-machines)
-      environment - Source project-lifecycle environment variables
-      secrets     - Deal with secrets/ folder
-      tf          - Run Terraform for a project-lifecycle
-
-This will eventually get broken out into a script directory tree as simplicity demands it.
-
-## `shell.bash`
-
-Before running trousseau or any other tools against a project environment, you will need to obtain a shell using `shell.bash` first:
-
-    icbmbp:swx-devops ianblenke$ ./shell.bash
-
-After doing this, you will get a prompt that tells you the `AWS_PROFILE`, `SWX_ENVIRONMENT`, and `DOCKER_MACHINE_NAME` variables like so:
-
-    [sofwerx::] icbvtcmbp:swx-devops ianblenke$
-
-## `swx`
-
-Your primary interaction will be through the `swx` function. You can run a command and it should show usage for that command:
-
-    $ swx
-    Usage: swx {command}
-      dm          - Manage dm (docker-machines)
-      environment - Source project-lifecycle environment variables
-      secrets     - Deal with secrets/ folder
-      tf          - Run Terraform for a project-lifecycle
-      dc          - Run docker-compose for a project-lifecycle
-
-The `swx` command also has very helpful bash tab completion.
-
-Note that there is no selected `SWX_ENVIRONMENT` yet. To select `swx-dev`, you would use this function:
-
-    swx environment switch swx-dev
-
-This would look something like:
-
-    [sofwerx::] icbvtcmbp:swx-devops ianblenke$ swx environment switch swx-dev
-    [sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$
-
-Also note that there is no selected `DOCKER_MACHINE_NAME` yet. To select `swx-dev`, you would use this function:
-
-    swx dm env swx-dev-0
-
-Which would look something like:
-
-    [sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$ swx dm env swx-dev
-    [sofwerx:swx-dev:swx-dev-0] icbvtcmbp:swx-devops ianblenke$
-
-Now I am ready to run any `docker-compose` commands in the correct folders.
-
-If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
-
 # AWS
 
 This project models some cloud resources under the `aws/` folder.
@@ -364,6 +250,129 @@ To find out what AWS IAM user you are currently using the credentials for:
             "Arn": "arn:aws:iam::123456789012:user/ianblenke"
         }
     }
+
+
+## .bashrc
+
+The "glue" of this harness is currently in the `.bashrc` file.
+
+The `swx` command provides the interface to the functions that interact with this devops harness:
+
+    $ swx
+    Usage: swx {command}
+      dm          - Manage dm (docker-machines)
+      environment - Source project-lifecycle environment variables
+      secrets     - Deal with secrets/ folder
+      tf          - Run Terraform for a project-lifecycle
+
+This will eventually get broken out into a script directory tree as simplicity demands it.
+
+## `shell.bash`
+
+Before running trousseau or any other tools against a project environment, you will need to obtain a shell using `shell.bash` first:
+
+    icbmbp:swx-devops ianblenke$ ./shell.bash
+
+After doing this, you will get a prompt that tells you the `AWS_PROFILE`, `SWX_ENVIRONMENT`, and `DOCKER_MACHINE_NAME` variables like so:
+
+    [sofwerx::] icbvtcmbp:swx-devops ianblenke$
+
+## Using trousseau
+
+First, ensure you are in a `shell.bash` session.
+
+By default `trousseau` will use a `~/.trousseau` file in your home directory.
+Using a `shell.bash` session, the `.trousseau` file in this project will be used and updated as you change things.
+We want this so that we can contribute the changes back to the git repo for others to use.
+
+After your gpg/ PR is merged, you need to get someone else who is already a trusted trousseau recipient to add your public key to their keychain and then run `trousseau add-recipient` for your email address:
+
+    trousseau add-recipient ian@sofwerx.org
+
+After this, they need to:
+
+    git add .trousseau
+    git commit -a -m 'Added ian@sofwerx.org to recipients'
+
+Now future trousseau operations will also be encrypted for you to be able to see with your gpg key.
+
+To set a trousseau key:
+
+    trousseau set myvariable somevalue
+
+To retrieve the value for a key:
+
+    trousseau get myvariable
+
+To delete a key:
+
+    trousseau del myvariable
+
+Running `trousseau` on its own will show the other usable commands.
+
+The `.trousseau` file in this project is the actual gpg encrypted contents used to manage our environments.
+If you fork this repo to use yourself, you will need to remove `.trousseau` and create a new one with `trousseau create {gpg key email or id}`
+
+After your gpg key is added, and you are added as a trousseau reciepient, you will then be able to use the trousseau command.
+
+Our key naming convention will evolve over time.
+
+- `file:` prefixed trousseau keys hold base64 encoded values of the content of the files.
+- `environment:` prefixed trousseau keys hold enviroment variables for terraform to use
+
+There are 2 functions and an alias presently defined in the `.bashrc` to automate this process.
+
+To automatically pull all of the latest trousseau `file:secrets/` prefixed files, you can use:
+
+    swx secrets pull
+
+To decrypt a specific file under secrets, I would use the following function:
+
+    swx secrets decrypt secrets/ssh/sofwerx
+
+To encrypt a file under secrets, I would use the following function:
+
+    swx secrets encrypt secrets/ssh/sofwerx
+
+After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
+
+## `swx`
+
+The `swx` function commands are available when you start a `shell.bash` session.
+
+Your primary interaction will be through the `swx` function. You can run a command and it should show usage for that command:
+
+    $ swx
+    Usage: swx {command}
+      dm          - Manage dm (docker-machines)
+      environment - Source project-lifecycle environment variables
+      secrets     - Deal with secrets/ folder
+      tf          - Run Terraform for a project-lifecycle
+      dc          - Run docker-compose for a project-lifecycle
+
+The `swx` command also has very helpful bash tab completion.
+
+Note that there is no selected `SWX_ENVIRONMENT` yet. To select `swx-dev`, you would use this function:
+
+    swx environment switch swx-dev
+
+This would look something like:
+
+    [sofwerx::] icbvtcmbp:swx-devops ianblenke$ swx environment switch swx-dev
+    [sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$
+
+Also note that there is no selected `DOCKER_MACHINE_NAME` yet. To select `swx-dev`, you would use this function:
+
+    swx dm env swx-dev-0
+
+Which would look something like:
+
+    [sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$ swx dm env swx-dev
+    [sofwerx:swx-dev:swx-dev-0] icbvtcmbp:swx-devops ianblenke$
+
+Now I am ready to run any `docker-compose` commands in the correct folders.
+
+If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
 
 ## terraform
 
