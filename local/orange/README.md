@@ -27,5 +27,5 @@ Elasticsearch / Logstash / Kibana (ELK) was deployed from here using:
 ELK on docker swarm:
 
 - https://github.com/ahromis/swarm-elk
-- elk_elasticsearch
+- https://botleg.com/stories/log-management-of-docker-swarm-with-elk-stack/
 
