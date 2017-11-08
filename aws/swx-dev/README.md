@@ -1,6 +1,6 @@
 # swx-dev
 
-This is an AWS IPv6 enabled terraform deployment of a dokku instance for PaaS deployment.
+This _was_  an AWS IPv6 enabled terraform deployment of a dokku instance for PaaS deployment. It is no longer deployed.
 
 ## environment
 
