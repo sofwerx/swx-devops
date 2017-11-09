@@ -27,10 +27,11 @@ The dependencies, and how to use them, are enumerated below.
 
 - [local/dev](local/dev/README.md) - Your local `dev` environment
 - [local/geo](local/geo/README.md) - Our `geo` mintpc in our Data Science pit
+- [local/orange](local/orange/README.md) - Our tranquilpc 8-blade docker swarm server in our Data Science pit
 - [local/swx-pi](local/swx-pi/README.md) - A shared raspberry-pi docker host in our Data Science pit
 - [local/swx-gpu](local/swx-gpu/README.md) - Our shared IBM Minsky ppc64le GPU server in our datacenter
-- [aws/swx-dev](aws/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing
-- [aws/rcloud-dev](aws/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation
+- ~~[aws/swx-dev](aws/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
+- ~~[aws/rcloud-dev](aws/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
 
 # Secrets
 
