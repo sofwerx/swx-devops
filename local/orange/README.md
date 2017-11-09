@@ -20,7 +20,7 @@ Due to `DOCKER_COMPOSE=orange.yml` in the orange environment, the `orange.yml` h
 
 Elasticsearch / Logstash / Kibana (ELK) was deployed from here using:
 
-    docker stack deploy -c orange.yml elk
+    docker stack deploy -c elk.yml elk
 
 ### Related:
 
