@@ -7,9 +7,8 @@ networks:
       encrypted: "true"
 
   traefik:
-    driver: overlay
-    driver_opts:
-      encrypted: "true"
+    external:
+      name: traefik_traefik 
 
 services:
 
@@ -53,6 +52,7 @@ services:
       replicas: 1
       labels:
         - "traefik.backend=kibana"
+        - "traefik.backend.loadbalancer.swarm=true"
         - "traefik.port=5601"
         - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
         - "traefik.frontend.passHostHeader=true"
