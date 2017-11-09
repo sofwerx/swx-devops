@@ -6,6 +6,11 @@ networks:
     driver_opts:
       encrypted: "true"
 
+  traefik:
+    driver: overlay
+    driver_opts:
+      encrypted: "true"
+
 services:
 
   elasticsearch:
@@ -27,6 +32,8 @@ services:
       mode: replicated
       replicas: 1
       endpoint_mode: dnsrr
+      labels:
+        - "traefik.enable=false"
 
   kibana:
     image: kibana:latest
@@ -36,13 +43,20 @@ services:
       ELASTICSEARCH_URL: http://elasticsearch:9200
     networks:
       - elk
-    deploy:
-      mode: replicated
-      replicas: 1
+      - traefik
     healthcheck:
       test: wget -qO- http://localhost:5601 > /dev/null
       interval: 30s
       retries: 3
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.backend=kibana"
+        - "traefik.port=5601"
+        - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
 
   logstash:
     hostname: logstash
@@ -57,4 +71,6 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+      labels:
+        - "traefik.enable=false"
 
