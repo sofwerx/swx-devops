@@ -6,7 +6,7 @@ NETNAME=${NETNAME:-tinc0}
 DEBUG_LEVEL=${DEBUG_LEVEL:-3}
 PIDFILE=/usr/var/run/tinc.${NETNAME}.pid
 TINC=${TINC:-tinc --pidfile=${PIDFILE}}
-START=${START:-${TINC} start -D -U nobody --logfile=/dev/stdout --debug=${DEBUG_LEVEL}}
+START=${START:-${TINC} start -D -U root --logfile=/dev/stdout --debug=${DEBUG_LEVEL}}
 
 TINC_PORT=${TINC_PORT:-655}
 
@@ -40,8 +40,9 @@ if [ ! -f /etc/tinc/${NETNAME}/tinc.conf ]; then
   ${TINC} init ${HOSTNAME}
 fi
 
+mkdir -p /etc/tinc/${NETNAME}/hosts/
 if [ -n "${TINC_IMPORT}" ] ; then
-  echo "${TINC_IMPORT}" | tinc import
+  echo "${TINC_IMPORT}" | base64 -d | tinc import || true
 fi
 
 ${TINC} set Port ${TINC_PORT}
@@ -90,7 +91,7 @@ BRIDGE_INTERFACE=${BRIDGE_INTERFACE:-br${NETNAME}}
 
 cat << TINCUP > tinc-up
 #!/bin/bash -x
-ifconfig \${INTERFACE} ${IP} subnet ${SUBNET} up
+ifconfig \${INTERFACE} ${IP} netmask ${SUBNET} up
 TINCUP
 chmod u+x tinc-up
 
