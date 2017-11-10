@@ -37,6 +37,7 @@ services:
       placement:
         constraints:
           - "node.role == manager"
+          - "engine.labels.storage-constrained != true"
       labels:
         - "traefik.backend=traefik"
         - "traefik.backend.loadbalancer.swarm=true"

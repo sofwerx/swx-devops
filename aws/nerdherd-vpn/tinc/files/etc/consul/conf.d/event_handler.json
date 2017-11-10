@@ -1,0 +1,8 @@
+{
+  "watches": [
+    {
+      "type": "event",
+      "handler": "/etc/consul/event_handler.sh"
+    }
+  ]
+}

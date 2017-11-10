@@ -125,8 +125,8 @@ resource "aws_security_group_rule" "sg_ingress_https" {
 
 resource "aws_security_group_rule" "sg_ingress_tinc_tcp" {
     type = "ingress"
-    from_port = 665
-    to_port = 665
+    from_port = 655
+    to_port = 655
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
@@ -136,8 +136,8 @@ resource "aws_security_group_rule" "sg_ingress_tinc_tcp" {
 
 resource "aws_security_group_rule" "sg_ingress_tinc_udp" {
     type = "ingress"
-    from_port = 665
-    to_port = 665
+    from_port = 655
+    to_port = 655
     protocol = "udp"
     cidr_blocks = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]

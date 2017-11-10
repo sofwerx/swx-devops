@@ -31,6 +31,9 @@ services:
       mode: replicated
       replicas: 1
       endpoint_mode: dnsrr
+      placement:
+        constraints:
+          - "engine.labels.storage-constrained != true"
       labels:
         - "traefik.enable=false"
 

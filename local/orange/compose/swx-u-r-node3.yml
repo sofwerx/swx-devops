@@ -1,0 +1,28 @@
+version: "3.3"
+
+volumes:
+  nerdherdvpn-data:
+    driver: local
+
+services:
+
+  nerdherdvpn:
+    build: tinc/
+    image: sofwerx/tinc
+    container_name: nerdherdvpn
+    network_mode: host
+    devices:
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - nerdherdvpn-data:/etc/tinc
+    restart: always
+    ports:
+      - "655:655"
+      - "655:655/udp"
+    environment:
+      NETNAME: nerdherd
+      IP: 172.31.128.123
+      SUBNET: 255.255.255.0
+
