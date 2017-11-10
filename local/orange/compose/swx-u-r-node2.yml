@@ -25,4 +25,6 @@ services:
       NETNAME: nerdherd
       IP: 172.31.128.122
       SUBNET: 255.255.255.0
+      TINC_IMPORT: ${TINC_IMPORT}
+      TINC_CONNECT_TO: ${TINC_CONNECT_TO}
 
