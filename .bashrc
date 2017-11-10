@@ -19,6 +19,10 @@ if grep $AWS_PROFILE $AWS_CONFIG_FILE > /dev/null 2>&1 ; then
   export AWS_DEFAULT_OUTPUT="$(aws configure get output --profile $AWS_PROFILE)"
 fi
 
+if [ -n "$DOCKER_API_VERSION" ]; then
+ unset DOCKER_API_VERSION
+fi
+
 # Set the bash prompt to show our $AWS_PROFILE
 export PS1='[$AWS_PROFILE:$SWX_ENVIRONMENT:$DOCKER_MACHINE_NAME] \h:\W \u\$ '
 
