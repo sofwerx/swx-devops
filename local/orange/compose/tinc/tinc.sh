@@ -6,7 +6,7 @@ NETNAME=${NETNAME:-tinc0}
 DEBUG_LEVEL=${DEBUG_LEVEL:-3}
 PIDFILE=/usr/var/run/tinc.${NETNAME}.pid
 TINC=${TINC:-tinc --pidfile=${PIDFILE}}
-START=${START:-${TINC} start -D -U nobody --logfile=/dev/stdout --debug=${DEBUG_LEVEL}}
+START=${START:-${TINC} start -D -U root --logfile=/dev/stdout --debug=${DEBUG_LEVEL}}
 
 TINC_PORT=${TINC_PORT:-655}
 
@@ -38,6 +38,11 @@ fi
 
 if [ ! -f /etc/tinc/${NETNAME}/tinc.conf ]; then
   ${TINC} init ${HOSTNAME}
+fi
+
+mkdir -p /etc/tinc/${NETNAME}/hosts/
+if [ -n "${TINC_IMPORT}" ] ; then
+  echo "${TINC_IMPORT}" | base64 -d | tinc import || true
 fi
 
 ${TINC} set Port ${TINC_PORT}
@@ -86,79 +91,14 @@ BRIDGE_INTERFACE=${BRIDGE_INTERFACE:-br${NETNAME}}
 
 cat << TINCUP > tinc-up
 #!/bin/bash -x
-brctl addbr ${BRIDGE_INTERFACE} || true
-ifconfig ${BRIDGE_INTERFACE} up
-if [ -n "${PRIVATE_INTERFACE}" ]; then
-  brctl addif ${BRIDGE_INTERFACE} ${PRIVATE_INTERFACE} || true
-  ifconfig ${PRIVATE_INTERFACE} up
-fi
-brctl addif ${BRIDGE_INTERFACE} \${INTERFACE} || true
-ifconfig \${INTERFACE} up
-ip -6 addr add ${IPV6} dev ${BRIDGE_INTERFACE}
+ifconfig \${INTERFACE} ${IP} netmask ${SUBNET} up
 TINCUP
 chmod u+x tinc-up
 
 cat << TINCDOWN > tinc-down
 #!/bin/bash -x
-ip -6 addr del ${IPV6} dev ${BRIDGE_INTERFACE} || true
 ifconfig \${INTERFACE} down
-brctl delif ${BRIDGE_INTERFACE} \${INTERFACE} || true
-if [ -n "${PRIVATE_INTERFACE}" ]; then
-  ifconfig ${PRIVATE_INTERFACE} down
-  brctl delif ${BRIDGE_INTERFACE} ${PRIVATE_INTERFACE} || true
-fi
-ifconfig ${BRIDGE_INTERFACE} down
-brctl delbr ${BRIDGE_INTERFACE} || true
 TINCDOWN
 chmod u+x tinc-down
-
-# If CONSUL_VERSION is defined, prepare and run a consul agent
-
-if [ -n "${CONSUL_VERSION}" ]; then
-  CONSUL_VERSION=${CONSUL_VERSION:-0.5.2}
-
-  export CONSUL_SERVICE_NAME=${CONSUL_SERVICE_NAME:-tinc}
-  export CONSUL_SERVICE_PORT=${CONSUL_SERVICE_PORT:-${TINC_PORT}}
-
-  apk add --update ca-certificates bash wget curl rsync unzip jq
-
-  curl -sLo /tmp/glibc-2.21-r2.apk https://circle-artifacts.com/gh/andyshinn/alpine-pkg-glibc/6/artifacts/0/home/ubuntu/alpine-pkg-glibc/packages/x86_64/glibc-2.21-r2.apk
-  apk add --update --allow-untrusted /tmp/glibc-2.21-r2.apk
-  rm -rf /tmp/glibc-2.21-r2.apk
-
-  curl -sLo /tmp/consul.zip https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip
-  curl -sLo /tmp/consul.sha256sums https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_SHA256SUMS
-  echo "$(grep consul_${CONSUL_VERSION}_linux_amd64.zip /tmp/consul.sha256sums | awk '{print $1}')  /tmp/consul.zip" > /tmp/consul.sha256
-  cat /tmp/consul.sha256
-  sha256sum /tmp/consul.zip
-  sha256sum -c /tmp/consul.sha256 || (echo "$0: consul.zip failed SHA checksum"; exit 1)
-  unzip -o /tmp/consul.zip -d /usr/bin
-  chmod +x /usr/bin/consul
-  mkdir -p {/data/consul,/etc/consul/conf.d,/etc/consul/handlers.d}
-  rm /tmp/consul.zip
-  rm -rf /var/cache/apk/*
-
-  # Install goreman - foreman clone written in Go language
-  curl -sLo /tmp/goreman.tar.gz https://github.com/mattn/goreman/releases/download/v0.0.7/goreman_linux_amd64.tar.gz
-  tar xvzf /tmp/goreman.tar.gz -C /usr/local/bin --strip-components=1
-
-  # Start a consul session, and ensure cleanup on tinc-down
-  export CONSUL_SESSION_ID=$(curl  -X PUT -d '{"Name": "tinc-session","Behavior": "delete"}' http://${CONSUL_HOST:-172.17.0.1}:8500/v1/session/create | jq -r .ID)
-  echo "curl  -X PUT http://${CONSUL_HOST:-172.17.0.1}:8500/v1/session/destroy/${CONSUL_SESSION_ID}" >> tinc-down
-
-  hash -r
-
-  # Fire consul events for the tinc scripts
-  echo 'consul event -name tinc/v1.1/host-up "$(${TINC} export)"' >> tinc-up
-  echo 'consul event -name tinc/v1.1/host-down "$(${TINC} export)"' >> tinc-down
-
-  cat <<PROCFILE > /Procfile
-tinc: ${START}
-consul: /consul_agent.sh
-PROCFILE
-
-  START="/usr/local/bin/goreman -f /Procfile start"
-  export GOMAXPROCS=2
-fi
 
 exec ${START}

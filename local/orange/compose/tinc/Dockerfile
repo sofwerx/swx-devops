@@ -34,7 +34,6 @@ EXPOSE 655/tcp 655/udp
 RUN mkdir -p /usr/var/run
 VOLUME /etc/tinc
 
-ADD files/ /
-RUN find / -name '*.sh' -exec chmod u+x {} \;
+ADD tinc.sh /tinc.sh
 
 CMD bash /tinc.sh
