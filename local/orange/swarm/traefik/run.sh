@@ -81,21 +81,40 @@ storageFile = "/ssl/acme.json"
 #
 entryPoint = "https"
 
+EOF
+
+if [ -n "${AWS_ACCESS_KEY_ID}" ] ; then
+cat <<EOF >> /etc/traefik/traefik.toml
+dnsProvider = "route53"
+acmeLogging = true
+EOF
+fi
+
+cat <<EOF >> /etc/traefik/traefik.toml
 # Enable on demand certificate. This will request a certificate from Let's Encrypt during the first TLS handshake for a hostname that does not yet have a certificate.
 # WARNING, TLS handshakes will be slow when requesting a hostname certificate for the first time, this can leads to DoS attacks.
 # WARNING, Take note that Let's Encrypt have rate limiting: https://community.letsencrypt.org/t/quick-start-guide/1631
 #
 # Optional
 #
-onDemand = true
+onDemand = false
+onHostRule = true
 
 # CA server to use
 # Uncomment the line to run on the staging let's encrypt server
-# Leave comment to go to prod
+# Leave commented to go to prod
 #
 # Optional
 #
+EOF
+
+if [ -n "${STAGING}" ] ; then
+cat <<EOF >> /etc/traefik/traefik.toml
 caServer = "https://acme-staging.api.letsencrypt.org/directory"
+EOF
+fi
+
+cat <<EOF >> /etc/traefik/traefik.toml
 
 # Domains list
 # You can provide SANs (alternative domains) to each main domain
@@ -122,4 +141,6 @@ fi # $WILDCARD_SSL_CERTIFICATE
 
 cat /etc/traefik/traefik.toml
 
-exec /go/bin/traefik $@
+export PATH=/go/bin:$GOPATH/bin:$PATH
+
+exec traefik $@
