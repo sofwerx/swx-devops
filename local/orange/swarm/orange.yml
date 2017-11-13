@@ -1,0 +1,20 @@
+version: "3.4"
+
+networks:
+
+  default:
+    driver: overlay
+    driver_opts:
+      encrypted: "true"
+
+services:
+
+  # Enable docker to auto-run any architecture image using qemu
+  #     docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  multiarch:
+    container_name: multiarch
+    image: multiarch/qemu-user-static:register
+    privileged: true
+    deploy:
+      mode: global
+

@@ -1,11 +1,10 @@
-version: "3.3"
+version: "3.4"
 
 networks:
 
-  traefik:
-    driver: overlay
-    driver_opts:
-      encrypted: "true"
+  default:
+    external:
+      name: orange_default
 
 services:
 
@@ -13,7 +12,7 @@ services:
     hostname: traefik
     build: traefik/
     image: sofwerx/traefik
-    restart: always
+    restart: "on-failure"
     ports:
       - 80:80
       - 443:443
@@ -30,10 +29,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --docker --docker.swarmmode --docker.domain=${DNS_DOMAIN} --docker.watch
-    networks:
-      - traefik
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
       placement:
         constraints:
           - "node.role == manager"

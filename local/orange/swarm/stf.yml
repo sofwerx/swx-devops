@@ -1,0 +1,458 @@
+version: '3.4'
+
+networks: 
+  stf:
+    driver: overlay
+    driver_opts:
+      encrypted: "true"
+
+  traefik:
+    external:
+      name: traefik_traefik 
+
+volumes:
+  rethink-data:
+    driver: local
+
+# Traefik frontend proxy needs SNI for:
+# SUBDOMAINS: [ "stf.${DNS_DOMAIN}", "wss.stf.${DNS_DOMAIN}", "auth.stf.${DNS_DOMAIN}", "appside.stf.${DNS_DOMAIN}", "devside.stf.${DNS_DOMAIN}" ]
+
+# Ports:
+# 3100 - stf-app
+# 3200 - stf-auth
+# 3300 - stf-storage-plugin-apk
+# 3400 - stf-storage-plugin-image
+# 3500 - stf-storage-temp
+# 3600 - stf-websocket
+# 7150 - app-pub
+# 7250 - dev-pub
+# 7160 - app-dealer
+# 7260 - dev-dealer
+# 7170 - app-pull
+# 7270 - dev-pull
+
+services:
+
+  rethinkdb-primary:
+    image: rethinkdb:2.3
+    volumes:
+      - rethink-data:/data
+    restart: always
+    networks:
+      - stf
+    command: rethinkdb --bind all --cache-size 2048
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "engine.labels.storage-constrained != true"
+      labels:
+        - "traefik.enable=false"
+
+  rethinkdb:
+    image: rethinkdb:2.3
+    restart: always
+    networks:
+      - stf
+    ports:
+      - "28080:8080"
+      - "28015:28015"
+      - "29015:29015"
+    depends_on:
+      - rethinkdb-primary
+    command: rethinkdb --bind all --cache-size 2048 --join rethinkdb-primary
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "engine.labels.storage-constrained != true"
+      labels:
+        - "traefik.enable=false"
+  
+  abd:
+    image: sorccu/adb
+    container_name: provider-abd
+    privileged: true
+    networks:
+      - stf
+### Note: Ports do not need to be published external to docker network segment for `stf local` only
+#    ports:
+#      - "5037:5037"
+### Note: docker-compose deploy to swarm does not support network_mode: host
+#   network_mode: host
+    restart: always
+    volumes:
+      - "/dev/bus/usb:/dev/bus/usb"
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=false"
+
+  # The app unit provides the main HTTP server and it serves all static resources including images, scripts and stylesheets.
+  stf-app:
+    image: openstf/stf
+    container_name: stf-app
+    restart: always
+    depends_on:
+      - rethinkdb
+    networks:
+      - stf
+      - traefik
+    ports:
+      - 3100:3000
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    restart: always
+    command: >-
+      stf app --port 3000
+        --auth-url https://stf.${DNS_DOMAIN}/auth/oauth/
+        --websocket-url wss://stf.${DNS_DOMAIN}/socket-io/
+    deploy:
+      mode: global
+      labels:
+        - "traefik.backend=stf-app"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.port=3000"
+        - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN},PathPrefix:/"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  stf-auth:
+    image: openstf/stf
+    environment:
+      SECRET: ${STF_SECRET}
+      OAUTH_AUTHORIZATION_URL: ${STF_OAUTH_AUTHORIZATION_URL}
+      OAUTH_TOKEN_URL: ${STF_OAUTH_TOKEN_URL}
+      OAUTH_USERINFO_URL: ${STF_OAUTH_TOKEN_URL}
+      OAUTH_CLIENT_ID: ${STF_OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${STF_OAUTH_CLIENT_SECRET}
+      OAUTH_CALLBACK_URL: https://stf.${DNS_DOMAIN}/auth/oauth/callback
+      OAUTH_SCOPE: ${OAUTH_SCOPE}
+    container_name: stf-auth
+    restart: always
+    ports:
+      - 3200:3000
+    command: stf auth-oauth2 --port 3000 --app-url https://stf.${DNS_DOMAIN}/
+    deploy:
+      mode: global
+      labels:
+        - "traefik.backend=stf-auth"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.port=3000"
+        - "traefik.frontend.rule=Hoststf.${DNS_DOMAIN},PathPrefix:/auth"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  # This migrates the database to the latest version, which pretty much means creating tables and setting up indexes.
+  # Schema changes do not require a migration unless a new index is introduced.
+  stf-migrate:
+    image: openstf/stf
+    container_name: stf-migrate
+    command: stf migrate
+    networks:
+      - stf
+    depends_on:
+      - rethinkdb
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
+
+  # The processor is the main workhorse of STF.
+  #  It acts as a bridge between the devices and the app, and nearly all communication goes through it.
+  stf-processor:
+    image: openstf/stf
+    container_name: stf-processor
+    networks:
+      - stf
+    command: >-
+      stf processor stf-processor
+        --connect-app-dealer tcp://stf-triproxy-app:7160
+        --connect-dev-dealer tcp://stf-triproxy-dev:7260
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    depends_on:
+      - rethinkdb
+    restart: always
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=false"
+
+  # The provider unit connects to ADB and start worker processes for each device.
+  # It then sends and receives commands from the processor.  
+  # The name of the provider shows up in the device list, making it easier to see where the physical devices are located.
+  # In this configuration the name is set to the hostname.
+  # Note that the provider needs to be able to manage a certain port range,
+  # so --net host is required until Docker makes it easier to work with ranges.
+  # The ports are used for internal services and the screen capturing WebSocket.
+  # Note that you cannot have more than one provider unit running on the same host,
+  # as they would compete over which one gets to control the devices.
+  stf-provider:
+    image: openstf/stf
+    container_name: stf-reaper
+    ports:
+      - 15000:15499
+    command: >-
+      stf provider
+        --name "%H/%i"
+        --connect-sub tcp://stf-triproxy-dev:7250
+        --connect-push tcp://stf-triproxy-dev:7270
+        --storage-url https://stf.${DNS_DOMAIN}/
+        --public-ip ${PRIVATE_IPV4}
+        --min-port=15000
+        --max-port=15499
+        --heartbeat-interval 10000
+        --screen-ws-url-pattern "wss://stf.example.org/d/%i/<%= serial %>/<%= publicPort %>/"
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    depends_on:
+      - rethinkdb
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
+
+  # The APK storage plugin loads raw blobs from the main storage unit and allows additional actions to be performed on APK files, such as retrieving the AndroidManifest.xml.
+  stf-storage-plugin-apk:
+    image: openstf/stf
+    container_name: stf-storage-apk
+    networks:
+      - stf
+      - traefik
+    ports:
+      - 3300:3000
+    command: >-
+      stf storage-plugin-apk --port 3000
+        --storage-url https://stf.${DNS_DOMAIN}/
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    depends_on:
+      - rethinkdb
+    restart: always
+    deploy:
+      mode: global
+      labels:
+        - "traefik.backend=stf-storage-plugin-image"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.port=3000"
+        - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN},PathPrefix:/s/apk"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  # The image storage plugin loads raw blobs from the main storage unit and and allows images to be resized using parameters.
+  stf-storage-plugin-image:
+    image: openstf/stf
+    container_name: stf-storage-image
+    ports:
+      - 3400:3000
+    command: >-
+      stf storage-plugin-image --port 3000
+        --storage-url https://stf.${DNS_DOMAIN}/
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    depends_on:
+      - rethinkdb
+    restart: always
+    deploy:
+      mode: global
+      labels:
+        - "traefik.backend=stf-storage-plugin-image"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.port=3000"
+        - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN},PathPrefix:/s/image"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  stf-storage-temp:
+    image: openstf/stf
+    container_name: stf-storage-image
+    ports:
+      - 3500:3000
+    networks:
+      - stf
+      - traefik
+    command: >-
+      stf storage-temp --port 3000
+        --save-dir /data
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    depends_on:
+      - rethinkdb
+    restart: always
+    deploy:
+      mode: global
+      labels:
+        - "traefik.backend=stf-storage-plugin-image"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.port=3000"
+        - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN},PathPrefix:/s"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  # This will send and receive requests from the app units,
+  # and distribute them across the processor units.
+  # It's "dumb" in that it contains no real logic, and you rarely if ever need to upgrade
+  # We call it a triproxy because it deals with three endpoints instead of the usual two.
+  stf-triproxy-app:
+    image: openstf/stf
+    container_name: stf-triproxy-app
+    ports:
+      - 7150:7150 # app-pub
+      - 7160:7160 # app-dealer
+      - 7170:7170 # app-pull
+    networks:
+      - stf
+    command: >-
+      stf triproxy app
+        --bind-pub "tcp://*:7150"
+        --bind-dealer "tcp://*:7160"
+        --bind-pull "tcp://*:7170"
+    restart: always
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=false"
+
+  # This willreceive requests from the dev units,
+  # and distribute them across the processor units.
+  # It's "dumb" in that it contains no real logic, and you rarely if ever need to upgrade
+  # We call it a triproxy because it deals with three endpoints instead of the usual two.
+  stf-triproxy-dev:
+    image: openstf/stf
+    container_name: stf-triproxy-dev
+    ports:
+      - 7250:7250 # dev-pub
+      - 7260:7260 # dev-dealer
+      - 7270:7270 # dev-pull
+    networks:
+      - stf
+    command: >-
+      stf triproxy app
+        --bind-pub "tcp://*:7250"
+        --bind-dealer "tcp://*:7260"
+        --bind-pull "tcp://*:7270"
+    restart: always
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=false"
+
+  # The websocket unit provides the communication layer between client-side JavaScript
+  # and the server-side ZeroMQ+Protobuf combination.
+  # Almost every action in STF goes through the websocket unit.
+  stf-websocket:
+    image: openstf/stf
+    container_name: stf-websocket
+    ports:
+      - 3600:3000
+    networks:
+      - stf
+      - traefik
+    command: >-
+      stf websocket --port 3000 \
+        --storage-url https://stf.${DNS_DOMAIN}/
+        --connect-sub tcp://stf-triproxy-app:7150
+        --connect-push tcp://stf-triproxy-app:7170
+    deploy:
+      mode: global
+      labels:
+        - "traefik.backend=stf-auth"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.port=3000"
+        - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN},PathPrefix:/socket-io"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  # The api unit provides all the major RESTful APIs for STF.
+  # Users can generate their personal access token from STF UI and can use that token to access these api from any interface.
+  stf-api:
+    image: openstf/stf
+    container_name: stf-api
+    networks:
+      - stf
+      - traefik
+    command: >-
+      stf api --port 3000
+        --connect-sub tcp://stf-triproxy-app:7150
+        --connect-push tcp://stf-triproxy-app:7170
+    restart: always
+    deploy:
+      mode: global
+      labels:
+        - "traefik.backend=stf-api"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.port=3000"
+        - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN},PathPrefix:/api"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  # The reaper unit receives heartbeat events from device workers, 
+  # and marks lost devices as absent until a heartbeat is received again.
+  # The purpose of this unit is to ensure the integrity of the present/absent flag in the database,
+  # in case a provider shuts down unexpectedly or another unexpected failure occurs.
+  # It loads the current state from the database on startup and keeps patching its internal view as events are routed to it.
+  stf-reaper:
+    image: openstf/stf
+    container_name: stf-reaper
+    networks:
+      - stf
+    command: >-
+      stf reaper dev
+        --connect-push tcp://stf-triproxy-dev:7270
+        --connect-sub tcp://stf-triproxy-app:7150
+        --heartbeat-timeout 30000
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    depends_on:
+      - rethinkdb
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
+
+# The following services are optional and don't affect the way STF works in any way.
+
+  # Allows device log events to be stored in RethinkDB.
+  stf-log-rethinkdb:
+    image: openstf/stf
+    container_name: stf-log-rethinkdb
+    command: >-
+      stf log-rethinkdb
+        --connect-sub tcp://stf-triproxy-app:7150 
+    networks:
+      - stf
+    environment:
+      RETHINKDB_PORT_28015_TCP: tcp://rethinkdb:28015
+    depends_on:
+      - rethinkdb
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
+
+  # The optional Slack notifier unit can be enabled to push STF notifications to a public or private Slack channel. 
+  stf-notify-slack:
+    image: openstf/stf
+    container_name: stf-notify-slack
+    networks:
+      - stf
+    command: >-
+      stf notify-slack 
+        --connect-sub tcp://stf-triproxy-app:7150 
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
+
