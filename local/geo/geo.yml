@@ -12,5 +12,31 @@ services:
 
   traefik:
     extends:
-      file: docker-compose.yml
+      file: traefik/docker-compose.yml
       service: traefik
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+    labels:
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  geoserver:
+    extends:
+      file: docker-geoserver/docker-compose.yml
+      service: geoserver
+    ports:
+      - "8088:8080"
+    networks:
+      - default
+    labels:
+      - "traefik.backend=geoserver"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:geoserver.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
