@@ -13,3 +13,6 @@
 [submodule "local/geo/docker-geoserver"]
 	path = local/geo/docker-geoserver
 	url = git@github.com:sofwerx/docker-geoserver.git
+[submodule "local/geo/docker-guacamole"]
+	path = local/geo/docker-guacamole
+	url = https://github.com/sofwerx/docker-guacamole

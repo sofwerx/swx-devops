@@ -19,6 +19,16 @@ address = ":${REST_PORT}"
 endpoint = "unix:///var/run/docker.sock"
 domain = "${DNS_DOMAIN}"
 watch = true
+EOF
+
+if [ -n "${DOCKER_SWARMMODE}" ]; then
+cat <<EOF >> /etc/traefik/traefik.toml
+exposedbydefault = false
+swarmmode = true
+EOF
+fi
+
+cat <<EOF >> /etc/traefik/traefik.toml
 # Sample entrypoint configuration when using ACME
 [entryPoints]
   [entryPoints.http]
@@ -106,7 +116,15 @@ onHostRule = true
 #
 # Optional
 #
-# caServer = "https://acme-staging.api.letsencrypt.org/directory"
+EOF
+
+if [ -n "${STAGING}" ] ; then
+cat <<EOF >> /etc/traefik/traefik.toml
+caServer = "https://acme-staging.api.letsencrypt.org/directory"
+EOF
+fi
+
+cat <<EOF >> /etc/traefik/traefik.toml
 
 # Domains list
 # You can provide SANs (alternative domains) to each main domain
@@ -133,4 +151,6 @@ fi # $WILDCARD_SSL_CERTIFICATE
 
 cat /etc/traefik/traefik.toml
 
-exec /entrypoint.sh
+export PATH=/go/bin:$GOPATH/bin:$PATH
+
+exec traefik $@
