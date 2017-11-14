@@ -19,6 +19,16 @@ address = ":${REST_PORT}"
 endpoint = "unix:///var/run/docker.sock"
 domain = "${DNS_DOMAIN}"
 watch = true
+EOF
+
+if [ -n "${DOCKER_SWARMMODE}" ]; then
+cat <<EOF >> /etc/traefik/traefik.toml
+exposedbydefault = false
+swarmmode = true
+EOF
+fi
+
+cat <<EOF >> /etc/traefik/traefik.toml
 # Sample entrypoint configuration when using ACME
 [entryPoints]
   [entryPoints.http]

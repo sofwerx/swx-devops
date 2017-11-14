@@ -14,8 +14,8 @@ services:
     image: sofwerx/traefik
     restart: "on-failure"
     ports:
-      - 80:80
       - 443:443
+      - 80:80
     environment:
       HTTP_PORT: "80"
       HTTPS_PORT: "443"
@@ -26,9 +26,10 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION}
+      DOCKER_SWARMMODE: "true"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --docker --docker.swarmmode --docker.domain=${DNS_DOMAIN} --docker.watch
+    command: --docker --docker.swarmmode --docker.domain=${DNS_DOMAIN} --docker.watch --web
     deploy:
       mode: replicated
       replicas: 1
@@ -37,6 +38,7 @@ services:
           - "node.role == manager"
           - "engine.labels.storage-constrained != true"
       labels:
+        - "traefik.enabled=true"
         - "traefik.backend=traefik"
         - "traefik.backend.loadbalancer.swarm=true"
         - "traefik.port=8080"

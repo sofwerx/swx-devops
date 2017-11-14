@@ -36,6 +36,7 @@ services:
         constraints:
           - "node.role == manager"
       labels:
+        - "traefik.port=9200"
         - "traefik.enable=false"
       resources:
         limits:
@@ -77,6 +78,7 @@ services:
         constraints:
           - "engine.labels.storage-constrained != true"
       labels:
+        - "traefik.port=9200"
         - "traefik.enable=false"
       resources:
         limits:
@@ -100,12 +102,14 @@ services:
     deploy:
       mode: global
       labels:
+        - "traefik.enable=true"
         - "traefik.backend=kibana"
         - "traefik.backend.loadbalancer.swarm=true"
         - "traefik.port=5601"
         - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
         - "traefik.frontend.passHostHeader=true"
         - "traefik.frontend.entryPoints=http,https"
+        - "traefik.backend.loadbalancer.method=wrr"
 
 #  filebeat:
 #    image: docker.elastic.co/beats/filebeat:5.6.4
@@ -136,6 +140,9 @@ services:
 #    command: -system.hostfs=/hostfs
     deploy:
       mode: global
+      labels:
+        - "traefik.enable=false"
+        - "traefik.port=9200"
 
 #  packetbeat:
 #    image: docker.elastic.co/beats/packetbeat:5.6.4
@@ -160,4 +167,5 @@ services:
       mode: global
       labels:
         - "traefik.enable=false"
+        - "traefik.port=10514"
 
