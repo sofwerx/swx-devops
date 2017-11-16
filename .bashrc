@@ -45,6 +45,10 @@ if [ -d /usr/local/opt/gpg-agent ]; then
   export PATH="/usr/local/opt/gpg-agent/libexec:$PATH"
 fi
 
+if [ -f /usr/lib/gnupg2/gpg-preset-passphrase ]; then
+  export PATH=/usr/lib/gnupg2:$PATH
+fi
+
 if [ -f "$GNUPGHOME/.gpg-agent-info" ]; then
   . "$GNUPGHOME/.gpg-agent-info"
   export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
@@ -56,6 +60,16 @@ if [ -n "$GPG_AGENT_INFO" -a ! -e "$(echo $GPG_AGENT_INFO | cut -d: -f1)" ]; the
     rm -f "$GNUPGHOME/.gpg-agent-info"
   fi
   unset GPG_AGENT_INFO gpg_agent_info
+fi
+
+# Use pinentry-mac if it is available
+if ! grep pinentry-program "$GNUPGHOME/gpg-agent.conf" > /dev/null ; then
+  if which pinentry-mac > /dev/null ; then
+    echo "pinentry-program /usr/local/bin/pinentry-mac" >> "$GNUPGHOME/gpg-agent.conf"
+  fi
+  if [ -f /usr/bin/pinentry-curses ]; then
+    echo "pinentry-program /usr/bin/pinentry-curses" >> "$GNUPGHOME/gpg-agent.conf"
+  fi
 fi
 
 if [ -z "${GPG_AGENT_INFO}" ]; then
@@ -79,13 +93,6 @@ if [ -d "$GNUPGHOME" ] ; then
 else
   echo 'You may need to first generate a gpg key:'
   echo '    gpg --gen-key'
-fi
-
-# Use pinentry-mac if it is available
-if which pinentry-mac > /dev/null ; then
-  if ! grep pinentry-program "$GNUPGHOME/gpg-agent.conf" > /dev/null ; then
-    echo "pinentry-program /usr/local/bin/pinentry-mac" >> "$GNUPGHOME/gpg-agent.conf"
-  fi
 fi
 
 if gpg-agent --use-standard-socket-p ; then
