@@ -26,12 +26,44 @@ which gpg2 || (
   sudo chmod ugo+rwx /etc/apt/preferences.d /etc/apt/sources.list.d
   grep -e ^deb /etc/apt/sources.list | sed -e 's/xenial/trusty/g' -e 's/zesty/trusty/g' > /etc/apt/sources.list.d/trusty.list
   cat <<EOF > /etc/apt/preferences.d/gnupg
+Package: gnupg2:i386
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: gnupg-agent:i386
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: gnupg2
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: gnupg-agent
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: gnupg2:i386
+Pin: release n=zesty
+Pin-Priority: -10
+
+Package: gnupg-agent:i386
+Pin: release n=zesty
+Pin-Priority: -10
+
 Package: gnupg2
 Pin: release n=zesty
 Pin-Priority: -10
 
 Package: gnupg-agent
 Pin: release n=zesty
+Pin-Priority: -10
+
+Package: gnupg2:i386
+Pin: release n=xenial
+Pin-Priority: -10
+
+Package: gnupg-agent:i386
+Pin: release n=xenial
 Pin-Priority: -10
 
 Package: gnupg2
@@ -41,6 +73,14 @@ Pin-Priority: -10
 Package: gnupg-agent
 Pin: release n=xenial
 Pin-Priority: -10
+
+Package: gnupg2:i386
+Pin: release n=trusty
+Pin-Priority: 900
+
+Package: gnupg-agent:i386
+Pin: release n=trusty
+Pin-Priority: 900
 
 Package: gnupg2
 Pin: release n=trusty
@@ -77,11 +117,11 @@ which docker > /dev/null || (
   fi
 )
 which docker-compose > /dev/null || (
-  sudo curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+  sudo curl -Lo /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m`
   sudo chmod ugo+rx /usr/local/bin/docker-machine
 )
 which docker-machine > /dev/null || (
-  sudo curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` -o /usr/local/bin/docker-machine
+  sudo curl -Lo /usr/local/bin/docker-machine https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m`
   sudo chmod ugo+rx /usr/local/bin/docker-machine
 )
 # Install a simple entropy gathering daemon, to speed up key generation
