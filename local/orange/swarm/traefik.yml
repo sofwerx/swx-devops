@@ -2,7 +2,7 @@ version: "3.4"
 
 networks:
 
-  default:
+  orange_default:
     external:
       name: orange_default
 
@@ -16,6 +16,8 @@ services:
     ports:
       - 443:443
       - 80:80
+    networks:
+      - orange_default
     environment:
       HTTP_PORT: "80"
       HTTPS_PORT: "443"
@@ -27,6 +29,7 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION}
       DOCKER_SWARMMODE: "true"
+      CONSUL_HOST: consul_consul
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --docker --docker.swarmmode --docker.domain=${DNS_DOMAIN} --docker.watch --web
@@ -38,12 +41,12 @@ services:
           - "node.role == manager"
           - "engine.labels.storage-constrained != true"
       labels:
-        - "traefik.enabled=true"
+        - "traefik.enable=true"
         - "traefik.backend=traefik"
         - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.backend.loadbalancer.method=wrr"
         - "traefik.port=8080"
         - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
         - "traefik.frontend.passHostHeader=true"
         - "traefik.frontend.entryPoints=http,https"
-
 

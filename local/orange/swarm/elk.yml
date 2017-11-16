@@ -89,27 +89,46 @@ services:
     ports:
       - "5601:5601"
     restart: "on-failure"
-    environment:
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      ELASTICSEARCH_USERNAME: elastic
-      ELASTICSEARCH_PASSWORD: changeme
-      server.port: "5601"
-      XPACK_SECURITY_ENABLED: 'false'
-    healthcheck:
-      test: wget -qO- http://localhost:5601 > /dev/null
-      interval: 30s
-      retries: 100
+#    environment:
+#      ELASTICSEARCH_URL: http://elasticsearch:9200
+#      ELASTICSEARCH_USERNAME: elastic
+#      ELASTICSEARCH_PASSWORD: changeme
+#      ELASTICSEARCH_PRESERVEHOST: 'true'
+#      LOGGING_DEST: stdout
+#      LOGGING_VERBOSE: 'true'
+#      server.name: "orange"
+#      server.port: "5601"
+#      XPACK_SECURITY_ENABLED: 'false'
+#    healthcheck:
+#      test: wget -qO- http://localhost:5601 > /dev/null
+#      interval: 30s
+#      retries: 100
+    command: >-
+      /usr/share/kibana/bin/../node/bin/node
+       --no-warnings
+       /usr/share/kibana/bin/../src/cli
+         --cpu.cgroup.path.override=/
+         --cpuacct.cgroup.path.override=/
+         --logging.dest=stdout
+         --logging.quiet=true
+         --elasticsearch.password=changeme
+         --elasticsearch.url=http://elasticsearch:9200
+         --elasticsearch.username=elastic
+         --elasticsearch.preserveHost=true
+         --server.name=orange
+         --server.port=5601
+         --xpack.security.enabled=false
     deploy:
       mode: global
       labels:
         - "traefik.enable=true"
         - "traefik.backend=kibana"
         - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.backend.loadbalancer.method=wrr"
         - "traefik.port=5601"
         - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
         - "traefik.frontend.passHostHeader=true"
         - "traefik.frontend.entryPoints=http,https"
-        - "traefik.backend.loadbalancer.method=wrr"
 
 #  filebeat:
 #    image: docker.elastic.co/beats/filebeat:5.6.4
@@ -168,4 +187,16 @@ services:
       labels:
         - "traefik.enable=false"
         - "traefik.port=10514"
+
+
+## https://blog.codeship.com/monitoring-docker-containers-with-elasticsearch-and-cadvisor/
+## https://github.com/google/cadvisor/blob/master/docs/runtime_options.md
+# docker service create --network=monitoring --mode global --name cadvisor \
+#  --mount type=bind,source=/,target=/rootfs,readonly=true \
+#  --mount type=bind,source=/var/run,target=/var/run,readonly=false \
+#  --mount type=bind,source=/sys,target=/sys,readonly=true \
+#  --mount type=bind,source=/var/lib/docker/,target=/var/lib/docker,readonly=true \
+#  google/cadvisor:latest \
+#  -storage_driver=elasticsearch \
+#  -storage_driver_es_host="http://elasticsearch:9200"
 

@@ -15,6 +15,7 @@ services:
     container_name: multiarch
     image: multiarch/qemu-user-static:register
     privileged: true
+    restart: no
     deploy:
       mode: global
 

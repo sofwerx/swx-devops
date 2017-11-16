@@ -28,6 +28,65 @@ swarmmode = true
 EOF
 fi
 
+if [ -n "${CONSUL_HOST}" ]; then
+cat <<EOF >> /etc/traefik/traefik.toml
+################################################################
+# Consul KV configuration backend
+################################################################
+
+# Enable Consul KV configuration backend.
+[consul]
+
+# Consul server endpoint.
+#
+# Required
+# Default: "127.0.0.1:8500"
+#
+endpoint = "${CONSUL_HOST}:${CONSUL_PORT:-8500}"
+
+# Enable watch Consul changes.
+#
+# Optional
+# Default: true
+#
+watch = ${CONSUL_WATCH:-true}
+
+# Prefix used for KV store.
+#
+# Optional
+# Default: traefik
+#
+prefix = "${CONSUL_PREFIX:-traefik}"
+
+# Override default configuration template.
+# For advanced users :)
+#
+# Optional
+#
+# filename = "consul.tmpl"
+
+# Use Consul user/pass authentication.
+#
+# Optional
+#
+# username = foo
+# password = bar
+
+# Enable Consul TLS connection.
+#
+# Optional
+#
+#    [consul.tls]
+#    ca = "/etc/ssl/ca.crt"
+#    cert = "/etc/ssl/consul.crt"
+#    key = "/etc/ssl/consul.key"
+#    insecureskipverify = true
+EOF
+
+export ACME_STORAGE=${ACME_STORAGE:-acme.json}
+
+fi
+
 cat <<EOF >> /etc/traefik/traefik.toml
 # Sample entrypoint configuration when using ACME
 [entryPoints]
@@ -82,7 +141,7 @@ email = "${EMAIL}"
 #
 # Required
 #
-storageFile = "/ssl/acme.json"
+storage = "${ACME_STORAGE:-/ssl/acme.json}"
 
 # Entrypoint to proxy acme challenge to.
 # WARNING, must point to an entrypoint on port 443
