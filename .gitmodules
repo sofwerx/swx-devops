@@ -16,3 +16,6 @@
 [submodule "local/geo/docker-guacamole"]
 	path = local/geo/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
+[submodule "local/swx-gpu/docker-guacamole"]
+	path = local/swx-gpu/docker-guacamole
+	url = https://github.com/sofwerx/docker-guacamole
