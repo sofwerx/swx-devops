@@ -18,7 +18,7 @@ services:
     container_name: traefik
     hostname: traefik
     build: traefik/
-    image: sofwerx/traefik
+    image: sofwerx/traefik:ppc64le
     restart: always
     ports:
       - 80:80
@@ -37,11 +37,11 @@ services:
       - traefik-ssl:/ssl
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
-      - "traefik.backend=traefik"
-      - "traefik.port=8080"
-      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
+      traefik.backend: "traefik"
+      traefik.port: "8080"
+      traefik.frontend.rule: "Host:traefik.${DNS_DOMAIN}"
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.entryPoints: "http,https"
 
   postgres:
     extends:
