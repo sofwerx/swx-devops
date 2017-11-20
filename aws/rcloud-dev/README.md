@@ -19,8 +19,6 @@ Before using `docker-compose` in the current directory, you will also need to sw
     [sofwerx:rcloud-dev:] icbmbp:rcloud-dev ianblenke$ swx dm env rcloud-dev-0
     [sofwerx:rcloud-dev:rcloud-dev-0] icbmbp:rcloud-dev ianblenke$
 
-If you use the `swx tf` and `swx dc` wrappers instead, this will be taken care of for you.
-
 # terraform
 
 Please read the [terraform/README.md](terraform/README.md)
@@ -29,14 +27,14 @@ Please use `swx tf` instead of `terraform`, to ensure the correct environment is
 
 # docker-compose
 
-Please use `swx dc` instead of `docker-compose`, to ensure the correct environment is sourced, and that the correct remote "dm" docker-engine is being used.
+Make sure you are in the correct environment and are using the correct dm before proceeding.
 
 This does a full rebuild of the rcloud container:
 
-    swx dc build rcloud &&
-    swx dc stop rcloud &&
-    swx dc rm -f rcloud &&
-    swx dc up -d
+    docker-compose build rcloud &&
+    docker-compose stop rcloud &&
+    docker-compose rm -f rcloud &&
+    docker-compose up -d
 
 The rcloud data is persistently stored in docker volumes, as defined at the top of the `docker-compose.yml`:
 

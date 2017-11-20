@@ -10,7 +10,7 @@ Before running `swx tf` in the `terraform/` directory, please be sure to source 
     [sofwerx::] icbmbp:swx-dev ianblenke$ swx environment switch swx-dev
     [sofwerx:swx-dev:] icbmbp:swx-dev ianblenke$
 
-Before running `swx dc` in this directory, please be sure to source the dm:
+Before running `docker-compose` in this directory, please be sure to source the dm:
 
     [sofwerx:swx-dev:] icbmbp:swx-dev ianblenke$ swx dm env swx-dev-0
     [sofwerx:swx-dev:swx-dev-0] icbmbp:swx-dev ianblenke$
