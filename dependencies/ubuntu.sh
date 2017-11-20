@@ -22,7 +22,7 @@ which trousseau > /dev/null || (
   sudo dpkg -i trousseau_0.4.0_amd64.deb
 )
 #if [ "$(gpg2 --version | head -1 | cut -d' ' -f3- | cut -d. -f1-2)" != "2.0" ]; then
-which gpg2 || (
+which gpg2 > /dev/null || (
   sudo chmod ugo+rwx /etc/apt/preferences.d /etc/apt/sources.list.d
   grep -e ^deb /etc/apt/sources.list | sed -e 's/xenial/trusty/g' -e 's/zesty/trusty/g' > /etc/apt/sources.list.d/trusty.list
   cat <<EOF > /etc/apt/preferences.d/gnupg
@@ -118,7 +118,7 @@ which docker > /dev/null || (
 )
 which docker-compose > /dev/null || (
   sudo curl -Lo /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m`
-  sudo chmod ugo+rx /usr/local/bin/docker-machine
+  sudo chmod ugo+rx /usr/local/bin/docker-compose
 )
 which docker-machine > /dev/null || (
   sudo curl -Lo /usr/local/bin/docker-machine https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m`
