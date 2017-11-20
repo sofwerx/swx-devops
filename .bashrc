@@ -153,21 +153,6 @@ swx_tf ()
   fi
 }
 
-swx_dc ()
-{
-  if [ -f docker-compose.yml ]; then
-    environment="$(basename $PWD)"
-    swx_environment_switch $environment
-    if [ -f dc.sh ]; then
-      . dc.sh
-    fi
-    docker-compose $@
-  else
-    echo "There is no docker-compose.yml in this directory, please cd there first" 1>&2
-    return 1
-  fi
-}
-
 swx_dm_ls ()
 {
   trousseau keys | grep -e ^file:secrets/dm/ | cut -d/ -f3-
@@ -181,6 +166,10 @@ swx_dm_env ()
       if  [ -s "${devops}/secrets/dm/$1" ]; then
         dm="$(cat ${devops}/secrets/dm/$1)"
         eval $(dmport --import $dm)
+        if trousseau get dm2environment:$1 > /dev/null 2>&1 ; then
+          environment="$(trousseau get dm2environment:$1)"
+          swx_environment_switch $environment
+        fi
       fi
     else
       if [ -s "${devops}/secrets/dm/$1" ]; then
@@ -338,7 +327,6 @@ complete -F _swx swx
 swx ()
 {
   case $1 in
-dc) shift; swx_dc $@ ;;
 dm) shift; swx_dm $@ ;;
 environment) shift; swx_environment $@ ;;
 secrets) shift; swx_secrets $@ ;;
@@ -349,7 +337,6 @@ Usage: swx {command}
   environment - Source project-lifecycle environment variables
   secrets     - Deal with secrets/ folder
   tf          - Run Terraform for a project-lifecycle
-  dc          - Run docker-compose for a project-lifecycle
 EOU
   return 1
   ;;
@@ -357,4 +344,14 @@ EOU
 }
 alias swx="swx"
 complete -F _swx swx
+
+change_directory ()
+{
+  cd $@
+  if [ -f .dm ]; then
+    swx dm env $(cat .dm)
+  fi
+}
+
+alias cd='change_directory $@'
 

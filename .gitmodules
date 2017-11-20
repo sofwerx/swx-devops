@@ -12,10 +12,13 @@
 	url = https://github.com/sofwerx/synthetic-target-area-of-interest
 [submodule "local/geo/docker-geoserver"]
 	path = local/geo/docker-geoserver
-	url = git@github.com:sofwerx/docker-geoserver.git
+	url = https://github.com/sofwerx/docker-geoserver
 [submodule "local/geo/docker-guacamole"]
 	path = local/geo/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "local/swx-gpu/docker-guacamole"]
 	path = local/swx-gpu/docker-guacamole
+	url = https://github.com/sofwerx/docker-guacamole
+[submodule "local/pi-r-squared/docker-guacamole"]
+	path = local/pi-r-squared/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
