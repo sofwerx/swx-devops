@@ -25,3 +25,6 @@
 [submodule "local/osgeo/docker-guacamole"]
 	path = local/osgeo/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
+[submodule "local/mobile/docker-openstf"]
+	path = local/mobile/docker-openstf
+	url = https://github.com/sofwerx/docker-openstf

@@ -1,0 +1,62 @@
+version: '2'
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  rethink-data:
+    driver: local
+
+services:
+
+  traefik:
+    extends:
+      file: traefik/docker-compose.yml
+      service: traefik
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  rethinkdb:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: rethinkdb
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  adbd:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: adbd
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  stf:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: stf-local
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=openstf"
+      - "traefik.port=7100"
+      - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
