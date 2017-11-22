@@ -28,3 +28,6 @@
 [submodule "local/mobile/docker-openstf"]
 	path = local/mobile/docker-openstf
 	url = https://github.com/sofwerx/docker-openstf
+[submodule "local/geo/docker-traefik"]
+	path = local/geo/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
