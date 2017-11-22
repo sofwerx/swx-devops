@@ -17,6 +17,7 @@ if grep $AWS_PROFILE $AWS_CONFIG_FILE > /dev/null 2>&1 ; then
   export AWS_REGION="${AWS_REGION:-$(aws configure get region --profile $AWS_PROFILE)}"
   export AWS_DEFAULT_REGION="${AWS_REGION}"
   export AWS_DEFAULT_OUTPUT="$(aws configure get output --profile $AWS_PROFILE)"
+  export AWS_DEFAULT_OUTPUT=${AWS_DEFAULT_OUTPUT:-json}
 fi
 
 if [ -n "$DOCKER_API_VERSION" ]; then
