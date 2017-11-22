@@ -22,3 +22,6 @@
 [submodule "local/pi-r-squared/docker-guacamole"]
 	path = local/pi-r-squared/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
+[submodule "local/osgeo/docker-guacamole"]
+	path = local/osgeo/docker-guacamole
+	url = https://github.com/sofwerx/docker-guacamole
