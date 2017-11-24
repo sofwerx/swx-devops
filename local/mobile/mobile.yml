@@ -14,7 +14,7 @@ services:
 
   traefik:
     extends:
-      file: traefik/docker-compose.yml
+      file: docker-traefik/docker-compose.yml
       service: traefik
     networks:
       - default
@@ -52,10 +52,24 @@ services:
       service: stf-local
     networks:
       - default
+      - "traefik.enable=false"
+
+  nginx:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: nginx
+    build:
+      context: docker-openstf/nginx/
+      dockerfile: Dockerfile
+    image: sofwerx/nginx
+    networks:
+      - default
+#    ports:
+#      - 80:80
     labels:
       - "traefik.enable=true"
       - "traefik.backend=openstf"
-      - "traefik.port=7100"
+      - "traefik.port=80"
       - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
