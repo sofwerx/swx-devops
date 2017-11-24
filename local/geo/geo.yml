@@ -16,7 +16,7 @@ services:
 
   traefik:
     extends:
-      file: traefik/docker-compose.yml
+      file: docker-traefik/docker-compose.yml
       service: traefik
     networks:
       - default
