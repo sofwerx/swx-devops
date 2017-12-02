@@ -96,10 +96,10 @@ else
   echo '    gpg --gen-key'
 fi
 
-if gpg-agent --use-standard-socket-p ; then
-  echo "WARNING: Your gpg build/version/configuration is not compatible with trousseau: $(gpg --version | head -1)"
-  echo "If gpg is running with --use-standard-socket, GPG_AGENT_INFO will not be set, which trousseau needs to operate correctly"
-fi
+#if gpg-agent --use-standard-socket-p ; then
+#  echo "WARNING: Your gpg build/version/configuration is not compatible with trousseau: $(gpg --version | head -1)"
+#  echo "If gpg is running with --use-standard-socket, GPG_AGENT_INFO will not be set, which trousseau needs to operate correctly"
+#fi
 
 # This fixes my ssh-add hang problem when using gpg-agent instead of sshagent
 if echo "$SSH_AUTH_SOCK" | grep gpg > /dev/null ; then
@@ -354,7 +354,9 @@ complete -F _swx swx
 
 change_directory ()
 {
+  unalias cd 2>/dev/null 
   cd $@
+  alias cd='change_directory $@'
   if [ -f .dm ]; then
     swx dm env $(cat .dm)
   fi
