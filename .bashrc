@@ -355,13 +355,12 @@ complete -F _swx swx
 change_directory ()
 {
   unalias cd 2>/dev/null 
-  cd $@
+  \cd $@
   alias cd='change_directory $@'
   if [ -f .dm ]; then
     swx dm env $(cat .dm)
   fi
 }
 
-unalias cd 2>/dev/null 
-alias cd='change_directory $@'
+change_directory .
 
