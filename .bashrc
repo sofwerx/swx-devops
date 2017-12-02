@@ -101,6 +101,12 @@ if gpg-agent --use-standard-socket-p ; then
   echo "If gpg is running with --use-standard-socket, GPG_AGENT_INFO will not be set, which trousseau needs to operate correctly"
 fi
 
+# This fixes my ssh-add hang problem when using gpg-agent instead of sshagent
+if echo "$SSH_AUTH_SOCK" | grep gpg > /dev/null ; then
+  unalias ssh-add 2>/dev/null 
+  alias ssh-add="echo UPDATESTARTUPTTY | gpg-connect-agent ; ssh-add"
+fi
+
 # The trousseau and terraform commands need buckets
 export TROUSSEAU_STORE="${TROUSSEAU_STORE:-${devops}/.trousseau}"
 
@@ -354,5 +360,6 @@ change_directory ()
   fi
 }
 
+unalias cd 2>/dev/null 
 alias cd='change_directory $@'
 
