@@ -32,7 +32,22 @@ services:
       CONSUL_HOST: consul_consul
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --docker --docker.swarmmode --docker.domain=${DNS_DOMAIN} --docker.watch --web
+    command: >-
+      --loglevel DEBUG
+      --web
+      --web.address=":8080"
+      --docker
+      --docker.endpoint="unix:///var/run/docker.sock"
+      --docker.domain="${DNS_DOMAIN}"
+      --docker.swarmmode
+      --docker.watch
+      --exposedbydefault=false
+      --consul
+      --consul.endpoint="consul_consul:8500"
+      --consul.watch
+      --consul.prefix="traefik"
+      --entrypoints="Name:http Address::80"
+      --entrypoints="Name:https Address::443 TLS"
     deploy:
       mode: replicated
       replicas: 1

@@ -1,0 +1,37 @@
+version: "3.3"
+
+networks:
+  minio:
+    driver: overlay
+    driver_opts:
+      encrypted: "true"
+
+volumes:
+  minio-data:
+    driver: local
+
+services:
+
+  minio:
+    image: minio/minio:RELEASE.2017-10-27T18-59-02Z
+    command: >-
+      server http://minio/export
+    ports:
+      - 9004:9000
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio-data:/export
+    networks:
+      - minio
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+      placement:
+        constraints:
+          - "engine.labels.storage-constrained != true"
+      labels:
+        - "traefik.enable=false"
+

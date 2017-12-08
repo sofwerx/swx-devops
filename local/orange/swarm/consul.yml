@@ -1,0 +1,57 @@
+version: "3.4"
+
+networks:
+
+  orange_default:
+    external:
+      name: orange_default
+
+volumes:
+
+  consul-data:
+    driver: local
+
+services:
+
+  consul:
+    image: consul
+    restart: "on-failure"
+    ports:
+      - 8300:8300     # Server RPC
+      - 8301:8301/tcp # Serf LAN
+      - 8301:8301/udp # Serf LAN
+      - 8302:8302     # Serf WAN
+      - 8500:8500     # HTTP API
+      - 8600:8600     # DNS Interface
+    command: >-
+      agent
+        -server
+        -retry-join consul_consul
+        -bootstrap-expect 5
+        -ui-dir=/ui
+        -log-level debug
+        -advertise='{{ GetInterfaceIP "eth2" }}'
+        -client='{{ GetInterfaceIP "eth0" }} {{ GetInterfaceIP "eth1" }} {{ GetInterfaceIP "eth2" }}'
+        -serf-wan-bind='{{ GetInterfaceIP "eth2" }}'
+        -serf-lan-bind='{{ GetInterfaceIP "eth2" }}'
+    volumes:
+      - consul-data:/consul/data
+    networks:
+      - orange_default
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.role == manager"
+          - "engine.labels.storage-constrained != true"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=consul"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.backend.loadbalancer.method=wrr"
+        - "traefik.port=8500"
+        - "traefik.frontend.rule=Host:consul.${DNS_DOMAIN}"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+

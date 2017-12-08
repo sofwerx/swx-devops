@@ -11,12 +11,12 @@ networks:
 
 volumes:
 
-  datadir:
-    driver: overlay
+  mariadb-data:
+    driver: local
  
 services:
 
-  mariadb_galera:
+  mariadb:
     deploy:
       mode: global
       restart_policy:
@@ -32,6 +32,9 @@ services:
       update_config:
         parallelism: 1
         delay: 3m # must be higher than SST duration
+      placement:
+        constraints:
+          - "node.role == manager"
     image: severalnines/mariadb:10.1
     hostname: "{{.Service.Name}}-{{.Task.Slot}}"
     ports:
@@ -49,7 +52,7 @@ services:
     networks:
       - orange_default
     volumes:
-      - datadir:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
     ulimits:
       nofile:
         soft: 20000

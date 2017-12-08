@@ -7,5 +7,5 @@
 
 # Converge
 
-    ./converge.sh
+    . ./converge.sh
 
