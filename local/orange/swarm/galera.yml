@@ -1,0 +1,61 @@
+# https://github.com/severalnines/galera-docker-mariadb
+# https://severalnines.com/blog/mysql-docker-deploy-homogeneous-galera-cluster-etcd
+
+version: '3.4'
+
+networks:
+
+  orange_default:
+    external:
+      name: orange_default
+
+volumes:
+
+  datadir:
+    driver: overlay
+ 
+services:
+
+  mariadb_galera:
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 10
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1.5G
+        reservations:
+          memory: 1G
+      update_config:
+        parallelism: 1
+        delay: 3m # must be higher than SST duration
+    image: severalnines/mariadb:10.1
+    hostname: "{{.Service.Name}}-{{.Task.Slot}}"
+    ports:
+      - 3306:3306
+    environment:
+      CLUSTER_NAME: "MariaDB_Galera"
+      DISCOVERY_SERVICE: "192.168.1.120:2379,192.168.1.121:2379,192.168.1.122:2379,192.168.1.123:2379,192.168.1.124:2379,192.168.1.125:2379,192.168.1.126:2379"
+      MYSQL_ROOT_PASSWORD: "${GALERA_ROOT_PASSWORD}"
+      XTRABACKUP_PASSWORD: "${GALERA_XTRABACKUP_PASSWORD}"
+    command:
+      - --innodb_buffer_pool_size=512M
+      - --max_connections=51
+      - --wsrep_slave_thread=4
+      - --wsrep_provider_options=gcache.size=1G
+    networks:
+      - orange_default
+    volumes:
+      - datadir:/var/lib/mysql
+    ulimits:
+      nofile:
+        soft: 20000
+        hard: 40000
+    healthcheck:
+      interval: 10s
+      retries: 20 # interval * retries > SST duration
+
+ 

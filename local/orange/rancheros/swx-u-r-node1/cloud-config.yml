@@ -1,0 +1,35 @@
+#cloud-config
+hostname: swx-u-r-node1
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC+sv5Vi9t3L/nm0bJSsmc/Ip84GUWFRKkZtBXCxXFJAwVSH5rtk47Z94kqPlnfrkdzMRkVBykg7B3ENfO+bKBxi8MQWFxLR2LvIgZrVry7m5iJvKVQqL75X/LPrpVEFnyLfRzRZ1aJ3g1Szo7A5/wIYP6ZSGX1TktjA0+xL3/cP1T5Hxxxk7czp5PkqdmfE44kpDa9MyefI5KrKz41xfPG+Uct0pe1OeEtYEhnXAKPkKfbw6Tl9KBHG6xEp6hrVGsg/UkZyhD6s1CDp4tgtHC8rh+FhsrtGDgPG12A7yOlyA4VVLZ+4jfLz3gZS0tcGkeZ2dakSw0aL3vyZIEAqQ6/3uPX8h6/k51Y1AQLN8LpuiiSPNtffeuwG5SW0MIOrak8wViCHEd64A9/ugbqVQN0Xvn1a3ZiRqhX72CkTeQeqA3F9k3vD0dBVd/9STQinJ8t6V5AobhP58+Ac1eD95a7A5wOk+1NKOE6dC8Gn/ee7exQWYO2SkfemOMLaB9oEVgsxX0x2oRbxRKrOvWkO+FNzAvxji2G3Oab5Bt9pDDmtW18ShR1Bd9G/BsbC9qhC/JYLQmDiDT19n1OPfzWbHQ/DJP8o8bDREjXyoLW1laM26U99FYEjXkrJtMlKDgpuVtFGq5NhZX8RiHxetJZUoxe31VTmL+/68bA3DqOuaqlDw== sofwerx
+  - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEA2iiO8R8GVsJLbiUPaSdjr0I/AyzN776kHHQqF+jelYqvtCxb/WetfZwlecOPqJkhMnD4geAeFBFwjuZiMRBz/J889PXUGKXovi1kYAdFi4ywwUgIVt62oNUEB9GXYaEay3srvx9DmVvC1CCZqqD4u6QtUJde4eS6m2TMhLhImvbLYJj/RTbke5pSYjhOW/mrZlTp1bj4IjjEXzjW3ngnow/LI/JZklT0VV02zXmtgc3uNZRoyEnnaq+fTzNGpqtLa5mpsajguEzZHrDEBu+QtzPSF3XA8l8Z8cUrDNtZyM6FatWucCdJZwnqXVmhK2hH+BQw/Z+TS9TcEp0nl+vAhV0NfaFLMRYaHftc5FCQvmE3oGQTg86Pg61J6mlXr6w47mIo2/N0yguoy3tdblc7DqnctBhqLZQNACpqvh0lFdeDql/2wl3f7Zgfbq6m+j2iInFKbV1620meMm37bS03HeACt9WugUouylCBGpUcgI9T08S2J7pAo1gmyhX6If6tgN3ApJ+WiihDNJc/fJuhLjNRVQl2ocWtweD1TuQ9S6vXno4ZUm06q6FRAcUvuyX53Gsy4NWmGpTW4jz/z5giV2hnn0uE2AdnZKfZZx4GnuBJRBlxwLy8a4rQjnaT6Tgdmtz/rmtyOh+Q+YkEGSwi4S6gboLn+WIU4bWvtPMlzZ8= icblenke@icbmbp
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCqL9qS+5Gb+gNNQs4PiZGmd1p2RlEX9Sehh5v0xMbcx3sxqObn/tq4hpXAorWcCKrcuWwjP/ei5qMhiQmnMdc5gRYMx7DL3NXzY7U0PWdy0+WfsAX5UvY+ALreg+gFFIoDC1cs8i3BTbua5bnSP0K7NkK7OGc/UhLx9b/zmHvxypVUShrauR1AwVcN1P87JByHd4py8q2kILa7gmlIDY2LoV7vPTlnFOiGwLRfq1F/gT6bAVwCxi9avUoFhz6CHKX08e6UgiUQksYtcg3yCZf6nlzSsqJNyy9hrVdhvKxIWIWAjbDXL/G69GWCgsD+jq0EBx8/0Ystp4O7+6tegLbupoIVfjiLGPfrzX9xhfSEdYgVyKdij2M9pYz/1w5FfmLIO6zPMXFEyQrPQ269Z0B/p2kD0ppM16mRvAFr28YZhE3CTP21Y6nfkDBj3FxFYP3EqlQ/inbfj/Gw4arro5mAAxgUxuFbmnwHHlipCz7KBPmomAlMXpprmAamTKaAcQaBZO4TLMKLnBOiBC+jdW90NOZjtS5Wleg5CG9qLlD7BdaGhmWLykOCUsPxlBE7Fpv+1o1npKxd7rsQ2e/yMkHhHKWKmr7nflUQImPsCyZfHpBdW9Vm+5unIF6A0/h/Occ9V5L948iJXz+gXXwFr8D6i9zqcZVqanFGYWHZt1mTUw== icblenke@icbcfmbp
+rancher:
+  state:
+    fstype: auto
+    dev: LABEL=RANCHER_STATE
+  state:
+    autoformat:
+    - /dev/sdb
+  docker:
+    tls: true
+  network:
+    dns:
+      nameservers:
+      - 8.8.8.8
+      - 8.8.4.4
+    interfaces:
+      eth0:
+        address: 192.168.1.121/24
+        gateway: 192.168.1.1
+        mtu: 1500
+        dhcp: false
+      eth1:
+        dhcp: false
+write_files:
+  - path: /etc/profile.d/prompt.sh
+    permissions: "0644"
+    owner: root
+    content: |
+      export PS1='\[\e]0;\h: \w\a\][\u@\h \W]\$ '
+

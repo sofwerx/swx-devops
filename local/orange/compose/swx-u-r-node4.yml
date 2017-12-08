@@ -1,0 +1,24 @@
+version: "3.2"
+
+volumes:
+  etcd-data:
+    driver: local
+
+services:
+
+  etcd:
+    container_name: etcd
+    image: quay.io/coreos/etcd:v3.2
+    restart: "always"
+    network_mode: host
+    volumes:
+      - etcd-data:/data
+    environment:
+      ETCD_DATA_DIR: /data
+      ETCD_DISCOVERY: ${ETCD_DISCOVERY}
+      ETCD_NAME: swx_u_r_node4
+      ETCD_ADVERTISE_CLIENT_URLS: http://192.168.1.124:2379,http://192.168.1.124:4001
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://192.168.1.124:2380
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379,http://0.0.0.0:4001
+      ETCD_LISTEN_PEER_URLS: http://192.168.1.124:2380
+
