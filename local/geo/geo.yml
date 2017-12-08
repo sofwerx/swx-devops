@@ -97,3 +97,15 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  nginx:
+    build: ./nginx/
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=luciad"
+      - "traefik.port=8081"
+      - "traefik.frontend.rule=Host:luciad.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
