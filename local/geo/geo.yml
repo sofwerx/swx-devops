@@ -11,6 +11,8 @@ volumes:
     driver: local
   guacamole-data:
     driver: local
+  mariadb-data:
+    driver: local
 
 services:
 
@@ -110,4 +112,17 @@ services:
       - "traefik.frontend.rule=Host:luciad.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  mariadb:
+    image: mariadb:10.3
+    networks:
+      - default
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    labels:
+      - "traefik.enable=false"
 
