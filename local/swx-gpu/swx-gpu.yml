@@ -102,3 +102,13 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  ethminer:
+    extends:
+      file: docker-ethminer/docker-compose.yml
+      service: ethminer
+    build:
+      context: .
+      dockerfile: Dockerfile.ppc64le
+    labels:
+      - "traefik.enable=false"
+
