@@ -37,3 +37,6 @@
 [submodule "local/osgeo/docker-traefik"]
 	path = local/osgeo/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/swx-gpu/docker-ethminer"]
+	path = local/swx-gpu/docker-ethminer
+	url = https://github.com/sofwerx/docker-ethminer
