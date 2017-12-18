@@ -11,6 +11,9 @@ volumes:
     driver: local
   guacamole-data:
     driver: local
+  nvidia_driver:
+    external:
+      name: "nvidia_driver_384.81"
 
 services:
 
@@ -103,12 +106,16 @@ services:
       - "traefik.frontend.entryPoints=http,https"
 
   ethminer:
+    container_name: ethminer
+    hostname: ethminer
     extends:
       file: docker-ethminer/docker-compose.yml
       service: ethminer
     build:
-      context: .
+      context: docker-ethminer/
       dockerfile: Dockerfile.ppc64le
     labels:
       - "traefik.enable=false"
+    networks:
+      - default
 
