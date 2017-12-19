@@ -11,6 +11,8 @@ volumes:
     driver: local
   guacamole-data:
     driver: local
+  rethink-data:
+    driver: local
 
 services:
 
@@ -83,4 +85,48 @@ services:
       - "traefik.frontend.rule=Host:guacamole.${DNS_DOMAIN};AddPrefix:/guacamole"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  rethinkdb:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: rethinkdb
+    hostname: rethinkdb
+    container_name: rethinkdb
+    networks:
+      - default
+    volumes:
+      - rethink-data:/data
+    labels:
+      - "traefik.enable=false"
+
+  adbd:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: adbd
+    hostname: adbd
+    container_name: adbd
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  stf:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: stf-local
+    hostname: stf
+    container_name: stf
+    depends_on:
+      - adbd
+      - rethinkdb
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=stf"
+      - "traefik.port=7100"
+      - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 

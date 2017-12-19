@@ -40,3 +40,6 @@
 [submodule "local/swx-gpu/docker-ethminer"]
 	path = local/swx-gpu/docker-ethminer
 	url = https://github.com/sofwerx/docker-ethminer
+[submodule "local/osgeo/docker-openstf"]
+	path = local/osgeo/docker-openstf
+	url = https://github.com/sofwerx/docker-openstf
