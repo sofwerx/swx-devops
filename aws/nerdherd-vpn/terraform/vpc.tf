@@ -157,10 +157,10 @@ resource "aws_security_group_rule" "sg_ingress_docker" {
 
 }
 
-resource "aws_security_group_rule" "sg_ingress_guacamole" {
+resource "aws_security_group_rule" "sg_ingress_non_reserved" {
     type = "ingress"
-    from_port = 4822
-    to_port = 4822
+    from_port = 1024
+    to_port = 65535
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
