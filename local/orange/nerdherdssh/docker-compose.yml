@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+
+  autorun:
+
+    build: .
+    network_mode: host
+    image: sofwerx/nerdherdssh
+    container_name: nerdherdssh
+    hostname: nerdherdssh
+    volumes:
+      - /root/.ssh:/root/.ssh
+    restart: always
+
