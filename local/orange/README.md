@@ -34,6 +34,9 @@ Due to `DOCKER_COMPOSE=orange.yml` in the orange environment, the `orange.yml` h
 
 ## Public NAT
 
-The (fuel-nat/)[fuel-nat/] folder contains what was used to deploy the `public-nat` container that is acting as the default route NATting gateway for the OpenStack public segment.
+The (fuel-nat/)[fuel-nat/] folder contains what was used to deploy the `public-nat` container onto `swx-u-or-node0` that is acting as the default route NATting gateway for the OpenStack public segment.
 
+## nerdherdvpn
+
+The (nerdherdvpn/)[nerdherdvpn/] folder contains what was used to deploy the `nerdherdvpn` container, which is holding open some temporary ssh port forwards from an AWS instance to get around some weird networking problems on our Frontier connection at the office where the orange cluster is located.
 
