@@ -1,1 +1,1 @@
-swx-u-r-node0
+swx-u-or-node0
