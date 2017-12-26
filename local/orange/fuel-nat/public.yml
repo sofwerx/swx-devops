@@ -1,0 +1,34 @@
+version: '3.4'
+
+volumes:
+
+  dnsmasq-leases:
+    driver: local
+
+networks:
+
+  vlan20:
+    driver: macvlan
+    driver_opts:
+      parent: eth1.20
+    ipam:
+      config:
+        - subnet: 10.20.0.0/22
+
+services:
+
+  public-nat:
+    build: docker-nat/
+    image: sofwerx/nat
+    container_name: public-nat
+    hostname: public-nat
+    privileged: true
+    environment:
+      IPV4_ADDRESS: "10.20.0.1/22"
+    volumes:
+      - dnsmasq-leases:/var/lib/misc
+    networks:
+      - default
+      - vlan20
+    restart: always
+
