@@ -43,3 +43,9 @@
 [submodule "local/osgeo/docker-openstf"]
 	path = local/osgeo/docker-openstf
 	url = https://github.com/sofwerx/docker-openstf
+[submodule "aws/swx-geotools1/docker-guacamole"]
+	path = aws/swx-geotools1/docker-guacamole
+	url = https://github.com/sofwerx/docker-guacamole.git
+[submodule "aws/swx-geotools1/docker-traefik"]
+	path = aws/swx-geotools1/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
