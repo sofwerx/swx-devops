@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# https://wiki.ubuntu.com/UbuntuGIS
-#  https://launchpad.net/~ubuntugis
+# This script runs as root.
 
 # Make sure kernel filesystems are mounted
 mount -t proc none /proc
@@ -12,16 +11,24 @@ mount -t devpts none /dev/pts
 
 export DEBIAN_FRONTEND=noninteractive
 
-echo "deb http://ppa.launchpad.net/gcpp-kalxas/jupyter/ubuntu xenial main" > /etc/apt/sources.list.d/gcpp-kalxas-ubuntu-jupyter-xenial.list
-echo "deb http://ppa.launchpad.net/geonode/osgeo/ubuntu xenial main" > /etc/apt/sources.list.d/geonode-ubuntu-osgeo-xenial.list
+add-apt-repository ppa:hermlnx/xrdp -y
+add-apt-repository ppa:gcpp-kalxas/jupyter -y
+add-apt-repository ppa:geonode/osgeo -y
+add-apt-repository ppa:osgeolive/nightly -y
+add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
+
+#echo "deb http://ppa.launchpad.net/gcpp-kalxas/jupyter/ubuntu xenial main" > /etc/apt/sources.list.d/gcpp-kalxas-ubuntu-jupyter-xenial.list
+#echo "deb http://ppa.launchpad.net/geonode/osgeo/ubuntu xenial main" > /etc/apt/sources.list.d/geonode-ubuntu-osgeo-xenial.list
+#echo "deb http://ppa.launchpad.net/osgeolive/nightly/ubuntu xenial main" > /etc/apt/sources.list.d/osgeolive-nightly.list
+#echo "deb http://ppa.launchpad.net/ubuntugis/ubuntugis-unstable/ubuntu xenial main" > /etc/apt/sources.list.d/ubuntugis-ubuntu-ubuntugis-unstable-xenial.list
+
 echo "deb http://qgis.org/ubuntugis-nightly xenial main" > /etc/apt/sources.list.d/qgis.list
-echo "deb http://ppa.launchpad.net/osgeolive/nightly/ubuntu xenial main" > /etc/apt/sources.list.d/osgeolive-nightly.list
-echo "deb http://ppa.launchpad.net/ubuntugis/ubuntugis-unstable/ubuntu xenial main" > /etc/apt/sources.list.d/ubuntugis-ubuntu-ubuntugis-unstable-xenial.list
+curl -sL https://qgis.org/downloads/qgis-2017.gpg.key | apt-key add -
 
 apt-get update
 
 # Prepare the lubuntu base for osgeo
-apt-get install -y git ubuntu-minimal ubuntu-standard openssh-server lubuntu-desktop  rsync
+apt-get install -y git ubuntu-minimal ubuntu-standard openssh-server lubuntu-desktop  rsync xrdp
 
 # Clone osgeolive
 if [ ! -d /usr/local/share/gisvm ]; then
@@ -135,9 +142,18 @@ fi
 # Update the file search index
 updatedb
 
+cat <<EOF > $USER_HOME/.xsession
+#!/bin/bash
+xset -dpms s off
+exec /usr/bin/lxsession -s Lubuntu -e LXDE
+EOF
+chown ${USER_NAME}.${USER_NAME} ${USER_HOME}/.xsession
+chmod +x ${USER_HOME}/.xsession
+
 rsync -SHPaxv $USER_HOME/ /etc/skel/
 chown -R root:root /etc/skel
 
+# Clean up
 apt-get clean
 
 # Now umount (unmount) special filesystems and exit chroot
@@ -145,6 +161,7 @@ umount /proc || umount -lf /proc
 umount /sys
 umount /dev/pts
 
+# Add ssh key trust
 mkdir -p ${USER_HOME}/.ssh
 chown ${USER_NAME}.${USER_NAME} ${USER_HOME}/.ssh
 chmod 700 ${USER_HOME}/.ssh
@@ -159,4 +176,8 @@ AUTHORIZED_KEYS_FILE=$(mktemp /tmp/authorized_keys.XXXXXXXX)
 mv ${AUTHORIZED_KEYS_FILE} ${USER_HOME}/.ssh/authorized_keys
 chown ${USER_NAME}.${USER_NAME} ${USER_HOME}/.ssh/authorized_keys
 chmod 600 ${USER_HOME}/.ssh/authorized_keys
+
+if systemctl -a | grep lightdm | grep inactive; then
+  systemctl start lightdm
+fi
 

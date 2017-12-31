@@ -309,7 +309,7 @@ resource "aws_route53_record" "instance" {
 /* Define a project-environment.zone round-robin of A records */
 resource "aws_route53_record" "project-name-ipv4" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  name    = "${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
   records = ["${join(",", aws_instance.instance.*.public_ip)}"]
@@ -318,7 +318,7 @@ resource "aws_route53_record" "project-name-ipv4" {
 /* Define a project-environment.zone round-robin of AAAA records */
 resource "aws_route53_record" "project-name-ipv6" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  name    = "${var.Lifecycle}.${var.dns_zone}"
   type    = "AAAA"
   ttl     = "300"
   records = ["${join(",", flatten(aws_instance.instance.*.ipv6_addresses))}"]
@@ -327,7 +327,7 @@ resource "aws_route53_record" "project-name-ipv6" {
 /* Define traefik.project-environment.zone round-robin A records */
 resource "aws_route53_record" "traefik-ipv4" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "traefik.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  name    = "traefik.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
   records = ["${join(",", aws_instance.instance.*.public_ip)}"]
@@ -336,7 +336,7 @@ resource "aws_route53_record" "traefik-ipv4" {
 /* Define traefik.project-environment.zone round-robin AAAA records */
 resource "aws_route53_record" "traefik-ipv6" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "traefik.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  name    = "traefik.${var.Lifecycle}.${var.dns_zone}"
   type    = "AAAA"
   ttl     = "300"
   records = ["${join(",", flatten(aws_instance.instance.*.ipv6_addresses))}"]
@@ -345,7 +345,7 @@ resource "aws_route53_record" "traefik-ipv6" {
 /* Define guacamole.project-environment.zone round-robin A records */
 resource "aws_route53_record" "guacamole-ipv4" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "guacamole.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  name    = "guacamole.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
   records = ["${join(",", aws_instance.instance.*.public_ip)}"]
@@ -354,7 +354,7 @@ resource "aws_route53_record" "guacamole-ipv4" {
 /* Define guacamole.project-environment.zone round-robin AAAA records */
 resource "aws_route53_record" "guacamole-ipv6" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "guacamole.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  name    = "guacamole.${var.Lifecycle}.${var.dns_zone}"
   type    = "AAAA"
   ttl     = "300"
   records = ["${join(",", flatten(aws_instance.instance.*.ipv6_addresses))}"]
@@ -363,7 +363,7 @@ resource "aws_route53_record" "guacamole-ipv6" {
 /* Define a project-environment.zone wildcard of round-robin A records */
 resource "aws_route53_record" "wildcard_project_name_ipv4" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "*.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  name    = "*.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
   records = ["${join(",", aws_instance.instance.*.public_ip)}"]
@@ -371,7 +371,7 @@ resource "aws_route53_record" "wildcard_project_name_ipv4" {
 
 resource "aws_route53_record" "wildcard_project_name_ipv6" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "*.${var.Project}-${var.Lifecycle}.${var.dns_zone}"
+  name    = "*.${var.Lifecycle}.${var.dns_zone}"
   type    = "AAAA"
   ttl     = "300"
   records = ["${join(",", flatten(aws_instance.instance.*.ipv6_addresses))}"]
