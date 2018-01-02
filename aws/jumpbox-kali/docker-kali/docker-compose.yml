@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+
+  kali:
+    build: .
+    image: sofwerx/kali
+    container_name: kali
+    network_mode: host
+    privileged: true
+    volumes:
+      - /:/chroot
+

@@ -77,7 +77,7 @@ EOR
     curl \
     software-properties-common
 
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 
   add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/debian \
@@ -87,58 +87,17 @@ EOR
   apt-get update
   apt-get install -y linux-image-aws
   apt-get install -y docker-ce
-  usermod -a -G docker debian
+  usermod -a -G docker admin
   echo "User debian added to docker group. You may wish to re-login to avoid using sudo docker."  |wall
 
 fi
 
-if ! grep kali /etc/apt/sources.list ; then
-  ### Install needed packages
-  apt-get update
-  apt-get install -y dirmngr
-
-  ### Add the Kali Linux GPG keys to aptitude ###
-  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ED444FF07D8D0BF6
-
-  ### Replace the Debian repos with Kali repos ###
-  mv /etc/apt/sources.list /etc/apt/sources.list.debian
-  cat <<EOF > /etc/apt/sources.list
-deb http://http.kali.org/kali kali-rolling main non-free contrib
-# deb-src http://http.kali.org/kali kali-rolling main non-free contrib
-EOF
-
-  ### Update and install base packages ###
-  apt-get update
-  apt-get -y upgrade
-  apt-get -y dist-upgrade
-  apt-get -y autoremove --purge
-  apt-get -y install kali-linux
-
-  ### Downgrade specific packages to their Kali Linux versions ###
-  ### * Commented out since this is currently no longer necessary (2017-09-17).
-  ###   Leaving it for future reference just in case.
-  #apt-get -y --force-yes install tzdata=2015d-0+deb8u1
-  #apt-get -y --force-yes install libc6=2.19-18
-  #apt-get -y --force-yes install systemd=215-17+deb8u1 libsystemd0=215-17+deb8u1
-  #
-  ### Double-check that nothing else needs to be updated ###
-  #apt-get update
-  #apt-get -y upgrade
-  #apt-get -y dist-upgrade
-
-  ### Clean up ###
-  apt-get -y autoremove --purge
-  apt-get clean
-fi
-
-export USER_NAME=manager
-export USER_HOME=/home/manager
-
+USER_NAME=${USER_NAME:-manager}
+USER_HOME=${USER_HOME:-/home/${USER_NAME}}
 if ! id $USER_NAME ; then
   groupadd -g 1001 $USER_NAME
   useradd -g 1001 -u 1001 -d $USER_HOME -s /bin/bash -m $USER_NAME
 fi
-
 usermod -aG sudo $USER_NAME
 usermod -aG admin $USER_NAME
 usermod -aG docker $USER_NAME
@@ -149,7 +108,8 @@ chown ${USER_NAME}.${USER_NAME} ${USER_HOME}/.ssh
 chmod 700 ${USER_HOME}/.ssh
 AUTHORIZED_KEYS_FILE=$(mktemp /tmp/authorized_keys.XXXXXXXX)
 (
-  cat /home/debian/.ssh/authorized_keys
+  if [ -f /home/admin/.ssh/authorized_keys ] ; then cat /home/admin/.ssh/authorized_keys ; fi
+  if [ -f /home/${USER_NAME}/.ssh/authorized_keys ] ; then cat /home/${USER_NAME}/.ssh/authorized_keys ; fi
   curl -sL https://github.com/ianblenke.keys
   curl -sL https://github.com/tabinfl.keys
   curl -sL https://github.com/ahernmikej.keys
