@@ -303,7 +303,7 @@ resource "aws_route53_record" "instance" {
   name    = "${element(aws_instance.instance.*.tags.Name, count.index)}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${element(aws_instance.instance.*.public_ip, count.index)}"]
+  records = ["${element(aws_eip.instance.*.public_ip, count.index)}"]
 }
 
 /* Define a project-environment.zone round-robin of A records */
@@ -312,7 +312,7 @@ resource "aws_route53_record" "project-name-ipv4" {
   name    = "${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+  records = ["${join(",", aws_eip.instance.*.public_ip)}"]
 }
 
 /* Define a project-environment.zone round-robin of AAAA records */
@@ -330,7 +330,7 @@ resource "aws_route53_record" "traefik-ipv4" {
   name    = "traefik.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+  records = ["${join(",", aws_eip.instance.*.public_ip)}"]
 }
 
 /* Define traefik.project-environment.zone round-robin AAAA records */
@@ -348,7 +348,7 @@ resource "aws_route53_record" "guacamole-ipv4" {
   name    = "guacamole.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+  records = ["${join(",", aws_eip.instance.*.public_ip)}"]
 }
 
 /* Define guacamole.project-environment.zone round-robin AAAA records */
@@ -366,7 +366,7 @@ resource "aws_route53_record" "wildcard_project_name_ipv4" {
   name    = "*.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+  records = ["${join(",", aws_eip.instance.*.public_ip)}"]
 }
 
 resource "aws_route53_record" "wildcard_project_name_ipv6" {
@@ -386,7 +386,7 @@ output "ec2_ids" {
 }
 
 output "ec2_ipv4" {
-  value = "${join(",", aws_instance.instance.*.public_ip)}"
+  value = "${join(",", aws_eip.instance.*.public_ip)}"
 }
 
 output "ec2_ipv6" {
