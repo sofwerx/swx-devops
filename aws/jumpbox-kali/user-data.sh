@@ -80,15 +80,15 @@ EOR
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
   add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
    $(lsb_release -cs) \
    stable"
 
   apt-get update
   apt-get install -y linux-image-aws
   apt-get install -y docker-ce
-  usermod -a -G docker ubuntu
-  echo "User ubuntu added to docker group. You may wish to re-login to avoid using sudo docker."  |wall
+  usermod -a -G docker debian
+  echo "User debian added to docker group. You may wish to re-login to avoid using sudo docker."  |wall
 
 fi
 
@@ -131,4 +131,31 @@ EOF
   apt-get clean
 fi
 
-echo Done.
+export USER_NAME=manager
+export USER_HOME=/home/manager
+
+if ! id $USER_NAME ; then
+  groupadd -g 1001 $USER_NAME
+  useradd -g 1001 -u 1001 -d $USER_HOME -s /bin/bash -m $USER_NAME
+fi
+
+usermod -aG sudo $USER_NAME
+usermod -aG admin $USER_NAME
+usermod -aG docker $USER_NAME
+
+# Add ssh key trust
+mkdir -p ${USER_HOME}/.ssh
+chown ${USER_NAME}.${USER_NAME} ${USER_HOME}/.ssh
+chmod 700 ${USER_HOME}/.ssh
+AUTHORIZED_KEYS_FILE=$(mktemp /tmp/authorized_keys.XXXXXXXX)
+(
+  cat /home/debian/.ssh/authorized_keys
+  curl -sL https://github.com/ianblenke.keys
+  curl -sL https://github.com/tabinfl.keys
+  curl -sL https://github.com/ahernmikej.keys
+  curl -sL https://github.com/camswx.keys
+) | sort | uniq > ${AUTHORIZED_KEYS_FILE}
+mv ${AUTHORIZED_KEYS_FILE} ${USER_HOME}/.ssh/authorized_keys
+chown ${USER_NAME}.${USER_NAME} ${USER_HOME}/.ssh/authorized_keys
+chmod 600 ${USER_HOME}/.ssh/authorized_keys
+
