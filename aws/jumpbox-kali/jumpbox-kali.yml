@@ -1,0 +1,74 @@
+version: "2"
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  postgres-data:
+    driver: local
+  guacamole-data:
+    driver: local
+
+services:
+
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  postgres:
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: postgres
+    networks:
+      - default
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+
+  guacd:
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: guacd
+    networks:
+      - default
+    volumes:
+      - traefik-ssl:/ssl
+    labels:
+      - "traefik.enable=false"
+
+  guacamole:
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: guacamole
+    networks:
+      - default
+    volumes:
+      - guacamole-data:/data
+      - traefik-ssl:/ssl
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=guacamole"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:guacamole.${DNS_DOMAIN};AddPrefix:/guacamole"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
