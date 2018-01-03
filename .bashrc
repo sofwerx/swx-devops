@@ -1,6 +1,10 @@
 # .bash_profile
 # Prepare our devops environment with variables, useful functions, and aliases.
 
+if [ -n "${HOME}" -a -d ${HOME}/bin ] ; then
+  export PATH=${PATH}:${HOME}/bin
+fi
+
 devops="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 alias ch="cd ${devops}"
 
