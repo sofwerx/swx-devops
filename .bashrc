@@ -124,7 +124,11 @@ if [ -n "${GPG_AGENT_INFO}" -a -z "$TROUSSEAU_KEYRING_SERVICE" ]; then
   export TROUSSEAU_KEYRING_SERVICE=trouseau
 fi
 
-alias trousseau="$(which trousseau) --gnupg-home $GNUPGHOME --store $TROUSSEAU_STORE"
+if which trousseau 2>&1 > /dev/null ; then
+  alias trousseau="$(which trousseau) --gnupg-home $GNUPGHOME --store $TROUSSEAU_STORE"
+else
+  alias trousseau="echo Cannot find the trousseau command in your path"
+fi
 
 # Allow a secrets based local store of docker-machines... for Ian. You _probably_ don't want this directory.
 if [ -d "${devops}/secrets/docker/machines" ]; then
