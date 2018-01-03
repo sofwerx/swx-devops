@@ -168,6 +168,7 @@ swx_dm_ls ()
 swx_dm_env ()
 {
   if which dmport > /dev/null ; then
+    mkdir -p "${devops}/secrets/dm"
     if trousseau get file:secrets/dm/$1 > /dev/null 2>&1 ; then
       swx_secrets_decrypt secrets/dm/$1
       if  [ -s "${devops}/secrets/dm/$1" ]; then
