@@ -36,74 +36,82 @@ export TF_VAR_aws_region=${AWS_REGION}
 export TF_VAR_aws_access_key_id=${AWS_ACCESS_KEY_ID}
 export TF_VAR_aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
 
-if [ -d "${devops}/secrets/gnupg" ] ; then
-  export GNUPGHOME="${devops}/secrets/gnupg"
-else
-  if [ -d "$HOME/.gnupg" ]; then
-    export GNUPGHOME="$HOME/.gnupg"
+swx_gpg_prepare ()
+{
+  if [ -d "${devops}/secrets/gnupg" ] ; then
+    export GNUPGHOME="${devops}/secrets/gnupg"
+  else
+    if [ -d "$HOME/.gnupg" ]; then
+      export GNUPGHOME="$HOME/.gnupg"
+    fi
   fi
-fi
-chmod go-rwx "$GNUPGHOME"
+  chmod go-rwx "$GNUPGHOME"
 
-if [ -d /usr/local/opt/gpg-agent ]; then
-  export PATH="/usr/local/opt/gpg-agent/bin:$PATH"
-  export PATH="/usr/local/opt/gpg-agent/libexec:$PATH"
-fi
+  if [ ! -d "$GNUPGHOME" ] ; then
+    echo 'You may need to first generate a gpg key:'
+    echo '    gpg --gen-key'
+  fi
 
-if [ -f /usr/lib/gnupg2/gpg-preset-passphrase ]; then
-  export PATH=/usr/lib/gnupg2:$PATH
-fi
+  if [ -d /usr/local/opt/gpg-agent ]; then
+    export PATH="/usr/local/opt/gpg-agent/bin:$PATH"
+    export PATH="/usr/local/opt/gpg-agent/libexec:$PATH"
+  fi
 
-if [ -f "$GNUPGHOME/.gpg-agent-info" ]; then
-  . "$GNUPGHOME/.gpg-agent-info"
-  export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
-fi
+  if [ -f /usr/lib/gnupg2/gpg-preset-passphrase ]; then
+    export PATH=/usr/lib/gnupg2:$PATH
+  fi
 
-# If the GPG_AGENT_INFO points to a unix domain socket that doesn't exist, unset it
-if [ -n "$GPG_AGENT_INFO" -a ! -e "$(echo $GPG_AGENT_INFO | cut -d: -f1)" ]; then
   if [ -f "$GNUPGHOME/.gpg-agent-info" ]; then
-    rm -f "$GNUPGHOME/.gpg-agent-info"
+    . "$GNUPGHOME/.gpg-agent-info"
+    export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
   fi
-  unset GPG_AGENT_INFO gpg_agent_info
-fi
 
-# Use pinentry-mac if it is available
-if ! grep pinentry-program "$GNUPGHOME/gpg-agent.conf" > /dev/null ; then
-  if which pinentry-mac > /dev/null ; then
-    echo "pinentry-program /usr/local/bin/pinentry-mac" >> "$GNUPGHOME/gpg-agent.conf"
+  # If the GPG_AGENT_INFO points to a unix domain socket that doesn't exist, unset it
+  if [ -n "$GPG_AGENT_INFO" -a ! -e "$(echo $GPG_AGENT_INFO | cut -d: -f1)" ]; then
+    if [ -f "$GNUPGHOME/.gpg-agent-info" ]; then
+      rm -f "$GNUPGHOME/.gpg-agent-info"
+    fi
+    unset GPG_AGENT_INFO gpg_agent_info
   fi
-  if [ -f /usr/bin/pinentry-curses ]; then
-    echo "pinentry-program /usr/bin/pinentry-curses" >> "$GNUPGHOME/gpg-agent.conf"
+
+  # Use pinentry-mac if it is available
+  if ! grep pinentry-program "$GNUPGHOME/gpg-agent.conf" > /dev/null ; then
+    if which pinentry-mac > /dev/null ; then
+      echo "pinentry-program /usr/local/bin/pinentry-mac" >> "$GNUPGHOME/gpg-agent.conf"
+    fi
+    if [ -f /usr/bin/pinentry-curses ]; then
+      echo "pinentry-program /usr/bin/pinentry-curses" >> "$GNUPGHOME/gpg-agent.conf"
+    fi
   fi
-fi
 
-if [ -z "${GPG_AGENT_INFO}" ]; then
-  if which gpg-agent > /dev/null ; then
-    GPG_TTY=$(tty)
-    export GPG_TTY
-
-    eval $(gpg-agent --daemon --enable-ssh-support --write-env-file "$GNUPGHOME/.gpg-agent-info" --allow-preset-passphrase)
+  if [ -z "${GPG_AGENT_INFO}" ]; then
+    if which gpg-agent > /dev/null ; then
+      GPG_TTY=$(tty)
+      export GPG_TTY
+  
+      eval $(gpg-agent --daemon --enable-ssh-support --write-env-file "$GNUPGHOME/.gpg-agent-info" --allow-preset-passphrase)
+    fi
   fi
-fi
 
-if [ -n "${GPG_AGENT_INFO}" ]; then
-  export gpg_agent_info="${GPG_AGENT_INFO}"
-fi
+  if [ -n "${GPG_AGENT_INFO}" ]; then
+    export gpg_agent_info="${GPG_AGENT_INFO}"
+  fi
 
-if [ -d "$GNUPGHOME" ] ; then
-  export TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1 | head -1)
-  KEYGRIP=$(gpg --fingerprint --fingerprint | grep fingerprint | head -2 | tail -1 | cut -d= -f2 | sed -e 's/ //g')
-  alias gpg_remember="echo -n 'Please enter your gpg key passphrase: '; stty -echo; gpg-preset-passphrase --preset $KEYGRIP ; stty echo ; echo ''"
-  alias gpg_forget="gpg-preset-passphrase --forget $KEYGRIP"
-else
-  echo 'You may need to first generate a gpg key:'
-  echo '    gpg --gen-key'
-fi
+  #if gpg-agent --use-standard-socket-p ; then
+  #  echo "WARNING: Your gpg build/version/configuration is not compatible with trousseau: $(gpg --version | head -1)"
+  #  echo "If gpg is running with --use-standard-socket, GPG_AGENT_INFO will not be set, which trousseau needs to operate correctly"
+  #fi
 
-#if gpg-agent --use-standard-socket-p ; then
-#  echo "WARNING: Your gpg build/version/configuration is not compatible with trousseau: $(gpg --version | head -1)"
-#  echo "If gpg is running with --use-standard-socket, GPG_AGENT_INFO will not be set, which trousseau needs to operate correctly"
-#fi
+  if [ -z "$KEYGRIP" ]; then
+    if [ -z "$TROUSSEAU_MASTER_GPG_ID" ]; then
+      TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1 | head -1)
+    fi
+    KEYGRIP=$(gpg --fingerprint --fingerprint | grep fingerprint | head -2 | tail -1 | cut -d= -f2 | sed -e 's/ //g')
+  fi
+
+}
+
+swx_gpg_prepare
 
 # This fixes my ssh-add hang problem when using gpg-agent instead of sshagent
 if echo "$SSH_AUTH_SOCK" | grep gpg > /dev/null ; then
@@ -152,6 +160,51 @@ if which npm > /dev/null; then
 fi
 
 # The swx command functions are defined below.
+
+swx_gpg ()
+{
+  case $1 in
+prepare) shift; swx_gpg_prepare $@ ;;
+remember) shift; swx_gpg_remember $@ ;;
+forget) shift; swx_gpg_forget $@ ;;
+reset) shift; swx_gpg_reset $@ ;;
+*) cat <<EOU 1>&2
+Usage: swx gpg {action}
+  prepare  - Prepare your gpg-agent environment
+  remember - Remember your passphrase (gpg-agent)
+  forget   - Forget your passphrase (gpg-agent)
+  reset    - Reset your gpg-agent
+EOU
+  return 1
+  ;;
+  esac
+}
+
+
+swx_gpg_reset ()
+{
+  kill $(echo $GPG_AGENT_INFO | cut -d: -f2)
+  unset GPG_AGENT_INFO gpg_agent_info
+  if [ -f $GNUPGHOME/.gpg-agent-info ]; then
+    rm -f $GNUPGHOME/.gpg-agent-info
+  fi
+}
+
+swx_gpg_remember ()
+{
+  swx_gpg_prepare
+  echo -n 'Please enter your gpg key passphrase: '
+  stty -echo
+  gpg-preset-passphrase --preset $KEYGRIP
+  stty echo
+  echo ''
+}
+
+swx_gpg_forget ()
+{
+  swx_gpg_prepare
+  gpg-preset-passphrase --forget $KEYGRIP
+}
 
 swx_tf ()
 {
@@ -325,6 +378,7 @@ _swx ()
     "swx dm ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx dm env"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
     "swx dm"*) COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
+    "swx gpg"*) COMPREPLY=( $( compgen -W "prepare remember forget reset" -- $cur ) ) ;;
     "swx environment ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx environment switch"*) COMPREPLY=( $( compgen -W "$(swx_environment_ls)" -- $cur ) ) ;;
     "swx environment"*) COMPREPLY=( $( compgen -W "ls switch"  -- $cur ) ) ;;
@@ -343,12 +397,14 @@ complete -F _swx swx
 swx ()
 {
   case $1 in
+gpg) shift; swx_gpg $@ ;;
 dm) shift; swx_dm $@ ;;
 environment) shift; swx_environment $@ ;;
 secrets) shift; swx_secrets $@ ;;
 tf) shift; swx_tf $@ ;;
 *) cat <<EOU 1>&2
 Usage: swx {command}
+  gpg         - Interact with your gpg-agent
   dm          - Manage dm (docker-machines)
   environment - Source project-lifecycle environment variables
   secrets     - Deal with secrets/ folder
