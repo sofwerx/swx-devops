@@ -26,9 +26,11 @@ services:
       - "traefik.enable=false"
 
   traefik:
-    extends:
-      file: docker-traefik/docker-compose.yml
-      service: traefik
+    container_name: traefik
+    hostname: traefik
+    build: docker-traefik/
+    image: sofwerx/traefik
+    restart: always
     ports:
       - 80:80
       - 443:443
@@ -36,6 +38,14 @@ services:
       - default
     environment:
       REST_PORT: "7080"
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+    volumes:
+      - traefik-ssl:/ssl
+      - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.enable=true"
       - "traefik.backend=traefik"
