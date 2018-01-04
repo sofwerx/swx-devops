@@ -252,6 +252,36 @@ resource "aws_eip_association" "eip_assoc" {
   allocation_id = "${element(aws_eip.instance.*.id, count.index)}"
 }
 
+resource "aws_ebs_volume" "home" {
+  count = "${var.aws_instance_count}"
+
+  availability_zone = "${element(split(",",lookup(var.aws_availability_zones, var.aws_region)), count.index % length(split(",",lookup(var.aws_availability_zones, var.aws_region))))}"
+
+  size = "${var.ebs_home_volume_size}"
+  type = "standard"
+
+  encrypted = true
+
+  tags {
+    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
+  }
+}
+
+resource "aws_ebs_volume" "docker" {
+  count = "${var.aws_instance_count}"
+
+  availability_zone = "${element(split(",",lookup(var.aws_availability_zones, var.aws_region)), count.index % length(split(",",lookup(var.aws_availability_zones, var.aws_region))))}"
+
+  size = "${var.ebs_docker_volume_size}"
+  type = "standard"
+
+  encrypted = true
+
+  tags {
+    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
+  }
+}
+
 resource "aws_instance" "instance" {
   count = "${var.aws_instance_count}"
     
@@ -296,6 +326,22 @@ data "aws_route53_zone" "selected" {
   private_zone = false
 }
 
+resource "aws_volume_attachment" "instance-home" {
+  count = "${var.aws_instance_count}"
+  device_name = "xvdh"
+  instance_id = "${element(aws_instance.instance.*.id, count.index)}"
+  volume_id = "${element(aws_ebs_volume.home.*.id, count.index)}"
+  force_detach = true
+}
+
+resource "aws_volume_attachment" "instance-docker" {
+  count = "${var.aws_instance_count}"
+  device_name = "xvdi"
+  instance_id = "${element(aws_instance.instance.*.id, count.index)}"
+  volume_id = "${element(aws_ebs_volume.docker.*.id, count.index)}"
+  force_detach = true
+}
+
 /* Define a project-environment-instance.zone A record */
 resource "aws_route53_record" "instance" {
   count = "${var.aws_instance_count}"
@@ -303,7 +349,7 @@ resource "aws_route53_record" "instance" {
   name    = "${element(aws_instance.instance.*.tags.Name, count.index)}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${element(aws_instance.instance.*.public_ip, count.index)}"]
+  records = ["${element(aws_eip.instance.*.public_ip, count.index)}"]
 }
 
 /* Define a project-environment.zone round-robin of A records */
@@ -312,7 +358,7 @@ resource "aws_route53_record" "project-name-ipv4" {
   name    = "${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+  records = ["${join(",", aws_eip.instance.*.public_ip)}"]
 }
 
 /* Define a project-environment.zone round-robin of AAAA records */
@@ -330,7 +376,7 @@ resource "aws_route53_record" "traefik-ipv4" {
   name    = "traefik.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+  records = ["${join(",", aws_eip.instance.*.public_ip)}"]
 }
 
 /* Define traefik.project-environment.zone round-robin AAAA records */
@@ -348,7 +394,7 @@ resource "aws_route53_record" "guacamole-ipv4" {
   name    = "guacamole.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+  records = ["${join(",", aws_eip.instance.*.public_ip)}"]
 }
 
 /* Define guacamole.project-environment.zone round-robin AAAA records */
@@ -366,7 +412,7 @@ resource "aws_route53_record" "wildcard_project_name_ipv4" {
   name    = "*.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["${join(",", aws_instance.instance.*.public_ip)}"]
+  records = ["${join(",", aws_eip.instance.*.public_ip)}"]
 }
 
 resource "aws_route53_record" "wildcard_project_name_ipv6" {
@@ -386,7 +432,7 @@ output "ec2_ids" {
 }
 
 output "ec2_ipv4" {
-  value = "${join(",", aws_instance.instance.*.public_ip)}"
+  value = "${join(",", aws_eip.instance.*.public_ip)}"
 }
 
 output "ec2_ipv6" {

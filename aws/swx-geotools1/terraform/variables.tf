@@ -94,7 +94,7 @@ variable aws_instance_count {
 
 variable aws_instance_type {
     description = "AWS instance type to use"
-    default = "t2.medium"
+    default = "t2.xlarge"
 }
 
 variable linux_distro_name {
@@ -115,5 +115,15 @@ variable ssh_key_path {
 variable ebs_root_volume_size {
     description = "EBS Root Volume Size"
     default = "20"
+}
+
+variable ebs_home_volume_size {
+    description = "EBS Home Volume Size"
+    default = "50"
+}
+
+variable ebs_docker_volume_size {
+    description = "EBS Docker Volume Size"
+    default = "50"
 }
 
