@@ -15,21 +15,21 @@ volumes:
 services:
 
   osgeo:
-#    extends:
-#      file: docker-osgeo/docker-compose.yml
-#      service: osgeo
-    build: docker-osgeo/
-    image: sofwerx/osgeo
-    container_name: osgeo
+    extends:
+      file: docker-osgeo/docker-compose.yml
+      service: osgeo
     network_mode: host
     privileged: true
     volumes:
       - /:/chroot
+    labels:
+      - "traefik.enable=false"
 
   traefik:
     extends:
       file: docker-traefik/docker-compose.yml
       service: traefik
+    restart: always
     ports:
       - 80:80
       - 443:443
@@ -49,6 +49,7 @@ services:
     extends:
       file: docker-guacamole/docker-compose.yml
       service: postgres
+    restart: always
     networks:
       - default
     volumes:
@@ -56,33 +57,23 @@ services:
     labels:
       - "traefik.enable=false"
 
-  adminer:
-    extends:
-      file: docker-guacamole/docker-compose.yml
-      service: adminer
-    networks:
-      - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=adminer"
-      - "traefik.port=8080"
-      - "traefik.frontend.rule=Host:adminer.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
-
   guacd:
     extends:
       file: docker-guacamole/docker-compose.yml
       service: guacd
+    restart: always
     networks:
       - default
     volumes:
       - traefik-ssl:/ssl
+    labels:
+      - "traefik.enable=false"
 
   guacamole:
     extends:
       file: docker-guacamole/docker-compose.yml
       service: guacamole
+    restart: always
     networks:
       - default
     volumes:
