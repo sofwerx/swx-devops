@@ -103,10 +103,10 @@ swx_gpg_prepare ()
   #fi
 
   if [ -z "$KEYGRIP" ]; then
-    if [ -z "$TROUSSEAU_MASTER_GPG_ID" ]; then
-      TROUSSEAU_MASTER_GPG_ID=$(gpg --list-secret-keys | grep uid  | cut -d'<' -f2- | cut -d'>' -f1 | head -1)
-    fi
     KEYGRIP=$(gpg --fingerprint --fingerprint | grep fingerprint | head -2 | tail -1 | cut -d= -f2 | sed -e 's/ //g')
+  fi
+  if [ -z "$TROUSSEAU_MASTER_GPG_ID" ]; then
+    export TROUSSEAU_MASTER_GPG_ID=$KEYGRIP
   fi
 
 }
