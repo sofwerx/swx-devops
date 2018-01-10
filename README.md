@@ -110,9 +110,15 @@ Install Vagrant for your operating system:
 The biggest challenge managing Vagrant persistence will be syncing or sharing a folder between your host and the virtual machine.
 This differs based on the virtual machine engine you use with Vagrant (VirtualBox, VMWare Workstation, VMWare Fusion, Parallels, xhyve, etc).
 
-If you are using Vagrant, I strongly suggest creating a `secrets/gnupg` directory first:
+While you _can_ use the default `~/.gnupg` config folder, I strongly suggest creating a `secrets/gnupg` directory to keep your keychain local to this repo directory:
 
     mkdir -p secrets/gnupg
+
+Now run the `shell.bash` to enter the environment:
+
+    ./shell.bash
+
+This will prepare your gnupg keychain and environment.
 
 After installing gnupg 2.0, you will want to generate a private/public keypair:
 
@@ -123,9 +129,9 @@ If your `gpg` does not prompt you for the number of bits, you're probably using 
 
 After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
 
-    gpg --export --armor > gpg/ian@sofwerx.org
-    git add gpg/ian@sofwerx.org
-    git commit -m 'Adding gpg/ian@sofwerx.org public key'
+    gpg --export --armor > gpg/yourname@sofwerx.org
+    git add gpg/yourname@sofwerx.org
+    git commit -m 'Adding gpg/yourname@sofwerx.org public key'
 
 Our convention in this repository is that the filename must be your email address, to make trousseau management easier.
 
