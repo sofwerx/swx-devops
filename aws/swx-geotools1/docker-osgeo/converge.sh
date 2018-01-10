@@ -181,6 +181,10 @@ if systemctl -a | grep lightdm | grep inactive; then
   systemctl start lightdm
 fi
 
+if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
+  dpkg-reconfigure openssh-server
+fi
+
 # Install DBeaver database GUI
 cd /tmp
 wget https://dbeaver.jkiss.org/files/dbeaver-ce_latest_amd64.deb
