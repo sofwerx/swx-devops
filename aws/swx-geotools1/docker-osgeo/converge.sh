@@ -181,3 +181,9 @@ if systemctl -a | grep lightdm | grep inactive; then
   systemctl start lightdm
 fi
 
+# Install DBeaver database GUI
+cd /tmp
+wget https://dbeaver.jkiss.org/files/dbeaver-ce_latest_amd64.deb
+dpkg -i /tmp/dbeaver-ce_latest_amd64.deb
+rm /tmp/dbeaver-ce_latest_amd64.deb
+
