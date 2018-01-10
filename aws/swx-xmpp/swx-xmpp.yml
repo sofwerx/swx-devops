@@ -1,0 +1,113 @@
+version: "2"
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  ejabberd-log:
+    driver: local
+  ejabberd-db:
+    driver: local
+  ejabberd-config:
+    driver: local
+  traefik-ssl:
+    driver: local
+
+services:
+
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    container_name: traefik
+    hostname: traefik
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+#  turn:
+#    extends:
+#      file: turn/docker-compose.yml
+#      service: turn
+#    container_name: turn
+#    hostname: turn
+#    restart: always
+#    volumes:
+#     - traefik-ssl:/ssl
+#    networks:
+#      - default
+#    environment:
+#      PUBLIC_IP: ${PUBLIC_IP}
+#      DNS_DOMAIN: ${DNS_DOMAIN}
+#      JSON_CONFIG: "{\"config\":[\"verbose\",\"fingerprint\",\"lt-cred-mech\",\"user=user:${TURN_PASSWORD}\",\"realm=turn.${DNS_DOMAIN}\"]}"
+#      TURNCREDENTIALS_SECRET: ${TURN_PASSWORD}
+#      PORT: 3478
+#      ALT_PORT: 3479
+#      TLS_PORT: 5349
+#      TLS_ALT_PORT: 5350
+#      MIN_PORT: 10000
+#      MAX_PORT: 10999
+#    ports:
+#      - "3478:3478/udp" # STUN/TURN UDP
+#      - "3478:3478/tcp" # STUN/TURN TCP
+#      - "3479:3479/udp" # STUN/TURN UDP Alt port (RFC5780 support)
+#      - "3479:3479/tcp" # STUN/TURN TCP Alt port (RFC5780 support)
+#      - "5349:5349/udp" # STUN/TURN DTLS
+#      - "5349:5349/tcp" # STUN/TURN TLS
+#      - "5350:5350/udp" # STUN/TURN DTLS Alt port (RFC5780 support)
+#      - "5350:5350/tcp" # STUN/TURN TLS Alt port (RFC5780 support)
+#      - "10000:10999/udp" # UDP media ports for TURN relay
+#    logging:
+#      driver: json-file
+#      options:
+#        max-size: "20m"
+#    labels:
+#      - "traefik.enable=false"
+
+  ejabberd:
+    image: ejabberd/ecs:17.12
+    hostname: xmpp.devwerx.org
+    container_name: ejabberd
+    restart: always
+    ports:
+      - 5222:5222 # c2s port
+      - 5269:5269 # s2s port
+      - 5280:5280 # BOSH / websocket port
+    volumes:
+      - ejabberd-log:/home/ejabberd/log
+      - ejabberd-db:/home/ejabberd/db
+      - ejabberd-config:/home/ejabberd/config
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=ejabberd"
+      - "traefik.port=5280"
+      - "traefik.frontend.rule=Host:${DNS_DOMAIN},conference.${DNS_DOMAIN},pubsub.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+

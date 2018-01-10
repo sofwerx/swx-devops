@@ -1,0 +1,34 @@
+version: "2"
+
+services:
+
+  turn:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sofwerx/turn
+    environment:
+      PUBLIC_IP: 172.18.0.1
+      DNS_DOMAIN: localhost
+      JSON_CONFIG: "{\"config\":[\"verbose\",\"fingerprint\",\"lt-cred-mech\",\"user=user:password\",\"realm=localhost\"]}"
+      TURNCREDENTIALS_SECRET: password
+      PORT: 3478
+      ALT_PORT: 3479
+      TLS_PORT: 5349
+      TLS_ALT_PORT: 5350
+      MIN_PORT: 10000
+      MAX_PORT: 10999
+      #WILDCARD_SSL_CA_CHAIN: ${WILDCARD_SSL_CA_CHAIN}
+      #WILDCARD_SSL_PRIVATE_KEY: ${WILDCARD_SSL_PRIVATE_KEY}
+      #WILDCARD_SSL_CERTIFICATE: ${WILDCARD_SSL_CERTIFICATE}
+    ports:
+      - "3478:3478/udp" # STUN/TURN UDP
+      - "3478:3478/tcp" # STUN/TURN TCP
+      - "3479:3479/udp" # STUN/TURN UDP Alt port (RFC5780 support)
+      - "3479:3479/tcp" # STUN/TURN TCP Alt port (RFC5780 support)
+      - "5349:5349/udp" # STUN/TURN DTLS
+      - "5349:5349/tcp" # STUN/TURN TLS
+      - "5350:5350/udp" # STUN/TURN DTLS Alt port (RFC5780 support)
+      - "5350:5350/tcp" # STUN/TURN TLS Alt port (RFC5780 support)
+      - "10000:10999/udp" # UDP media ports for TURN relay
+

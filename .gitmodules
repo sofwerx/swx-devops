@@ -55,3 +55,6 @@
 [submodule "aws/jumpbox-kali/docker-traefik"]
 	path = aws/jumpbox-kali/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
+[submodule "aws/swx-xmpp/docker-traefik"]
+	path = aws/swx-xmpp/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
