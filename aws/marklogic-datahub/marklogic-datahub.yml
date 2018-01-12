@@ -20,10 +20,10 @@ volumes:
 
 services:
 
-  datahub:
+  converge:
     extends:
-      file: docker-datahub/docker-compose.yml
-      service: datahub
+      file: converge/docker-compose.yml
+      service: converge
     network_mode: host
     privileged: true
     volumes:
@@ -110,6 +110,9 @@ services:
     image: sofwerx/nifi
     networks:
       - default
+    ports:
+      - "8080:8080"
+      - "8181:8181"
     volumes:
       - database_repository:/opt/nifi/nifi-1.4.0/database_repository
       - flowfile_repository:/opt/nifi/nifi-1.4.0/flowfile_repository
@@ -123,13 +126,38 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-#  marklogic:
-#    build: docker-marklogic/
-#    ports:
-#      - "7997:7997" # health-check
-#      - "7998:7998" # cluster-port
-#      - "7999:7999" # cluster-port2
-#      - "8000:8000" # app-services
-#      - "8001:8001" # admin
-#      - "8002:8002" # manage
+  datahub:
+    build: docker-marklogic/
+    container_name: datahub
+    hostname: datahub
+    environment:
+      ML_CONFIG: |
+        AUTH_MODE="anyauth"
+        PASSWORD="admin"
+        USER="admin"
+        SEC_REALM="public"
+        LICENSE_FILE_FOLDER=/opt
+        VERSION=8
+        HOST_NAME=`hostname`
+    volumes:
+      - datahub-data:/data
+    ports:
+      - "7997:7997" # health-check
+      - "7998:7998" # cluster-port
+      - "7999:7999" # cluster-port2
+      - "8000:8000" # app-services
+      - "8001:8001" # admin
+      - "8002:8002" # manage
+      - "8040:8040"
+      - "8041:8041"
+      - "8042:8042"
+      - "8043:8043"
+      - "8044:8044"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=marklogic"
+      - "traefik.port=8000"
+      - "traefik.frontend.rule=Host:marklogic.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
