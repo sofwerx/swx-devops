@@ -64,3 +64,6 @@
 [submodule "aws/marklogic-datahub/docker-guacamole"]
 	path = aws/marklogic-datahub/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
+[submodule "aws/marklogic-datahub/docker-nifi"]
+	path = aws/marklogic-datahub/docker-nifi
+	url = https://github.com/sofwerx/docker-nifi
