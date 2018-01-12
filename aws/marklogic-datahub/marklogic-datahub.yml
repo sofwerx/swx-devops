@@ -9,6 +9,14 @@ volumes:
     driver: local
   guacamole-data:
     driver: local
+  database_repository:
+    driver: local
+  flowfile_repository:
+    driver: local
+  content_repository:
+    driver: local
+  provenance_repository:
+    driver: local
 
 services:
 
@@ -91,6 +99,27 @@ services:
       - "traefik.backend=guacamole"
       - "traefik.port=8080"
       - "traefik.frontend.rule=Host:guacamole.${DNS_DOMAIN};AddPrefix:/guacamole"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  nifi:
+    extends:
+      file: docker-nifi/docker-compose.yml
+      service: nifi
+    build: docker-nifi/
+    image: sofwerx/nifi
+    networks:
+      - default
+    volumes:
+      - database_repository:/opt/nifi/nifi-1.4.0/database_repository
+      - flowfile_repository:/opt/nifi/nifi-1.4.0/flowfile_repository
+      - content_repository:/opt/nifi/nifi-1.4.0/content_repository
+      - provenance_repository:/opt/nifi/nifi-1.4.0/provenance_repository
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=nifi"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:nifi.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
