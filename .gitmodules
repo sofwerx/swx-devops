@@ -67,3 +67,6 @@
 [submodule "aws/marklogic-datahub/docker-nifi"]
 	path = aws/marklogic-datahub/docker-nifi
 	url = https://github.com/sofwerx/docker-nifi
+[submodule "aws/marklogic-datahub/docker-marklogic"]
+	path = aws/marklogic-datahub/docker-marklogic
+	url = https://github.com/sofwerx/docker-marklogic.git
