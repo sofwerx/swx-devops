@@ -58,3 +58,9 @@
 [submodule "aws/swx-xmpp/docker-traefik"]
 	path = aws/swx-xmpp/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
+[submodule "aws/marklogic-datahub/docker-traefik"]
+	path = aws/marklogic-datahub/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
+[submodule "aws/marklogic-datahub/docker-guacamole"]
+	path = aws/marklogic-datahub/docker-guacamole
+	url = https://github.com/sofwerx/docker-guacamole

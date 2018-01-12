@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+
+  datahub:
+    build: .
+    image: sofwerx/datahub
+    container_name: datahub
+    network_mode: host
+    privileged: true
+    volumes:
+      - /:/chroot
+
