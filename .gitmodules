@@ -70,3 +70,12 @@
 [submodule "aws/marklogic-datahub/docker-marklogic"]
 	path = aws/marklogic-datahub/docker-marklogic
 	url = https://github.com/sofwerx/docker-marklogic.git
+[submodule "local/ibm-minsky/docker-traefik"]
+	path = local/ibm-minsky/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
+[submodule "local/ibm-minsky/docker-guacamole"]
+	path = local/ibm-minsky/docker-guacamole
+	url = https://github.com/sofwerx/docker-guacamole
+[submodule "local/ibm-minsky/docker-ethminer"]
+	path = local/ibm-minsky/docker-ethminer
+	url = https://github.com/sofwerx/docker-ethminer

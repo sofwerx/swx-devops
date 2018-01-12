@@ -1,0 +1,125 @@
+version: '2'
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  postgres-data:
+    driver: local
+  guacamole-data:
+    driver: local
+  nvidia_driver:
+    external:
+      name: "nvidia_driver_387.36"
+
+services:
+
+  traefik:
+    container_name: traefik
+    hostname: traefik
+    build:
+      context: docker-traefik/
+      dockerfile: Dockerfile.${ARCH}
+      args:
+        ARCH: ${ARCH}
+    image: sofwerx/traefik:${ARCH}
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
+      REST_PORT: "8080"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+    volumes:
+      - traefik-ssl:/ssl
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      traefik.backend: "traefik"
+      traefik.port: "8080"
+      traefik.frontend.rule: "Host:traefik.${DNS_DOMAIN}"
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.entryPoints: "http,https"
+
+  postgres:
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: postgres
+    networks:
+      - default
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+
+  adminer:
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: adminer
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=adminer"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:adminer.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  guacd:
+    build:
+      context: docker-guacamole/guacd/
+      dockerfile: Dockerfile.ppc64le
+    image: sofwerx/guacd:ppc64le
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: guacd
+    networks:
+      - default
+    volumes:
+      - traefik-ssl:/ssl
+
+  guacamole:
+    build:
+      context: docker-guacamole/guacamole/
+      dockerfile: Dockerfile.ppc64le
+    image: sofwerx/guacamole:ppc64le
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: guacamole
+    networks:
+      - default
+    volumes:
+      - guacamole-data:/data
+      - traefik-ssl:/ssl
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=guacamole"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:guacamole.${DNS_DOMAIN};AddPrefix:/guacamole"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  ethminer:
+    container_name: ethminer
+    hostname: ethminer
+    extends:
+      file: docker-ethminer/docker-compose.yml
+      service: ethminer
+    build:
+      context: docker-ethminer/
+      dockerfile: Dockerfile.ppc64le
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - default
+
