@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+
+  converge:
+    build: .
+    image: sofwerx/converge
+    container_name: converge
+    network_mode: host
+    privileged: true
+    volumes:
+      - /:/chroot
+

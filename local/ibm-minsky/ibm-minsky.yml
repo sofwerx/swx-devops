@@ -13,9 +13,20 @@ volumes:
     driver: local
   nvidia_driver:
     external:
-      name: "nvidia_driver_387.36"
+      name: "nvidia_driver_384.111"
 
 services:
+
+  converge:
+    extends:
+      file: converge/docker-compose.yml
+      service: converge
+    network_mode: host
+    privileged: true
+    volumes:
+      - /:/chroot
+    labels:
+      - "traefik.enable=false"
 
   traefik:
     container_name: traefik
