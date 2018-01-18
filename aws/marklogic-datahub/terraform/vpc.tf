@@ -367,7 +367,7 @@ resource "aws_volume_attachment" "instance-var-opt" {
   count = "${var.aws_instance_count}"
   device_name = "xvdg"
   instance_id = "${element(aws_instance.instance.*.id, count.index)}"
-  volume_id = "${element(aws_ebs_volume.docker.*.id, count.index)}"
+  volume_id = "${element(aws_ebs_volume.var_opt.*.id, count.index)}"
   force_detach = true
 }
 
