@@ -131,4 +131,8 @@ variable ebs_home_volume_size {
     default = "50"
 }
 
+variable ebs_var_opt_volume_size {
+    description = "EBS Var Opt Volume Size"
+    default = "50"
+}
 

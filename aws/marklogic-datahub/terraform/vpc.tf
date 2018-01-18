@@ -293,6 +293,21 @@ resource "aws_ebs_volume" "docker" {
   }
 }
 
+resource "aws_ebs_volume" "var_opt" {
+  count = "${var.aws_instance_count}"
+
+  availability_zone = "${element(split(",",lookup(var.aws_availability_zones, var.aws_region)), count.index % length(split(",",lookup(var.aws_availability_zones, var.aws_region))))}"
+
+  size = "${var.ebs_var_opt_volume_size}"
+  type = "standard"
+
+  encrypted = true
+
+  tags {
+    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
+  }
+}
+
 resource "aws_instance" "instance" {
   count = "${var.aws_instance_count}"
     
@@ -343,6 +358,14 @@ resource "aws_volume_attachment" "instance-home" {
 resource "aws_volume_attachment" "instance-docker" {
   count = "${var.aws_instance_count}"
   device_name = "xvdi"
+  instance_id = "${element(aws_instance.instance.*.id, count.index)}"
+  volume_id = "${element(aws_ebs_volume.docker.*.id, count.index)}"
+  force_detach = true
+}
+
+resource "aws_volume_attachment" "instance-var-opt" {
+  count = "${var.aws_instance_count}"
+  device_name = "xvdg"
   instance_id = "${element(aws_instance.instance.*.id, count.index)}"
   volume_id = "${element(aws_ebs_volume.docker.*.id, count.index)}"
   force_detach = true
