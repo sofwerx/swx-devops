@@ -22,8 +22,20 @@ services:
       service: traefik
     networks:
       - default
+    restart: always
+    ports:
+      - 8080:8080
+      - 8443:8443
     environment:
+      HTTP_PORT: "8080"
+      HTTPS_PORT: "8443"
       REST_PORT: "7080"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
     labels:
       - "traefik.enable=true"
       - "traefik.backend=traefik"
