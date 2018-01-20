@@ -11,6 +11,10 @@ volumes:
     driver: local
   guacamole-data:
     driver: local
+  mongo-db:
+    driver: local
+  mongo-configdb:
+    driver: local
 
 services:
 
@@ -86,4 +90,36 @@ services:
       - "traefik.frontend.rule=Host:guacamole.${DNS_DOMAIN};AddPrefix:/guacamole"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  mongo:
+    extends:
+      file: docker-mage-server/docker-compose.yml
+      service: mongo
+    image: mongo:3.6.2
+    restart: always
+    networks:
+      - default
+    volumes:
+      - mongo-db:/data/db
+      - mongo-configdb:/data/configdb
+    labels:
+      - "traefik.enable=false"
+
+  mage:
+    extends:
+      file: docker-mage-server/docker-compose.yml
+      service: mage
+#    restart: always
+    networks:
+      - default
+    depends_on:
+      - mongo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mage"
+      - "traefik.port=4242"
+      - "traefik.frontend.rule=Host:mage.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
