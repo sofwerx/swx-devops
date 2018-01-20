@@ -35,26 +35,23 @@ RUN ./configure
 RUN make
 
 WORKDIR /opt
-RUN curl https://codeload.github.com/ngageoint/mage-server/zip/master > mage-server.zip
-RUN unzip mage-server.zip
-RUN mv mage-server-master mage-server
-WORKDIR /opt/mage-server
+ENV MAGE_VERSION=5.0.0
+RUN git clone -b ${MAGE_VERSION} --depth 1 https://github.com/ngageoint/mage-server
+WORKDIR mage-server
 
 RUN npm install
 RUN mkdir -p /var/lib/mage
 
-# start MongoDB
-#RUN /usr/bin/mongod --config /etc/mongodb.conf
-RUN service mongod start
-
-# MAGE database setup
-RUN npm run migrate
-
 # install web dependencies
+RUN echo '{ "allow_root": true }' > ~/.bowerrc
 RUN npm run build
 
 RUN npm install -g forever
 
+ADD run.sh /run.sh
+
+VOLUME /var/lib/mage
+
 # run it!
-CMD ["forever", "start app.js"]
+CMD /run.sh
 

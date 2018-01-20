@@ -1,0 +1,34 @@
+version: "2"
+
+networks: 
+
+  default:
+    driver: bridge
+
+volumes:
+
+  mongo-db:
+    driver: local
+  mongo-configdb:
+    driver: local
+
+services:
+
+  mongo:
+    image: mongo:3.6.2
+    container_name: mongo
+    hostname: mongo
+    volumes:
+      - mongo-db:/data/db
+      - mongo-configdb:/data/configdb
+
+  mage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mage
+    hostname: mage
+    environment:
+      PORT: 4242
+
+
