@@ -94,8 +94,11 @@ module.exports = {
       "micro": parseInt(version[2])
     },
     "authenticationStrategies": {
+      //"anonymous": {
+      //  "everythingisfine": 1
+      //}
       "local": {
-        "passwordMinLength": 14
+        "passwordMinLength": 5
       }
       // "google": {
       //   "url": " ",
@@ -187,7 +190,7 @@ EPIC_CONFIG
 # This plugin generates image thumbnails. Enable it by default.
 cat <<IMAGE_CONFIG > plugins/mage-image/config.json
 {
-  "enable": ${IMAGE_ENABLE:-true},
+  "enable": ${IMAGE_ENABLE:-false},
   "image": {
     "orient": true,
     "thumbSizes": [150, 320, 800, 1024, 2048],

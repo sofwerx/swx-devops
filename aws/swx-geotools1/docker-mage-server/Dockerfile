@@ -29,14 +29,15 @@ RUN apt-get install -y --allow-unauthenticated mongodb-org
 RUN mkdir -p /opt/src
 WORKDIR /opt/src
 
-RUN curl https://raw.githubusercontent.com/sofwerx/swx-devops/master/aws/swx-geotools1/docker-mage-server/graphicsmagick-src.tar.xz | tar xvfJ -
-WORKDIR GraphicsMagick-1.3.27
-RUN ./configure
-RUN make
+RUN DEBIAN_FRONTEND=noninteracitve apt-get install -y libgraphicsmagick1-dev
+#RUN curl https://raw.githubusercontent.com/sofwerx/swx-devops/master/aws/swx-geotools1/docker-mage-server/graphicsmagick-src.tar.xz | tar xvfJ -
+#WORKDIR GraphicsMagick-1.3.27
+#RUN ./configure
+#RUN make
 
 WORKDIR /opt
 ENV MAGE_VERSION=5.0.0
-RUN git clone -b ${MAGE_VERSION} --depth 1 https://github.com/ngageoint/mage-server
+RUN git clone -b sofwerx --depth 1 https://github.com/sofwerx/mage-server
 WORKDIR mage-server
 
 RUN npm install
