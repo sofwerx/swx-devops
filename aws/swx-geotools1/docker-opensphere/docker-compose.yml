@@ -1,0 +1,19 @@
+version: "2"
+
+networks: 
+
+  default:
+    driver: bridge
+
+services:
+
+  opensphere:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: opensphere
+    hostname: mageopensphere
+    environment:
+      PORT: 8282
+
+

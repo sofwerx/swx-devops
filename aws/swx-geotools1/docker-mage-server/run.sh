@@ -190,7 +190,7 @@ EPIC_CONFIG
 # This plugin generates image thumbnails. Enable it by default.
 cat <<IMAGE_CONFIG > plugins/mage-image/config.json
 {
-  "enable": ${IMAGE_ENABLE:-false},
+  "enable": ${IMAGE_ENABLE:-true},
   "image": {
     "orient": true,
     "thumbSizes": [150, 320, 800, 1024, 2048],
