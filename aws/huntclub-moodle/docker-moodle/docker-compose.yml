@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+    dbapp:
+        image: mysql:latest
+        restart: always
+        volumes:
+            - db-volume:/var/lib/mysql
+        env_file:
+            - moodle_variables.env
+        networks:
+            - backendDB
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: any
+    moodleapp:
+        image: jhardison/moodle:latest
+        links:
+            - dbapp:DB
+        depends_on: 
+            - dbapp
+        restart: always
+        volumes:
+            - moodleapp-data:/var/moodledata
+        ports:
+            - 80:80
+            - 443:443
+        env_file:
+            - moodle_variables.env
+        networks:
+            - backendDB
+            - frontendWEB
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: any            
+
+volumes: 
+    db-volume:
+    moodleapp-data:
+
+networks:
+    backendDB:
+    frontendWEB:
