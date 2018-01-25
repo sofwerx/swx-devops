@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+
+  ethereum:
+    build:
+      context: .
+      dockerfile: Dockerfile.${ARCH}
+    image: sofwerx/ethereum:${ARCH}
+    restart: always
+    command: geth --fast --cache=2048
+

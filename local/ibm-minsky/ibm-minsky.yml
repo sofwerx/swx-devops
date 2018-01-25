@@ -14,6 +14,22 @@ volumes:
   nvidia_driver:
     external:
       name: "nvidia_driver_384.111"
+  ethereum-mainnet-cachedir:
+    driver: local
+  ethereum-mainnet-dagdir:
+    driver: local
+  ethereum-mainnet-datadir:
+    driver: local
+  ethereum-mainnet-keystore:
+    driver: local
+  ethereum-rinkeby-cachedir:
+    driver: local
+  ethereum-rinkeby-dagdir:
+    driver: local
+  ethereum-rinkeby-datadir:
+    driver: local
+  ethereum-rinkeby-keystore:
+    driver: local
 
 services:
 
@@ -134,3 +150,107 @@ services:
     networks:
       - default
 
+  mainnet:
+    container_name: mainnet
+    hostname: mainnet
+    extends:
+      file: docker-ethereum/docker-compose.yml
+      service: ethereum
+    build:
+      context: docker-ethereum/
+      dockerfile: Dockerfile.${ARCH}
+    image: sofwerx/ethereum:${ARCH}
+    volumes:
+      - ethereum-mainnet-cachedir:/cachedir
+      - ethereum-mainnet-dagdir:/dagdir
+      - ethereum-mainnet-datadir:/datadir
+      - ethereum-mainnet-keystore:/keystore
+    command: >-
+      geth --fast --cache=2048
+      --datadir=/datadir --keystore=/keystore 
+      --ethash.cachedir=/cachedir --ethash.dagdir=/dagdir
+      --ipcpath=/datadir/geth.ipc
+      --metrics
+      --shh --shh.maxmessagesize=1048576 --shh.pow=0.2
+      --rpc --rpcaddr=0.0.0.0 --rpcport=8545
+      --ws --wsaddr=0.0.0.0 --wsport=8546
+    restart: always
+    ports:
+      - "127.0.0.1:8545:8545" # RPC (do not publically expose)
+      - "127.0.0.1:8546:8546" # WS-RPC (do not publically expose)
+      - "30303:30303"
+      - "30303/udp:30303/udp" 
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  rinkeby:
+    container_name: rinkeby
+    hostname: rinkeby
+    extends:
+      file: docker-ethereum/docker-compose.yml
+      service: ethereum
+    build:
+      context: docker-ethereum/
+      dockerfile: Dockerfile.${ARCH}
+    image: sofwerx/ethereum:${ARCH}
+    volumes:
+      - ethereum-rinkeby-cachedir:/cachedir
+      - ethereum-rinkeby-dagdir:/dagdir
+      - ethereum-rinkeby-datadir:/datadir
+      - ethereum-rinkeby-keystore:/keystore
+    command: >-
+      geth --rinkeby --fast --cache=2048
+      --datadir=/datadir --keystore=/keystore 
+      --ethash.cachedir=/cachedir --ethash.dagdir=/dagdir
+      --ipcpath=/datadir/geth.ipc
+      --metrics
+      --shh --shh.maxmessagesize=1048576 --shh.pow=0.2
+      --rpc --rpcaddr=0.0.0.0 --rpcport=8547
+      --ws --wsaddr 0.0.0.0 --wsport=8548
+      --port 30305
+    restart: always
+    ports:
+      - "127.0.0.1:8547:8545" # RPC (do not publically expose)
+      - "127.0.0.1:8548:8546" # WS-RPC (do not publically expose)
+      - "30305:30305"
+      - "30305/udp:30305/udp" 
+      - "30306/udp:30306/udp"
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  swarm:
+    container_name: swarm
+    hostname: swarm
+    build:
+      context: docker-ethereum/
+      dockerfile: Dockerfile.${ARCH}
+    image: sofwerx/ethereum:${ARCH}
+    restart: always
+    volumes:
+      - ethereum-mainnet-datadir:/datadir
+      - ethereum-mainnet-keystore:/keystore
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:8500:8500
+      - 30399:30399
+    labels:
+      - "traefik.enable=false"
+    command: >-
+      sh -xc "
+      echo ${SWARM_PASSWORD} > /tmp/password; 
+      exec swarm --bzzaccount ${BZZACCOUNT}
+      --bzznetworkid=0
+      --corsdomain=swarm.${DNS_DOMAIN}
+      --ens-api=/datadir/geth.ipc
+      --datadir=/datadir
+      --ipcpath=/datadir/swarm.ipc
+      --keystore=/keystore
+      --port=30399
+      --httpaddr=0.0.0.0
+      --password=/tmp/password
+      "
