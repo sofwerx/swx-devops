@@ -20,14 +20,16 @@ RUN rm -fr /var/www/html \
 RUN git clone -b MOODLE_27_STABLE --depth=1 https://github.com/CinecaElearning/moodle-mod_attendanceregister  /var/www/html/mod/moodle-mod_attendanceregister
 
 # https://moodle.org/plugins/qbehaviour_interactivehints
+# https://moodle.org/plugins/qtype_poasquestion
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install mercurial \
  && apt-get clean autoclean \
  && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/*
 RUN hg clone https://bitbucket.org/oasychev/moodle-plugins /tmp/moodle_plugins \
- && mkdir -p /var/www/html/question/behaviour/ \
+ && mkdir -p /var/www/html/question/behaviour/ /var/www/html/question/type/  \
  && mv /tmp/moodle_plugins/question/behaviour/interactivehints /var/www/html/question/behaviour/interactivehints \
+ && mv /tmp/moodle_plugins/question/type/poasquestion /var/www/html/question/type/poasquestion \
  && rm -fr /tmp/moodle_plugins
 
 # https://moodle.org/plugins/mod_vpl
