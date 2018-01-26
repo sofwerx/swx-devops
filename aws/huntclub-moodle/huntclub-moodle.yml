@@ -7,6 +7,8 @@ networks:
 volumes:
   traefik-ssl:
     driver: local
+  mysqldb-data:
+    driver: local
   mariadb-data:
     driver: local
   moodle-data:
@@ -44,17 +46,17 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  mariadb:
-    image: mariadb:10.2.12
-    container_name: mariadb
-    hostname: mariadb
+  mysqldb:
+    image: mysql:5.5
+    container_name: mysqldb
+    hostname: mysqldb
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_MOODLE_DATABASE}
       MYSQL_USER: ${MYSQL_MOODLE_USERNAME}
       MYSQL_PASSWORD: ${MYSQL_MOODLE_PASSWORD}
     volumes:
-      - 'mariadb-data:/var/lib/mysql'
+      - 'mysqldb-data:/var/lib/mysql'
     labels:
       - "traefik.enable=false"
 
@@ -71,11 +73,11 @@ services:
       DB_ENV_MYSQL_DATABASE: ${MYSQL_MOODLE_DATABASE}
       DB_ENV_MYSQL_USER: ${MYSQL_MOODLE_USERNAME}
       DB_ENV_MYSQL_PASSWORD: ${MYSQL_MOODLE_PASSWORD}
-      DB_PORT_3306_TCP_ADDR: mariadb
+      DB_PORT_3306_TCP_ADDR: mysqldb
       DB_PORT_3306_TCP_PORT: 3306
       MOODLE_URL: https://${DNS_DOMAIN}
     depends_on:
-      - mariadb
+      - mysqldb
     labels:
       - "traefik.enable=true"
       - "traefik.backend=moodle"
