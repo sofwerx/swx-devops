@@ -85,3 +85,6 @@
 [submodule "aws/huntclub-moodle/docker-traefik"]
 	path = aws/huntclub-moodle/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
+[submodule "aws/swx-geotools1/docker-mage-server"]
+	path = aws/swx-geotools1/docker-mage-server
+	url = https://github.com/sofwerx/docker-mage-server
