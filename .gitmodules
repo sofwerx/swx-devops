@@ -88,3 +88,6 @@
 [submodule "aws/swx-geotools1/docker-mage-server"]
 	path = aws/swx-geotools1/docker-mage-server
 	url = https://github.com/sofwerx/docker-mage-server
+[submodule "aws/swx-geotools1/docker-opensphere"]
+	path = aws/swx-geotools1/docker-opensphere
+	url = https://github.com/sofwerx/docker-opensphere
