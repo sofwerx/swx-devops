@@ -91,3 +91,6 @@
 [submodule "aws/swx-geotools1/docker-opensphere"]
 	path = aws/swx-geotools1/docker-opensphere
 	url = https://github.com/sofwerx/docker-opensphere
+[submodule "aws/swx-geotools1/docker-geoserver"]
+	path = aws/swx-geotools1/docker-geoserver
+	url = git@github.com:sofwerx/docker-geoserver.git

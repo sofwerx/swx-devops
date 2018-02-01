@@ -31,6 +31,24 @@ services:
     labels:
       - "traefik.enable=false"
 
+  geoserver:
+    extends:
+      file: docker-geoserver/docker-compose.yml
+      service: geoserver
+    networks:
+      - default
+    ports:
+      - 8088:8088
+    volumes:
+      - geoserver-data:/home/geo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=geoserver"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:geoserver.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
   traefik:
     extends:
       file: docker-traefik/docker-compose.yml
