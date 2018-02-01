@@ -17,6 +17,8 @@ volumes:
     driver: local
   mage-data:
     driver: local
+  geoserver-data:
+    driver: local
 
 services:
 
