@@ -19,6 +19,8 @@ volumes:
     driver: local
   geoserver-data:
     driver: local
+  postgis-data:
+    driver: local
 
 services:
 
@@ -37,12 +39,12 @@ services:
     extends:
       file: docker-geoserver/docker-compose.yml
       service: geoserver
+    restart: always
     networks:
       - default
-    ports:
-      - 8088:8088
     volumes:
-      - geoserver-data:/home/geo
+      - geoserver-data:/opt/geoserver/data_dir
+      - /home/geo:/home/geo
     labels:
       - "traefik.enable=true"
       - "traefik.backend=geoserver"
@@ -70,6 +72,19 @@ services:
       - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  postgis:
+    extends:
+      file: docker-postgis/docker-compose.yml
+      service: postgis
+    networks:
+      - default
+    expose:
+      - 5432
+    volumes:
+       - postgis-data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
 
   postgres:
     extends:

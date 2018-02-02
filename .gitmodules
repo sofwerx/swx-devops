@@ -94,3 +94,6 @@
 [submodule "aws/swx-geotools1/docker-geoserver"]
 	path = aws/swx-geotools1/docker-geoserver
 	url = git@github.com:sofwerx/docker-geoserver.git
+[submodule "aws/swx-geotools1/docker-postgis"]
+	path = aws/swx-geotools1/docker-postgis
+	url = git@github.com:sofwerx/docker-postgis.git
