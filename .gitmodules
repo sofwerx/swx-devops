@@ -94,10 +94,12 @@
 [submodule "aws/swx-geotools1/docker-geoserver"]
 	path = aws/swx-geotools1/docker-geoserver
 	url = https://github.com/sofwerx/docker-geoserver.git
+[submodule "aws/swx-geotools1/docker-postgis"]
+	path = aws/swx-geotools1/docker-postgis
+	url = https://github.com/sofwerx/docker-postgis.git
 [submodule "local/orange/fuel-nat/docker-nat"]
 	path = local/orange/fuel-nat/docker-nat
 	url = https://github.com/sofwerx/docker-geoserver.git
 [submodule "local/swx-gpu/tor-moneropool/tor-monero"]
 	path = local/swx-gpu/tor-moneropool/tor-monero
 	url = https://github.com/sofwerx/tor-moneropool.git
-
