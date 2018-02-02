@@ -288,6 +288,21 @@ swx_environment_ls ()
   trousseau keys | grep -e ^environment: | cut -d: -f2 | sort | uniq
 }
 
+swx_environment_get ()
+{
+  trousseau get "environment:${environment}:$1"
+}
+
+swx_environment_set ()
+{
+  trousseau set "environment:${environment}:$1" "$2"
+}
+
+swx_environment_keys ()
+{
+  trousseau keys | grep -e "^environment:${environment}:" | sed -e "s/^environment:${environment}://"
+}
+
 swx_environment_switch ()
 {
   environment=$1
@@ -317,10 +332,16 @@ swx_environment ()
   case $1 in
 ls) shift; swx_environment_ls ;;
 switch) shift; swx_environment_switch $@ ;;
+get) shift; swx_environment_get $@ ;;
+set) shift; swx_environment_set $@ ;;
+keys) shift; swx_environment_keys $@ ;;
 *) cat <<EOU 1>&2
 Usage: swx dm environment {action}
   ls     - List environments
   switch - Switch to an environment
+  get    - Get an environment variable from the current environment
+  set    - Set an environment variable in the current environment
+  keys   - List the environment variable for the current environment
 EOU
   return 1
   ;;
@@ -381,7 +402,10 @@ _swx ()
     "swx gpg"*) COMPREPLY=( $( compgen -W "prepare remember forget reset" -- $cur ) ) ;;
     "swx environment ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx environment switch"*) COMPREPLY=( $( compgen -W "$(swx_environment_ls)" -- $cur ) ) ;;
-    "swx environment"*) COMPREPLY=( $( compgen -W "ls switch"  -- $cur ) ) ;;
+    "swx environment get"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
+    "swx environment set"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
+    "swx environment keys") COMPREPLY=( $cur ) ;;
+    "swx environment"*) COMPREPLY=( $( compgen -W "ls switch get set keys"  -- $cur ) ) ;;
     "swx secrets addrecipients"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx secrets encrypt "*) COMPREPLY=( $( compgen -W "$(find secrets/ -type f | grep -v -e 'gnupg\|docker')" -- $cur ) ) ;;
     "swx secrets decrypt "*) COMPREPLY=( $( compgen -W "$(trousseau keys | grep -e ^file:secrets/ | sed -e s/^file://)" -- $cur ) ) ;;
