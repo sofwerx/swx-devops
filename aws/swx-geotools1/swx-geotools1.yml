@@ -75,16 +75,34 @@ services:
 
   postgis:
     extends:
-      file: docker-postgis/docker-compose.yml
+      file: docker-postgis/9.5-2.4/docker-compose.yml
       service: postgis
     networks:
       - default
-    expose:
-      - 5432
     volumes:
-       - postgis-data:/var/lib/postgresql/data
+      - postgis-data:/var/lib/postgresql/data
     labels:
       - "traefik.enable=false"
+
+  pgadmin:
+    extends:
+      file: docker-postgis/9.5-2.4/docker-compose.yml
+      service: pgadmin
+    networks:
+      - default
+    volumes:
+      - traefik-ssl:/ssl
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_SERVER_NAME: pgadmin.${DNS_DOMAIN}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=pgadmin"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:pgadmin.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
   postgres:
     extends:
