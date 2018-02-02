@@ -1,10 +1,12 @@
 version: '2'
 
 networks: 
+
   default:
     driver: bridge
 
 volumes:
+
   traefik-ssl:
     driver: local
   postgres-data:
@@ -29,6 +31,22 @@ volumes:
   ethereum-rinkeby-datadir:
     driver: local
   ethereum-rinkeby-keystore:
+    driver: local
+  sia-consensus:
+    driver: local
+  sia-explorer:
+    driver: local
+  sia-gateway:
+    driver: local
+  sia-host:
+    driver: local
+  sia-miner:
+    driver: local
+  sia-renter:
+    driver: local
+  sia-transactionpool:
+    driver: local
+  sia-wallet:
     driver: local
 
 services:
@@ -179,7 +197,7 @@ services:
       - "127.0.0.1:8545:8545" # RPC (do not publically expose)
       - "127.0.0.1:8546:8546" # WS-RPC (do not publically expose)
       - "30303:30303"
-      - "30303/udp:30303/udp" 
+      - "30303:30303/udp" 
     networks:
       - default
     labels:
@@ -215,8 +233,8 @@ services:
       - "127.0.0.1:8547:8545" # RPC (do not publically expose)
       - "127.0.0.1:8548:8546" # WS-RPC (do not publically expose)
       - "30305:30305"
-      - "30305/udp:30305/udp" 
-      - "30306/udp:30306/udp"
+      - "30305:30305/udp" 
+      - "30306:30306/udp"
     networks:
       - default
     labels:
@@ -254,3 +272,29 @@ services:
       --httpaddr=0.0.0.0
       --password=/tmp/password
       "
+
+  siad:
+    container_name: siad
+    hostname: siad
+    build:
+      context: docker-sia/
+      dockerfile: Dockerfile
+    image: sofwerx/sia:${ARCH}
+#    restart: always
+    networks:
+      - default
+    volumes:
+      -  sia-consensus:/root/consensus
+      -  sia-explorer:/root/explorer
+      -  sia-gateway:/root/gateway
+      -  sia-host:/root/host
+      -  sia-miner:/root/miner
+      -  sia-renter:/root/renter
+      -  sia-transactionpool:/root/transactionpool
+      -  sia-wallet:/root/wallet
+    ports:
+      - 172.18.0.1:9980:9980
+    command: siad --api-addr 0.0.0.0:9980 -M gctwhme
+    labels:
+      - "traefik.enable=false"
+
