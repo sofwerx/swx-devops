@@ -217,3 +217,19 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  gremlin:
+    extends:
+      file: docker-gremlin/docker-compose.yml
+      service: gremlin
+    image: sofwerx/gremlin
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=gremlin"
+      - "traefik.port=8182"
+      - "traefik.frontend.rule=Host:gremlin.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
