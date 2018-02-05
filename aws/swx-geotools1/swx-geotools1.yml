@@ -53,6 +53,18 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  geonode:
+    extends:
+      file: docker-geonode/docker-compose.yml
+      service: geonode
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=geoserver"
+      - "traefik.port=8000"
+      - "traefik.frontend.rule=Host:geonode.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
   traefik:
     extends:
       file: docker-traefik/docker-compose.yml

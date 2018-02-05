@@ -1,0 +1,71 @@
+version: '2'
+services:
+
+  postgres:
+    image: postgres
+
+  elasticsearch:
+   image: elasticsearch
+
+  rabbitmq:
+     image: rabbitmq
+
+  django:
+    image: geonode/geonode:geonode
+    links:
+      - postgres
+      - elasticsearch
+      - rabbitmq
+    command: django-admin.py runserver 0.0.0.0:8000 --settings=geonode.settings
+    env_file:
+      - ./scripts/docker/env/production/django.env
+
+  celery:
+    image: geonode/geonode:geonode
+    links:
+      - rabbitmq
+      - postgres
+      - elasticsearch
+    command: celery worker --app=geonode.celery_app:app -B -l INFO
+    env_file:
+      - ./scripts/docker/env/production/django.env
+
+  consumers:
+    image: geonode/geonode:geonode
+    links:
+      - rabbitmq
+      - postgres
+      - elasticsearch
+    command: python manage.py runmessaging
+    env_file:
+      - ./scripts/docker/env/production/django.env
+
+  geoserver:
+    image: geonode/geoserver:alias
+    links:
+      - postgres
+    ports:
+      - "8080"
+    volumes_from:
+      - data_dir_conf
+    env_file:
+      - ./scripts/docker/env/production/geoserver.env
+
+  geonode:
+    image: geonode/nginx:geoserver
+    links:
+      - django
+      - geoserver
+    ports:
+      - "80:80"
+
+  data_dir_conf:
+    image: geonode/geoserver_data:2.9.x-oauth2
+    container_name: geoserver_data_dir
+    command: /bin/true
+    volumes:
+      - /geoserver_data/data
+
+volumes:
+
+  geoserver_data_dir:
