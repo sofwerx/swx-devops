@@ -412,7 +412,7 @@ _swx ()
     "swx secrets pull "*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx secrets"*) COMPREPLY=( $( compgen -W "addrecipients decrypt encrypt pull" -- $cur ) ) ;;
     "swx tf"*) COMPREPLY=( $( compgen -W "apply destroy fmt get graph import init output plan push refresh remote show taint untaint validate version state" -- $cur ) ) ;;
-    *) COMPREPLY=( $( compgen -W 'dc dm environment secrets tf' -- $cur ) ) ;;
+    *) COMPREPLY=( $( compgen -W 'dc dm environment gpg secrets tf' -- $cur ) ) ;;
   esac
   return 0
 }
