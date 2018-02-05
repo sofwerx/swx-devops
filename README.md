@@ -267,6 +267,7 @@ The `swx` command provides the interface to the functions that interact with thi
 
     $ swx
     Usage: swx {command}
+      gpg         - Interact with your gpg-agent
       dm          - Manage dm (docker-machines)
       environment - Source project-lifecycle environment variables
       secrets     - Deal with secrets/ folder
@@ -380,6 +381,35 @@ Which would look something like:
 Now I am ready to run any `docker-compose` commands in the correct folders.
 
 If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
+
+# `swx gpg`
+
+When you use the `swx` or `trousseau` commands that require access to the trousseau secrets, your `gpg-agent` will prompt you for a passphrase.
+
+If you enter this passphrase incorrectly, these commands will fail until you "repair" your `gpg-agent` which will not prompt you for another passphrase until the ttl expiry, which is quite long.
+
+The `swx gpg` commands are meant to deal with this condition:
+
+- `swx prepare`  - Prepare your gpg-agent environment
+- `swx remember` - Remember your passphrase (gpg-agent)
+- `swx forget`   - Forget your passphrase (gpg-agent)
+- `swx reset`    - Reset your gpg-agent
+
+The exact sequence of which command to use depends on what the state of your `gpg-agent` is.
+
+Typically, try a `swx forget` followed by an `swx remember` first, and see if the commands work after you enter your passphrase.
+
+If this fails, try a `swx reset` followed by a `swx prepare`, which will restart `gpg-agent` and hopefully let you enter a passphrase the next time you try using an `swx` or `trousseau` command that requires access to your troussea secrets.
+
+# `swx environment`
+
+In addition to listing (`swx enviroment ls`) and switching (`swx enviroment switch ENVIRONMENT`), there are a few other `swx environment` commands 
+for dealing with `environment:` prefixed trousseau keys that store environment variables for enviroments:
+
+    swx enviroment keys
+    swx enviroment get VARIABLE
+    swx enviroment set VARIABLE VALUE
+    swx enviroment del VARIABLE
 
 ## terraform
 
