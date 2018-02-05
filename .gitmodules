@@ -103,3 +103,6 @@
 [submodule "local/swx-gpu/tor-moneropool/tor-monero"]
 	path = local/swx-gpu/tor-moneropool/tor-monero
 	url = https://github.com/sofwerx/tor-moneropool.git
+[submodule "aws/swx-geotools1/docker-geonode"]
+	path = aws/swx-geotools1/docker-geonode
+	url = https://github.com/sofwerx/geonode.git
