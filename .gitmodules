@@ -106,3 +106,9 @@
 [submodule "aws/swx-redteam/docker-traefik"]
 	path = aws/swx-redteam/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "aws/swx-blueteam/docker-traefik"]
+	path = aws/swx-blueteam/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "aws/swx-geotools1/docker-geonode"]
+	path = aws/swx-geotools1/docker-geonode
+	url = https://github.com/sofwerx/geonode.git
