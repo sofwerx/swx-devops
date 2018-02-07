@@ -31,23 +31,13 @@ volumes:
   ethereum-rinkeby-datadir:
     driver: local
   ethereum-rinkeby-keystore:
+    driver: local 
+  ipfs-staging:
     driver: local
-  sia-consensus:
+  ipfs-data:
     driver: local
-  sia-explorer:
-    driver: local
-  sia-gateway:
-    driver: local
-  sia-host:
-    driver: local
-  sia-miner:
-    driver: local
-  sia-renter:
-    driver: local
-  sia-transactionpool:
-    driver: local
-  sia-wallet:
-    driver: local
+  ipfs-cluster-data:
+    driver: local 
 
 services:
 
@@ -273,28 +263,36 @@ services:
       --password=/tmp/password
       "
 
-  siad:
-    container_name: siad
-    hostname: siad
-    build:
-      context: docker-sia/
-      dockerfile: Dockerfile
-    image: sofwerx/sia:${ARCH}
-#    restart: always
-    networks:
-      - default
+  ipfs:
+    extends:
+      file: docker-ipfs/docker-compose.yml
+      service: ipfs
+    image: sofwerx/ipfs:${ARCH}
+    restart: always
     volumes:
-      -  sia-consensus:/root/consensus
-      -  sia-explorer:/root/explorer
-      -  sia-gateway:/root/gateway
-      -  sia-host:/root/host
-      -  sia-miner:/root/miner
-      -  sia-renter:/root/renter
-      -  sia-transactionpool:/root/transactionpool
-      -  sia-wallet:/root/wallet
+      - ipfs-staging:/export
+      - ipfs-data:/data/ipfs
     ports:
-      - 172.18.0.1:9980:9980
-    command: siad --api-addr 0.0.0.0:9980 -M gctwhme
+      - 4001:4001             # public swarm address
+      - 127.0.0.1:8080:8080   # gateway service
+      - 127.0.0.1:5001:5001   # api service
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.backend=ipfs"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+#  ipfs-cluster:
+#    extends:
+#      file: docker-ipfs-cluster/docker-compose.yml
+#      service: ipfs-cluster
+#    image: sofwerx/ipfs-cluster:${ARCH}
+#    container_name: ipfs-cluster
+#    hostname: ipfs-cluster
+#    volumes:
+#      - ipfs-cluster-data:/data/ipfs-cluster
+#    labels:
+#      - "traefik.enable=false"
 
