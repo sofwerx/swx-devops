@@ -290,17 +290,29 @@ swx_environment_ls ()
 
 swx_environment_get ()
 {
-  trousseau get "environment:${environment}:$1"
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau get "environment:${SWX_ENVIRONMENT}:$1"
+  else
+    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+  fi
 }
 
 swx_environment_set ()
 {
-  trousseau set "environment:${environment}:$1" "$2"
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau set "environment:${SWX_ENVIRONMENT}:$1" "$2"
+  else
+    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+  fi
 }
 
 swx_environment_keys ()
 {
-  trousseau keys | grep -e "^environment:${environment}:" | sed -e "s/^environment:${environment}://"
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"
+  else
+    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+  fi
 }
 
 swx_environment_switch ()

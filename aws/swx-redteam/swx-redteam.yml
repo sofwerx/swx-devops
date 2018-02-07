@@ -1,0 +1,238 @@
+version: "2"
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  postgres-data:
+    driver: local
+  geoserver-data:
+    driver: local
+  elasticsearch-data:
+    driver: local
+  elasticsearch-logs:
+    driver: local
+
+services:
+
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  geoserver:
+    extends:
+      file: docker-geoserver/docker-compose.yml
+      service: geoserver
+    restart: always
+    networks:
+      - default
+    volumes:
+      - geoserver-data:/opt/geoserver/data_dir
+      - /home/geo:/home/geo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=geoserver"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:geoserver.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  postgis:
+    extends:
+      file: docker-postgis/9.5-2.4/docker-compose.yml
+      service: postgis
+    networks:
+      - default
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+
+  pgadmin:
+    extends:
+      file: docker-postgis/9.5-2.4/docker-compose.yml
+      service: pgadmin
+    networks:
+      - default
+    volumes:
+      - traefik-ssl:/ssl
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_SERVER_NAME: pgadmin.${DNS_DOMAIN}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=pgadmin"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:pgadmin.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  postgres:
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: postgres
+    restart: always
+    networks:
+      - default
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+
+  guacd:
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: guacd
+    restart: always
+    networks:
+      - default
+    volumes:
+      - traefik-ssl:/ssl
+    labels:
+      - "traefik.enable=false"
+
+  guacamole:
+    extends:
+      file: docker-guacamole/docker-compose.yml
+      service: guacamole
+    restart: always
+    networks:
+      - default
+    volumes:
+      - guacamole-data:/data
+      - traefik-ssl:/ssl
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=guacamole"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:guacamole.${DNS_DOMAIN};AddPrefix:/guacamole"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  mongo:
+    extends:
+      file: docker-mage-server/docker-compose.yml
+      service: mongo
+    image: mongo:3.6.2
+    restart: always
+    networks:
+      - default
+    volumes:
+      - mongo-db:/data/db
+      - mongo-configdb:/data/configdb
+    labels:
+      - "traefik.enable=false"
+
+  mage:
+    extends:
+      file: docker-mage-server/docker-compose.yml
+      service: mage
+    restart: always
+    networks:
+      - default
+    depends_on:
+      - mongo
+    volumes:
+      - mage-data:/var/lib/mage
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mage"
+      - "traefik.port=4242"
+      - "traefik.frontend.rule=Host:mage.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+#  mongoexpress:
+#    image: sofwerx/mongo-express
+#    container_name: mongoexpress
+#    hostname: mongoexpress
+##    environment:
+##      ME_CONFIG_OPTIONS_EDITORTHEME: ambiance
+##      ME_CONFIG_BASICAUTH_USERNAME: manager
+##      ME_CONFIG_BASICAUTH_PASSWORD: correcthorsebatterystaple
+#    networks:
+#      - default
+#    depends_on:
+#      - mongo
+#    links:
+#      - mongo
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=mongoexpress"
+#      - "traefik.port=8081"
+#      - "traefik.frontend.rule=Host:mongoexpress.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+
+  opensphere:
+    extends:
+      file: docker-opensphere/docker-compose.yml
+      service: opensphere
+    image: sofwerx/opensphere
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=opensphere"
+      - "traefik.port=8282"
+      - "traefik.frontend.rule=Host:opensphere.${DNS_DOMAIN};AddPrefix:/opensphere/dist/opensphere"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  elasticsearch:
+    extends:
+      file: elasticsearch/docker-compose.yml
+      service: elasticsearch
+    image: sofwerx/elasticsearch
+    networks:
+      - default
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+      - elasticsearch-logs:/usr/share/elasticsearch/logs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=elasticsearch"
+      - "traefik.port=9200"
+      - "traefik.frontend.rule=Host:elasticsearch.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  janusgraph:
+    extends:
+      file: docker-janusgraph/docker-compose.yml
+      service: janusgraph
+    image: sofwerx/janusgraph
+#    restart: always
+    networks:
+      - default
+    volumes:
+      - janusgraph-storage:/home/janusgraph/janusgraph/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=janusgraph"
+      - "traefik.port=8182"
+      - "traefik.frontend.rule=Host:janusgraph.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
