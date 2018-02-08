@@ -67,9 +67,9 @@ services:
       - "traefik.enable=false"
 
   magento:
-    image: 'bitnami/magento:latest'
-    container_name: magento
-    hostname: magento
+    extends:
+      file: magento/docker-compose.yml
+      service: magento
     networks:
       - default
     environment:
