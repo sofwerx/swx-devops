@@ -288,6 +288,15 @@ swx_environment_ls ()
   trousseau keys | grep -e ^environment: | cut -d: -f2 | sort | uniq
 }
 
+swx_environment_del ()
+{
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau del "environment:${SWX_ENVIRONMENT}:$1"
+  else
+    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+  fi
+}
+
 swx_environment_get ()
 {
   if [ -n "${SWX_ENVIRONMENT}" ]; then
@@ -300,12 +309,23 @@ swx_environment_get ()
 swx_environment_set ()
 {
   if [ -n "${SWX_ENVIRONMENT}" ]; then
+    export "$1=$2"
     trousseau set "environment:${SWX_ENVIRONMENT}:$1" "$2"
   else
     echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
   fi
 }
 
+swx_environment_show ()
+{
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://" | while read key ; do
+      echo "${key}=$(trousseau get environment:${SWX_ENVIRONMENT}:${key})"
+    done
+  else
+    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+  fi
+}
 swx_environment_keys ()
 {
   if [ -n "${SWX_ENVIRONMENT}" ]; then
@@ -344,16 +364,20 @@ swx_environment ()
   case $1 in
 ls) shift; swx_environment_ls ;;
 switch) shift; swx_environment_switch $@ ;;
+del) shift; swx_environment_del $@ ;;
 get) shift; swx_environment_get $@ ;;
 set) shift; swx_environment_set $@ ;;
+show) shift; swx_environment_show $@ ;;
 keys) shift; swx_environment_keys $@ ;;
 *) cat <<EOU 1>&2
 Usage: swx dm environment {action}
   ls     - List environments
   switch - Switch to an environment
+  del    - Delete an environment variable from the current environment
   get    - Get an environment variable from the current environment
   set    - Set an environment variable in the current environment
-  keys   - List the environment variable for the current environment
+  show   - Show the environment variables and values for the current environment
+  keys   - List the environment variables for the current environment
 EOU
   return 1
   ;;
@@ -414,10 +438,12 @@ _swx ()
     "swx gpg"*) COMPREPLY=( $( compgen -W "prepare remember forget reset" -- $cur ) ) ;;
     "swx environment ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx environment switch"*) COMPREPLY=( $( compgen -W "$(swx_environment_ls)" -- $cur ) ) ;;
+    "swx environment del"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
     "swx environment get"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
     "swx environment set"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
+    "swx environment show"*) COMPREPLY=( $cur ) ;;
     "swx environment keys") COMPREPLY=( $cur ) ;;
-    "swx environment"*) COMPREPLY=( $( compgen -W "ls switch get set keys"  -- $cur ) ) ;;
+    "swx environment"*) COMPREPLY=( $( compgen -W "ls switch del get set show keys"  -- $cur ) ) ;;
     "swx secrets addrecipients"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx secrets encrypt "*) COMPREPLY=( $( compgen -W "$(find secrets/ -type f | grep -v -e 'gnupg\|docker')" -- $cur ) ) ;;
     "swx secrets decrypt "*) COMPREPLY=( $( compgen -W "$(trousseau keys | grep -e ^file:secrets/ | sed -e s/^file://)" -- $cur ) ) ;;
