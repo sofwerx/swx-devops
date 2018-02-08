@@ -292,6 +292,7 @@ swx_environment_del ()
 {
   if [ -n "${SWX_ENVIRONMENT}" ]; then
     trousseau del "environment:${SWX_ENVIRONMENT}:$1"
+    unset $1
   else
     echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
   fi
@@ -309,8 +310,8 @@ swx_environment_get ()
 swx_environment_set ()
 {
   if [ -n "${SWX_ENVIRONMENT}" ]; then
-    export "$1=$2"
     trousseau set "environment:${SWX_ENVIRONMENT}:$1" "$2"
+    export "$1=$2"
   else
     echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
   fi
