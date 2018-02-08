@@ -254,6 +254,12 @@ resource "aws_eip" "instance" {
   count = "${var.aws_instance_count}"
 
   vpc = true
+
+  tags {
+    Name = "${var.Project}-a-${var.Lifecycle}-host${count.index}"
+    Project = "${var.Project}"
+    Lifecycle = "${var.Lifecycle}"
+  }
 }
 
 resource "aws_eip_association" "eip_assoc" {
@@ -274,7 +280,9 @@ resource "aws_ebs_volume" "home" {
   encrypted = true
 
   tags {
-    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
+    Name = "${var.Project}-a-${var.Lifecycle}-host${count.index}"
+    Project = "${var.Project}"
+    Lifecycle = "${var.Lifecycle}"
   }
 }
 
@@ -289,7 +297,9 @@ resource "aws_ebs_volume" "docker" {
   encrypted = true
 
   tags {
-    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
+    Name = "${var.Project}-a-${var.Lifecycle}-host${count.index}"
+    Project = "${var.Project}"
+    Lifecycle = "${var.Lifecycle}"
   }
 }
 
@@ -322,12 +332,14 @@ resource "aws_instance" "instance" {
     
   root_block_device {
     volume_type = "standard"
-    delete_on_termination = true
+    delete_on_termination = false
     volume_size = "${var.ebs_root_volume_size}"
   }
 
   volume_tags {
-    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
+    Name = "${var.Project}-a-${var.Lifecycle}-host${count.index}"
+    Project = "${var.Project}"
+    Lifecycle = "${var.Lifecycle}"
   }
   user_data = "${file("../user-data.sh")}"
 }
