@@ -94,7 +94,7 @@ variable aws_instance_count {
 
 variable aws_instance_type {
     description = "AWS instance type to use"
-    default = "t2.medium"
+    default = "c5.large"
 }
 
 variable linux_distro_name {
