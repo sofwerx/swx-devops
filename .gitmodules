@@ -112,3 +112,6 @@
 [submodule "aws/swx-geotools1/docker-geonode"]
 	path = aws/swx-geotools1/docker-geonode
 	url = https://github.com/sofwerx/geonode.git
+[submodule "local/ibm-minsky/docker-volume-ipfs"]
+	path = local/ibm-minsky/docker-volume-ipfs
+	url = https://github.com/sofwerx/docker-volume-ipfs

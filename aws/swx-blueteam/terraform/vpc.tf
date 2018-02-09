@@ -351,7 +351,7 @@ data "aws_route53_zone" "selected" {
 
 resource "aws_volume_attachment" "instance-home" {
   count = "${var.aws_instance_count}"
-  device_name = "xvdh"
+  device_name = "/dev/sdh"
   instance_id = "${element(aws_instance.instance.*.id, count.index)}"
   volume_id = "${element(aws_ebs_volume.home.*.id, count.index)}"
   force_detach = true
@@ -359,7 +359,7 @@ resource "aws_volume_attachment" "instance-home" {
 
 resource "aws_volume_attachment" "instance-docker" {
   count = "${var.aws_instance_count}"
-  device_name = "xvdi"
+  device_name = "/dev/sdi"
   instance_id = "${element(aws_instance.instance.*.id, count.index)}"
   volume_id = "${element(aws_ebs_volume.docker.*.id, count.index)}"
   force_detach = true
