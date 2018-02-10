@@ -1,0 +1,10 @@
+FROM bitnami/magento:latest
+
+RUN apt-get update \
+ && apt-get install -y git rsync
+
+RUN git clone --depth 1 https://github.com/openstream/OSMM-Magento /tmp/osmm \
+ && chown -R bitnami:daemon /tmp/osmm \
+ && rsync -SHPaxv --exclude=.git /tmp/osmm/ /opt/bitnami/magento/htdocs/ \
+ && rm -fr /tmp/osmm
+
