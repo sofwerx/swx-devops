@@ -17,6 +17,7 @@ services:
       file: iri/docker-compose.yml
       service: iri
     image: sofwerx/iri
+    restart: always
     command: ["/run.sh", "-XX:+DisableAttachMechanism", "-Xmx8g", "-Xms256m", "-Dlogback.configurationFile=/iri/conf/logback.xml", "-Djava.net.preferIPv4Stack=true", "-jar", "iri.jar", "-p", "14265", "-u", "14777", "-t", "15777", "--remote", "--max-peers", "19", "-n", "tcp://176.9.3.149:14265 tcp://5.9.118.112:14265 tcp://5.9.137.199:14265 tcp://5.9.149.169:14265 tcp://88.198.230.98:14265 tcp://cryptoiota.win:14265 tcp://eugene.iota.community:14265 tcp://eugene.iota.comunity:14265 tcp://eugene.iotasupport.com:14999 tcp://eugeneoldisoft.iotasupport.com:14265 tcp://iotanode.farm:14265 tcp://mainnet.necropaz.com:14500 tcp://node.deviceproof.org:14265 tcp://node.lukaseder.de:14265 tcp://node01.iotatoken.nl:14265 tcp://node02.iotatoken.nl:14265 tcp://node03.iotatoken.nl:15265 tcp://node04.iotatoken.nl:14265 tcp://node05.iotatoken.nl:16265 tcp://node06.iotatoken.nl:14265 tcp://wallets.iotamexico.com:80 udp://176.9.3.149:14777 udp://5.9.118.112:14777 udp://5.9.137.199:14777 udp://5.9.149.169:14777 udp://88.198.230.98:14777 udp://cryptoiota.win:14777 udp://eugene.iota.community:14777 udp://eugene.iota.comunity:14777 udp://eugeneoldisoft.iotasupport.com:14777 udp://iotanode.farm:14777 udp://node.deviceproof.org:14777 udp://node.lukaseder.de:14777 udp://node01.iotatoken.nl:14777 udp://node02.iotatoken.nl:14777 udp://node04.iotatoken.nl:14777 udp://node06.iotatoken.nl:14777 udp://94.156.128.15:14600 udp://185.181.8.149:14600", "$$@"]
 # "--remote-limit-api", "\"addNeighbors, removeNeighbors, getNeighbors\"", 
 
@@ -25,6 +26,7 @@ services:
       context: nelson.cli/
       dockerfile: Dockerfile
     image: sofwerx/nelson
+    restart: always
     network_mode: host
     container_name: nelson
     hostname: nelson
@@ -32,17 +34,19 @@ services:
 
   isf:
     build: isf-jclient/
+    image: sofwerx/isf-jclient
+    restart: always
+    container_name: isf 
+    hostname: isf 
     environment:
       SYNC_CHECK_INTERVAL: '600'
       THIRD_PARTY_NODE_LIST: 'true'
       INTERVAL: '60'
       TIME_FORMAT: 'HH:mm:ss'
-      THREADS_AMOUNT: '100'
+      THREADS_AMOUNT: '1'
       THREADS_PRIORITY: '2'
       NODE_LIST: ${NODE_LIST}
       EMAIL: ${EMAIL}
       PASSWORD: ${PASSWORD}
-    image: sofwerx/isf-jclient
-    container_name: isf 
-    hostname: isf 
+
 
