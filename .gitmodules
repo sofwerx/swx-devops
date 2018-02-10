@@ -115,3 +115,21 @@
 [submodule "local/ibm-minsky/docker-volume-ipfs"]
 	path = local/ibm-minsky/docker-volume-ipfs
 	url = https://github.com/sofwerx/docker-volume-ipfs
+[submodule "aws/swx-blueteam/docker-elastic"]
+	path = aws/swx-blueteam/docker-elastic
+	url = https://github.com/sofwerx/docker-elastic
+[submodule "local/ibm-minsky/iri"]
+	path = local/ibm-minsky/iri
+	url = https://github.com/sofwerx/iri
+[submodule "local/ibm-minsky/nelson.cli"]
+	path = local/ibm-minsky/nelson.cli
+	url = https://github.com/sofwerx/nelson.cli
+[submodule "local/icbgamingpc/iri"]
+	path = local/icbgamingpc/iri
+	url = https://github.com/sofwerx/iri
+[submodule "local/icbgamingpc/nelson.cli"]
+	path = local/icbgamingpc/nelson.cli
+	url = https://github.com/sofwerx/nelson.cli
+[submodule "local/icbgamingpc/isf-jclient"]
+	path = local/icbgamingpc/isf-jclient
+	url = https://github.com/sofwerx/isf-jclient.git
