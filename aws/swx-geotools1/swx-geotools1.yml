@@ -21,6 +21,8 @@ volumes:
     driver: local
   postgis-data:
     driver: local
+  neo4j-data:
+    driver: local
 
 services:
 
@@ -53,17 +55,17 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  geonode:
-    extends:
-      file: docker-geonode/docker-compose.yml
-      service: geonode
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=geoserver"
-      - "traefik.port=8000"
-      - "traefik.frontend.rule=Host:geonode.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
+#  geonode:
+#    extends:
+#      file: docker-geonode/docker-compose.yml
+#      service: geonode
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=geoserver"
+#      - "traefik.port=8000"
+#      - "traefik.frontend.rule=Host:geonode.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
 
   traefik:
     extends:
@@ -228,6 +230,23 @@ services:
       - "traefik.frontend.rule=Host:opensphere.${DNS_DOMAIN};AddPrefix:/opensphere/dist/opensphere"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  neo4j:
+    extends:
+      file: docker-neo4j/docker-compose.yml
+      service: neo4j
+    image: neo4j:3.3
+    restart: always
+    networks: 
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=neo4j"
+      - "traefik.port=7474"
+      - "traefik.frontend.rule=Host:neo4j.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
   gremlin:
     extends:

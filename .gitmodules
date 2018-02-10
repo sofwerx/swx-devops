@@ -106,3 +106,6 @@
 [submodule "aws/swx-geotools1/docker-geonode"]
 	path = aws/swx-geotools1/docker-geonode
 	url = https://github.com/sofwerx/geonode.git
+[submodule "aws/swx-geotools1/docker-geonetwork"]
+	path = aws/swx-geotools1/docker-geonetwork
+	url = https://github.com/sofwerx/core-geonetwork.git
