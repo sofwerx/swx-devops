@@ -54,7 +54,7 @@ services:
 
   # IOTA Peer Manager
   ipm:
-    build: docker-iota-dashboard/
+    build: ipm/
     image: sofwerx/iota-ipm
     ports:
       - 8888:8888
