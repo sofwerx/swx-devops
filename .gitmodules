@@ -136,3 +136,6 @@
 [submodule "local/icbgamingpc/isf-jclient"]
 	path = local/icbgamingpc/isf-jclient
 	url = https://github.com/sofwerx/isf-jclient.git
+[submodule "aws/swx-blueteam/isf-jclient"]
+	path = aws/swx-blueteam/isf-jclient
+	url = https://github.com/sofwerx/isf-jclient
