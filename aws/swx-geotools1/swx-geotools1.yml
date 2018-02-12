@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 networks: 
   default:
@@ -23,15 +23,15 @@ volumes:
     driver: local
   neo4j-data:
     driver: local
-  ourcloud-data:
+  owncloud-data:
     driver: local
-  ourcloud-files:
+  owncloud-files:
     driver: local
-  ourcloud-mysql:
+  owncloud-mysql:
     driver: local
-  ourcloud-backup:
+  owncloud-backup:
     driver: local
-  ourcloud-redis:
+  owncloud-redis:
     driver: local
 
 services:
@@ -282,23 +282,22 @@ services:
   owncloud:
     image: owncloud/server:${OWNCLOUD_VERSION}
     restart: always
-    depends_on:
-      - db
-      - redis
+    container_name: owncloud
+    hostname: owncloud
     environment:
       - OWNCLOUD_DOMAIN=owncloud.${DNS_DOMAIN}
       - OWNCLOUD_DB_TYPE=mysql
-      - OWNCLOUD_DB_NAME=${OURCLOUD_MYSQL_DATABASE}
-      - OWNCLOUD_DB_USERNAME=${OURCLOUD_MYSQL_USERNAME}
-      - OWNCLOUD_DB_PASSWORD=${OURCLOUD_MYSQL_PASSWORD}
-      - OWNCLOUD_DB_HOST=ourcloud-mysql
+      - OWNCLOUD_DB_NAME=${OWNCLOUD_MYSQL_DATABASE}
+      - OWNCLOUD_DB_USERNAME=${OWNCLOUD_MYSQL_USERNAME}
+      - OWNCLOUD_DB_PASSWORD=${OWNCLOUD_MYSQL_PASSWORD}
+      - OWNCLOUD_DB_HOST=owncloud-mysql
       - OWNCLOUD_ADMIN_USERNAME=${OWNCLOUD_ADMIN_USERNAME}
       - OWNCLOUD_ADMIN_PASSWORD=${OWNCLOUD_ADMIN_PASSWORD}
       - OWNCLOUD_UTF8MB4_ENABLED=true
       - OWNCLOUD_REDIS_ENABLED=true
-      - OWNCLOUD_REDIS_HOST=ourcloud-redis
+      - OWNCLOUD_REDIS_HOST=owncloud-redis
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://ourcloud.${DNS_DOMAIN}/status.php"]
+      test: "curl -f http://owncloud/status.php"
       interval: 30s
       timeout: 10s
       retries: 5
@@ -307,8 +306,8 @@ services:
     networks:
       - default
     depends_on:
-      - ourcloud-mysql
-      - ourcloud-redis
+      - owncloud-mysql
+      - owncloud-redis
     labels:
       - "traefik.enable=true"
       - "traefik.backend=owncloud"
@@ -317,14 +316,16 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  ourcloud-mysql:
+  owncloud-mysql:
     image: webhippie/mariadb:latest
     restart: always
+    container_name: owncloud-mysql
+    hostname: owncloud-mysql
     environment:
-      - MARIADB_ROOT_PASSWORD=${OURCLOUD_MYSQL_ROOT_PASSWORD}
-      - MARIADB_USERNAME=${OURCLOUD_MYSQL_USERNAME}
-      - MARIADB_PASSWORD=${OURCLOUD_MYSQL_PASSWORD}
-      - MARIADB_DATABASE=${OURCLOUD_MYSQL_DATABASE}
+      - MARIADB_ROOT_PASSWORD=${OWNCLOUD_MYSQL_ROOT_PASSWORD}
+      - MARIADB_USERNAME=${OWNCLOUD_MYSQL_USERNAME}
+      - MARIADB_PASSWORD=${OWNCLOUD_MYSQL_PASSWORD}
+      - MARIADB_DATABASE=${OWNCLOUD_MYSQL_DATABASE}
       - MARIADB_MAX_ALLOWED_PACKET=128M
       - MARIADB_INNODB_LOG_FILE_SIZE=64M
       - MARIADB_INNODB_LARGE_PREFIX=ON
@@ -335,16 +336,18 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - ourcloud-mysql:/var/lib/mysql
-      - ourcloud-backup:/var/lib/backup
+      - owncloud-mysql:/var/lib/mysql
+      - owncloud-backup:/var/lib/backup
     networks:
       - default
     labels:
       - "traefik.enable=false"
 
-  ourcloud-redis:
+  owncloud-redis:
     image: webhippie/redis:latest
     restart: always
+    container_name: owncloud-redis
+    hostname: owncloud-redis
     environment:
       - REDIS_DATABASES=1
     healthcheck:
@@ -353,7 +356,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - ourcloud-redis:/var/lib/redis
+      - owncloud-redis:/var/lib/redis
     networks:
       - default
     labels:
