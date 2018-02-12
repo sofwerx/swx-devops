@@ -23,6 +23,16 @@ volumes:
     driver: local
   neo4j-data:
     driver: local
+  ourcloud-data:
+    driver: local
+  ourcloud-files:
+    driver: local
+  ourcloud-mysql:
+    driver: local
+  ourcloud-backup:
+    driver: local
+  ourcloud-redis:
+    driver: local
 
 services:
 
@@ -268,4 +278,84 @@ services:
       - "traefik.frontend.rule=Host:gremlin.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  owncloud:
+    image: owncloud/server:${OWNCLOUD_VERSION}
+    restart: always
+    depends_on:
+      - db
+      - redis
+    environment:
+      - OWNCLOUD_DOMAIN=owncloud.${DNS_DOMAIN}
+      - OWNCLOUD_DB_TYPE=mysql
+      - OWNCLOUD_DB_NAME=${OURCLOUD_MYSQL_DATABASE}
+      - OWNCLOUD_DB_USERNAME=${OURCLOUD_MYSQL_USERNAME}
+      - OWNCLOUD_DB_PASSWORD=${OURCLOUD_MYSQL_PASSWORD}
+      - OWNCLOUD_DB_HOST=ourcloud-mysql
+      - OWNCLOUD_ADMIN_USERNAME=${OWNCLOUD_ADMIN_USERNAME}
+      - OWNCLOUD_ADMIN_PASSWORD=${OWNCLOUD_ADMIN_PASSWORD}
+      - OWNCLOUD_UTF8MB4_ENABLED=true
+      - OWNCLOUD_REDIS_ENABLED=true
+      - OWNCLOUD_REDIS_HOST=ourcloud-redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://ourcloud.${DNS_DOMAIN}/status.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - owncloud-data:/mnt/data
+    networks:
+      - default
+    depends_on:
+      - ourcloud-mysql
+      - ourcloud-redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=owncloud"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:owncloud.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  ourcloud-mysql:
+    image: webhippie/mariadb:latest
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=${OURCLOUD_MYSQL_ROOT_PASSWORD}
+      - MARIADB_USERNAME=${OURCLOUD_MYSQL_USERNAME}
+      - MARIADB_PASSWORD=${OURCLOUD_MYSQL_PASSWORD}
+      - MARIADB_DATABASE=${OURCLOUD_MYSQL_DATABASE}
+      - MARIADB_MAX_ALLOWED_PACKET=128M
+      - MARIADB_INNODB_LOG_FILE_SIZE=64M
+      - MARIADB_INNODB_LARGE_PREFIX=ON
+      - MARIADB_INNODB_FILE_FORMAT=Barracuda
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ourcloud-mysql:/var/lib/mysql
+      - ourcloud-backup:/var/lib/backup
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  ourcloud-redis:
+    image: webhippie/redis:latest
+    restart: always
+    environment:
+      - REDIS_DATABASES=1
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ourcloud-redis:/var/lib/redis
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
 
