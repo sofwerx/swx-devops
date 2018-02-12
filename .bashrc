@@ -19,7 +19,8 @@ if grep $AWS_PROFILE $AWS_CONFIG_FILE > /dev/null 2>&1 ; then
   export AWS_ACCESS_KEY_ID="$(aws configure get aws_access_key_id --profile $AWS_PROFILE)"
   export AWS_SECRET_ACCESS_KEY="$(aws configure get aws_secret_access_key --profile $AWS_PROFILE)"
   export AWS_REGION="${AWS_REGION:-$(aws configure get region --profile $AWS_PROFILE)}"
-  export AWS_DEFAULT_REGION="${AWS_REGION}"
+  export AWS_REGION="${AWS_REGION:-us-east-1}"
+  export AWS_DEFAULT_REGION="${AWS_REGION:-us-east-1}"
   export AWS_DEFAULT_OUTPUT="$(aws configure get output --profile $AWS_PROFILE)"
   export AWS_DEFAULT_OUTPUT=${AWS_DEFAULT_OUTPUT:-json}
 fi
