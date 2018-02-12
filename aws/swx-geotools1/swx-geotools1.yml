@@ -239,6 +239,12 @@ services:
     restart: always
     networks: 
       - default
+    ports:
+      - 7687:7687
+      - 7474:7474
+      - 7473:7473
+    volumes:
+      - traefik-ssl:/ssl
     labels:
       - "traefik.enable=true"
       - "traefik.backend=neo4j"
@@ -247,11 +253,10 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-
   gremlin:
-    extends:
-      file: docker-gremlin/docker-compose.yml
-      service: gremlin
+#    extends:
+#      file: docker-gremlin/docker-compose.yml
+#      service: gremlin
     image: sofwerx/gremlin
     restart: always
     networks:
