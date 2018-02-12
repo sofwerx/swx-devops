@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 networks: 
   default:
@@ -22,6 +22,16 @@ volumes:
   postgis-data:
     driver: local
   neo4j-data:
+    driver: local
+  owncloud-data:
+    driver: local
+  owncloud-files:
+    driver: local
+  owncloud-mysql:
+    driver: local
+  owncloud-backup:
+    driver: local
+  owncloud-redis:
     driver: local
 
 services:
@@ -283,4 +293,87 @@ services:
       - "traefik.frontend.rule=Host:gremlin.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  owncloud:
+    image: owncloud/server:${OWNCLOUD_VERSION}
+    restart: always
+    container_name: owncloud
+    hostname: owncloud
+    environment:
+      - OWNCLOUD_DOMAIN=owncloud.${DNS_DOMAIN}
+      - OWNCLOUD_DB_TYPE=mysql
+      - OWNCLOUD_DB_NAME=${OWNCLOUD_MYSQL_DATABASE}
+      - OWNCLOUD_DB_USERNAME=${OWNCLOUD_MYSQL_USERNAME}
+      - OWNCLOUD_DB_PASSWORD=${OWNCLOUD_MYSQL_PASSWORD}
+      - OWNCLOUD_DB_HOST=owncloud-mysql
+      - OWNCLOUD_ADMIN_USERNAME=${OWNCLOUD_ADMIN_USERNAME}
+      - OWNCLOUD_ADMIN_PASSWORD=${OWNCLOUD_ADMIN_PASSWORD}
+      - OWNCLOUD_UTF8MB4_ENABLED=true
+      - OWNCLOUD_REDIS_ENABLED=true
+      - OWNCLOUD_REDIS_HOST=owncloud-redis
+    healthcheck:
+      test: "curl -f http://owncloud/status.php"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - owncloud-data:/mnt/data
+    networks:
+      - default
+    depends_on:
+      - owncloud-mysql
+      - owncloud-redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=owncloud"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:owncloud.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  owncloud-mysql:
+    image: webhippie/mariadb:latest
+    restart: always
+    container_name: owncloud-mysql
+    hostname: owncloud-mysql
+    environment:
+      - MARIADB_ROOT_PASSWORD=${OWNCLOUD_MYSQL_ROOT_PASSWORD}
+      - MARIADB_USERNAME=${OWNCLOUD_MYSQL_USERNAME}
+      - MARIADB_PASSWORD=${OWNCLOUD_MYSQL_PASSWORD}
+      - MARIADB_DATABASE=${OWNCLOUD_MYSQL_DATABASE}
+      - MARIADB_MAX_ALLOWED_PACKET=128M
+      - MARIADB_INNODB_LOG_FILE_SIZE=64M
+      - MARIADB_INNODB_LARGE_PREFIX=ON
+      - MARIADB_INNODB_FILE_FORMAT=Barracuda
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - owncloud-mysql:/var/lib/mysql
+      - owncloud-backup:/var/lib/backup
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  owncloud-redis:
+    image: webhippie/redis:latest
+    restart: always
+    container_name: owncloud-redis
+    hostname: owncloud-redis
+    environment:
+      - REDIS_DATABASES=1
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - owncloud-redis:/var/lib/redis
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
 
