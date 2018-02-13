@@ -1,5 +1,12 @@
 version: '2'
 
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
 networks: 
 
   default:
@@ -53,6 +60,7 @@ services:
     privileged: true
     volumes:
       - /:/chroot
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
@@ -82,6 +90,7 @@ services:
     volumes:
       - traefik-ssl:/ssl
       - /var/run/docker.sock:/var/run/docker.sock
+    logging: *default-logging
     labels:
       traefik.backend: "traefik"
       traefik.port: "8080"
@@ -97,6 +106,7 @@ services:
       - default
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
@@ -113,6 +123,7 @@ services:
       - "traefik.frontend.rule=Host:adminer.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+    logging: *default-logging
 
   guacd:
     build:
@@ -140,6 +151,7 @@ services:
     volumes:
       - guacamole-data:/data
       - traefik-ssl:/ssl
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=guacamole"
@@ -159,6 +171,7 @@ services:
       dockerfile: Dockerfile.ppc64le
     labels:
       - "traefik.enable=false"
+    logging: *default-logging
     networks:
       - default
 
@@ -194,6 +207,7 @@ services:
       - "30303:30303/udp" 
     networks:
       - default
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
@@ -231,6 +245,7 @@ services:
       - "30306:30306/udp"
     networks:
       - default
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
@@ -252,6 +267,7 @@ services:
       - 30399:30399
     labels:
       - "traefik.enable=false"
+    logging: *default-logging
     command: >-
       sh -xc "
       echo ${SWARM_PASSWORD} > /tmp/password; 
@@ -320,6 +336,7 @@ services:
       - 4001:4001             # public swarm address
       - 127.0.0.1:8080:8080   # gateway service
       - 127.0.0.1:5001:5001   # api service
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=ipfs"
@@ -349,6 +366,7 @@ services:
       - "traefik.frontend.rule=Host:iota.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+    logging: *default-logging
     command: ["/run.sh", "-XX:+DisableAttachMechanism", "-Xmx768g", "-Xms256g", "-Dlogback.configurationFile=/iri/conf/logback.xml", "-Djava.net.preferIPv4Stack=true", "-jar", "iri.jar", "-p", "14265", "-u", "14777", "-t", "15777", "--remote", "--remote-limit-api", "\"addNeighbors, removeNeighbors, getNeighbors\"", "-n", "tcp://176.9.3.149:14265 tcp://5.9.118.112:14265 tcp://5.9.137.199:14265 tcp://5.9.149.169:14265 tcp://88.198.230.98:14265 tcp://cryptoiota.win:14265 tcp://eugene.iota.community:14265 tcp://eugene.iota.comunity:14265 tcp://eugene.iotasupport.com:14999 tcp://eugeneoldisoft.iotasupport.com:14265 tcp://iotanode.farm:14265 tcp://mainnet.necropaz.com:14500 tcp://node.deviceproof.org:14265 tcp://node.lukaseder.de:14265 tcp://node01.iotatoken.nl:14265 tcp://node02.iotatoken.nl:14265 tcp://node03.iotatoken.nl:15265 tcp://node04.iotatoken.nl:14265 tcp://node05.iotatoken.nl:16265 tcp://node06.iotatoken.nl:14265 tcp://wallets.iotamexico.com:80 udp://176.9.3.149:14777 udp://5.9.118.112:14777 udp://5.9.137.199:14777 udp://5.9.149.169:14777 udp://88.198.230.98:14777 udp://cryptoiota.win:14777 udp://eugene.iota.community:14777 udp://eugene.iota.comunity:14777 udp://eugeneoldisoft.iotasupport.com:14777 udp://iotanode.farm:14777 udp://node.deviceproof.org:14777 udp://node.lukaseder.de:14777 udp://node01.iotatoken.nl:14777 udp://node02.iotatoken.nl:14777 udp://node04.iotatoken.nl:14777 udp://node06.iotatoken.nl:14777 udp://94.156.128.15:14600 udp://185.181.8.149:14600", "$$@"]
 
   nelson:
@@ -360,4 +378,23 @@ services:
     container_name: nelson
     hostname: nelson
     command: -r 127.0.0.1 -i 14265 -u 14777 -t 15777 --neighbors "mainnet.deviota.com/16600 mainnet2.deviota.com/16600 mainnet3.deviota.com/16600 iotairi.tt-tec.net/16600"
+
+  # IOTA Spam Fund
+  isf:
+    build: isf-jclient/
+    image: sofwerx/isf-jclient
+    restart: always
+    container_name: isf 
+    hostname: isf 
+    logging: *default-logging
+    environment:
+      SYNC_CHECK_INTERVAL: '600'
+      THIRD_PARTY_NODE_LIST: 'true'
+      INTERVAL: '60'
+      TIME_FORMAT: 'HH:mm:ss'
+      THREADS_AMOUNT: '1'
+      THREADS_PRIORITY: '2'
+      NODE_LIST: ${NODE_LIST}
+      EMAIL: ${ISF_EMAIL}
+      PASSWORD: ${ISF_PASSWORD}
 

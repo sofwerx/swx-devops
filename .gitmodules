@@ -139,3 +139,6 @@
 [submodule "aws/swx-blueteam/isf-jclient"]
 	path = aws/swx-blueteam/isf-jclient
 	url = https://github.com/sofwerx/isf-jclient
+[submodule "local/ibm-minsky/isf-jclient"]
+	path = local/ibm-minsky/isf-jclient
+	url = https://github.com/sofwerx/isf-jclient
