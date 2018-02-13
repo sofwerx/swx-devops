@@ -467,6 +467,7 @@ services:
     restart: always
     container_name: isf 
     hostname: isf 
+    logging: *default-logging
     environment:
       SYNC_CHECK_INTERVAL: '600'
       THIRD_PARTY_NODE_LIST: 'true'
