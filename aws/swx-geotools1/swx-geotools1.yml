@@ -281,7 +281,7 @@ services:
       - "traefik.enable=true"
       - "traefik.backend=structr"
       - "traefik.port=8582"
-      - "traefik.frontend.rule=Host:structr.${DNS_DOMAIN};AddPrefix:/structr/"
+      - "traefik.frontend.rule=Host:structr.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
