@@ -38,6 +38,10 @@ volumes:
     driver: local
   ipfs-cluster-data:
     driver: local 
+#  test-data:
+#    driver: ipfs
+  iri-data:
+    driver: local
 
 services:
 
@@ -263,26 +267,27 @@ services:
       --password=/tmp/password
       "
 
-  ipfs:
-    extends:
-      file: docker-ipfs/docker-compose.yml
-      service: ipfs
-    image: sofwerx/ipfs:${ARCH}
-    restart: always
-    volumes:
-      - ipfs-staging:/export
-      - ipfs-data:/data/ipfs
-    ports:
-      - 4001:4001             # public swarm address
-      - 127.0.0.1:8080:8080   # gateway service
-      - 127.0.0.1:5001:5001   # api service
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=ipfs"
-      - "traefik.port=8080"
-      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
+#  ipfs:
+#    privileged: true
+#    extends:
+#      file: docker-ipfs/docker-compose.yml
+#      service: ipfs
+#    image: sofwerx/ipfs:${ARCH}
+#    restart: always
+#    volumes:
+#      - ipfs-staging:/export
+#      - ipfs-data:/data/ipfs
+#    ports:
+#      - 4001:4001             # public swarm address
+#      - 127.0.0.1:8080:8080   # gateway service
+#      - 127.0.0.1:5001:5001   # api service
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=ipfs"
+#      - "traefik.port=8080"
+#      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
 
 #  ipfs-cluster:
 #    extends:
@@ -295,4 +300,64 @@ services:
 #      - ipfs-cluster-data:/data/ipfs-cluster
 #    labels:
 #      - "traefik.enable=false"
+
+  docker-volume-ipfs:
+    privileged: true
+    restart: always
+    build:
+      context: docker-volume-ipfs/
+      dockerfile: Dockerfile.${ARCH}
+    container_name: docker-volume-ipfs
+    hostname: docker-volume-ipfs
+    image: sofwerx/docker-volume-ipfs:${ARCH}
+    environment:
+      ARCH: ${ARCH}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ipfs-staging:/export
+      - ipfs-data:/data/ipfs
+    ports:
+      - 4001:4001             # public swarm address
+      - 127.0.0.1:8080:8080   # gateway service
+      - 127.0.0.1:5001:5001   # api service
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=ipfs"
+      - "traefik.ipfs.port=8080"
+      - "traefik.ipfs.rule=Host:ipfs.${DNS_DOMAIN};AddPrefix:/ipfs"
+      - "traefik.ipfs.passHostHeader=true"
+      - "traefik.ipfs.entryPoints=http,https"
+      - "traefik.ipfswebui.port=5001"
+      - "traefik.ipfswebui.rule=Host:ipfs-webui.${DNS_DOMAIN};AddPrefix:/webui"
+      - "traefik.ipfswebui.passHostHeader=true"
+      - "traefik.ipfswebui.entryPoints=http,https"
+
+#  test:
+#    image: ubuntu:xenial
+#    volumes:
+#      - test-data:/data
+
+  iri:
+    extends:
+      file: iri/docker-compose.yml
+      service: iri
+    image: sofwerx/iri:${ARCH}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=iri"
+      - "traefik.port=14265"
+      - "traefik.frontend.rule=Host:iota.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+    command: ["/run.sh", "-XX:+DisableAttachMechanism", "-Xmx768g", "-Xms256g", "-Dlogback.configurationFile=/iri/conf/logback.xml", "-Djava.net.preferIPv4Stack=true", "-jar", "iri.jar", "-p", "14265", "-u", "14777", "-t", "15777", "--remote", "--remote-limit-api", "\"addNeighbors, removeNeighbors, getNeighbors\"", "-n", "tcp://176.9.3.149:14265 tcp://5.9.118.112:14265 tcp://5.9.137.199:14265 tcp://5.9.149.169:14265 tcp://88.198.230.98:14265 tcp://cryptoiota.win:14265 tcp://eugene.iota.community:14265 tcp://eugene.iota.comunity:14265 tcp://eugene.iotasupport.com:14999 tcp://eugeneoldisoft.iotasupport.com:14265 tcp://iotanode.farm:14265 tcp://mainnet.necropaz.com:14500 tcp://node.deviceproof.org:14265 tcp://node.lukaseder.de:14265 tcp://node01.iotatoken.nl:14265 tcp://node02.iotatoken.nl:14265 tcp://node03.iotatoken.nl:15265 tcp://node04.iotatoken.nl:14265 tcp://node05.iotatoken.nl:16265 tcp://node06.iotatoken.nl:14265 tcp://wallets.iotamexico.com:80 udp://176.9.3.149:14777 udp://5.9.118.112:14777 udp://5.9.137.199:14777 udp://5.9.149.169:14777 udp://88.198.230.98:14777 udp://cryptoiota.win:14777 udp://eugene.iota.community:14777 udp://eugene.iota.comunity:14777 udp://eugeneoldisoft.iotasupport.com:14777 udp://iotanode.farm:14777 udp://node.deviceproof.org:14777 udp://node.lukaseder.de:14777 udp://node01.iotatoken.nl:14777 udp://node02.iotatoken.nl:14777 udp://node04.iotatoken.nl:14777 udp://node06.iotatoken.nl:14777 udp://94.156.128.15:14600 udp://185.181.8.149:14600", "$$@"]
+
+  nelson:
+    build:
+      context: nelson.cli/
+      dockerfile: Dockerfile.${ARCH}
+    image: sofwerx/nelson:${ARCH}
+    network_mode: host
+    container_name: nelson
+    hostname: nelson
+    command: -r 127.0.0.1 -i 14265 -u 14777 -t 15777 --neighbors "mainnet.deviota.com/16600 mainnet2.deviota.com/16600 mainnet3.deviota.com/16600 iotairi.tt-tec.net/16600"
 
