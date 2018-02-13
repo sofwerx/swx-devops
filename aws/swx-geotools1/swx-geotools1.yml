@@ -23,6 +23,8 @@ volumes:
     driver: local
   neo4j-data:
     driver: local
+  structr-data:
+    driver: local
   owncloud-data:
     driver: local
   owncloud-files:
@@ -260,6 +262,26 @@ services:
       - "traefik.backend=neo4j"
       - "traefik.port=7474"
       - "traefik.frontend.rule=Host:neo4j.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  structr:
+    image: structr/structr:2.3.5
+    container_name: structr
+    hostname: structr
+    restart: always
+    networks:
+      - default
+    ports:
+      - 8582:8082
+      - 8583:8083
+    volumes:
+      - traefik-ssl:/ssl
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=structr"
+      - "traefik.port=8583"
+      - "traefik.frontend.rule=Host:structr.${DNS_DOMAIN};AddPrefix:/structr/"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
