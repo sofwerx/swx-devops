@@ -128,6 +128,7 @@ services:
     privileged: true
     image: docker.elastic.co/elasticsearch/elasticsearch-platinum:${ELASTICSEARCH_VERSION}
     container_name: elasticsearch
+    hostname: elasticsearch
     ports: ['127.0.0.1:9200:9200']
     restart: always
     environment:
@@ -155,6 +156,7 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
     container_name: kibana
+    hostname: kibana
     environment:
       ELASTICSEARCH_USERNAME: kibana
       ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
@@ -179,6 +181,7 @@ services:
       dockerfile: Dockerfile.logstash
     image: sofwerx/logstash:${ELASTICSEARCH_VERSION}
     container_name: logstash
+    hostname: logstash
     environment:
       - 'xpack.monitoring.elasticsearch.password=${ELASTIC_PASSWORD}'
     depends_on: ['elasticsearch', 'setup_logstash']
@@ -191,6 +194,7 @@ services:
   auditbeat:
     image: docker.elastic.co/beats/auditbeat:${ELASTICSEARCH_VERSION}
     container_name: auditbeat
+    hostname: auditbeat
     command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     cap_add:
       - AUDIT_CONTROL
@@ -208,6 +212,7 @@ services:
   filebeat:
     image: docker.elastic.co/beats/filebeat:${ELASTICSEARCH_VERSION}
     container_name: filebeat
+    hostname: filebeat
     command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     # If the host system has logs at "/var/log", mount them at "/mnt/log"
     # inside the container, where Filebeat can find them.
@@ -225,6 +230,7 @@ services:
   heartbeat:
     image: docker.elastic.co/beats/heartbeat:${ELASTICSEARCH_VERSION}
     container_name: heartbeat
+    hostname: heartbeat
     command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     depends_on:
       - elasticsearch
@@ -238,6 +244,7 @@ services:
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:${ELASTICSEARCH_VERSION}
     container_name: metricbeat
+    hostname: metricbeat
     # The commented sections below enable Metricbeat to monitor the Docker host,
     # rather than the Metricbeat container. It's problematic with Docker for
     # Windows, however, since "/proc", "/sys" etc. don't exist on Windows.
@@ -259,6 +266,7 @@ services:
   packetbeat:
     image: docker.elastic.co/beats/packetbeat:${ELASTICSEARCH_VERSION}
     container_name: packetbeat
+    hostname: packetbeat
     # Packetbeat needs some elevated privileges to capture network traffic.
     # We'll grant them with POSIX capabilities.
     cap_add: ['NET_RAW', 'NET_ADMIN']
@@ -280,6 +288,7 @@ services:
   apm_server:
     image: docker.elastic.co/apm/apm-server:${ELASTICSEARCH_VERSION}
     container_name: apm_server
+    hostname: apm_server
     ports: ['127.0.0.1:8200:8200']
     command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     depends_on:
@@ -300,6 +309,7 @@ services:
       dockerfile: Dockerfile.setup_logstash
     image: sofwerx/setup_logstash:${ELASTICSEARCH_VERSION}
     container_name: setup_logstash
+    hostname: setup_logstash
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     depends_on:
@@ -318,6 +328,7 @@ services:
       dockerfile: Dockerfile.setup_kibana
     image: sofwerx/setup_kibana:${ELASTICSEARCH_VERSION}
     container_name: setup_kibana
+    hostname: setup_kibana
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     networks:
@@ -336,6 +347,7 @@ services:
       dockerfile: Dockerfile.setup_auditbeat
     image: sofwerx/auditbeat:${ELASTICSEARCH_VERSION}
     container_name: setup_auditbeat
+    hostname: setup_auditbeat
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     cap_add:
@@ -359,6 +371,7 @@ services:
       dockerfile: Dockerfile.setup_filebeat
     image: sofwerx/filebeat:${ELASTICSEARCH_VERSION}
     container_name: setup_filebeat
+    hostname: setup_filebeat
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     depends_on:
@@ -377,6 +390,7 @@ services:
       dockerfile: Dockerfile.setup_heartbeat
     image: sofwerx/heartbeat:${ELASTICSEARCH_VERSION}
     container_name: setup_heartbeat
+    hostname: setup_heartbeat
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     depends_on:
@@ -395,6 +409,7 @@ services:
       dockerfile: Dockerfile.setup_metricbeat
     image: sofwerx/metricbeat:${ELASTICSEARCH_VERSION}
     container_name: setup_metricbeat
+    hostname: setup_metricbeat
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     depends_on:
@@ -413,6 +428,7 @@ services:
       dockerfile: Dockerfile.setup_packetbeat
     image: sofwerx/packetbeat:${ELASTICSEARCH_VERSION}
     container_name: setup_packetbeat
+    hostname: setup_packetbeat
     cap_add: ['NET_RAW', 'NET_ADMIN']
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
@@ -432,6 +448,7 @@ services:
       dockerfile: Dockerfile.setup_apm_server
     image: sofwerx/apm-server:${ELASTICSEARCH_VERSION}
     container_name: setup_apm_server
+    hostname: setup_apm_server
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     depends_on:
