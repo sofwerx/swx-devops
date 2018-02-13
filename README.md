@@ -382,7 +382,7 @@ Now I am ready to run any `docker-compose` commands in the correct folders.
 
 If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
 
-# `swx gpg`
+### `swx gpg`
 
 When you use the `swx` or `trousseau` commands that require access to the trousseau secrets, your `gpg-agent` will prompt you for a passphrase.
 
@@ -401,7 +401,7 @@ Typically, try a `swx forget` followed by an `swx remember` first, and see if th
 
 If this fails, try a `swx reset` followed by a `swx prepare`, which will restart `gpg-agent` and hopefully let you enter a passphrase the next time you try using an `swx` or `trousseau` command that requires access to your troussea secrets.
 
-# `swx environment`
+### `swx environment`
 
 In addition to listing (`swx enviroment ls`) and switching (`swx enviroment switch ENVIRONMENT`), there are a few other `swx environment` commands 
 for dealing with `environment:` prefixed trousseau keys that store environment variables for enviroments:
