@@ -1,4 +1,4 @@
-version: "2.1"
+version: "2"
 
 networks: 
   default:
@@ -263,18 +263,18 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  neo4j-js-ng2:
+  neo4j-js:
     extends:
       file: docker-neo4j/docker-compose.yml
-      service: neo4j-js-ng2
+      service: neo4j-js
     restart: always
     ports:
       - 4200:4200
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=neo4j-js-ng2"
+      - "traefik.backend=neo4j-js"
       - "traefik.port=4200"
-      - "traefik.frontend.rule=Host:neo4j-js-ng2.${DNS_DOMAIN}"
+      - "traefik.frontend.rule=Host:neo4j-js.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
@@ -311,11 +311,11 @@ services:
       - OWNCLOUD_UTF8MB4_ENABLED=true
       - OWNCLOUD_REDIS_ENABLED=true
       - OWNCLOUD_REDIS_HOST=owncloud-redis
-    healthcheck:
-      test: "curl -f http://owncloud/status.php"
-      interval: 30s
-      timeout: 10s
-      retries: 5
+#    healthcheck:
+#      test: "curl -f http://owncloud/status.php"
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
     volumes:
       - owncloud-data:/mnt/data
     networks:
@@ -345,11 +345,11 @@ services:
       - MARIADB_INNODB_LOG_FILE_SIZE=64M
       - MARIADB_INNODB_LARGE_PREFIX=ON
       - MARIADB_INNODB_FILE_FORMAT=Barracuda
-    healthcheck:
-      test: ["CMD", "/usr/bin/healthcheck"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+#    healthcheck:
+#      test: ["CMD", "/usr/bin/healthcheck"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
     volumes:
       - owncloud-mysql:/var/lib/mysql
       - owncloud-backup:/var/lib/backup
@@ -365,11 +365,11 @@ services:
     hostname: owncloud-redis
     environment:
       - REDIS_DATABASES=1
-    healthcheck:
-      test: ["CMD", "/usr/bin/healthcheck"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+#    healthcheck:
+#      test: ["CMD", "/usr/bin/healthcheck"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
     volumes:
       - owncloud-redis:/var/lib/redis
     networks:

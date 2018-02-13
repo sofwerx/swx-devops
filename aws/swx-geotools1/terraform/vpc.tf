@@ -145,6 +145,27 @@ resource "aws_security_group_rule" "sg_ingress_rdp" {
     security_group_id = "${aws_security_group.sg.id}"
 }
 
+resource "aws_security_group_rule" "sg_ingress_neo4j-js" {
+    type = "ingress"
+    from_port = 4200
+    to_port = 4200
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+
+    security_group_id = "${aws_security_group.sg.id}"
+}
+resource "aws_security_group_rule" "sg_ingress_neo4j-js2" {
+    type = "ingress"
+    from_port = 49153
+    to_port = 49153
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+
+    security_group_id = "${aws_security_group.sg.id}"
+}
+
 resource "aws_security_group_rule" "sg_ingress_guacd" {
     type = "ingress"
     from_port = 4822
