@@ -20,6 +20,10 @@ volumes:
     driver: local
   elasticsearch-data:
     driver: local
+  sourcegraph-config:
+    driver: local
+  sourcegraph-data:
+    driver: local
 
 services:
 
@@ -478,5 +482,23 @@ services:
       NODE_LIST: ${NODE_LIST}
       EMAIL: ${ISF_EMAIL}
       PASSWORD: ${ISF_PASSWORD}
+    labels:
+      - "traefik.enable=false"
 
+  sourcegraph:
+    image: sourcegraph/server:2.5.4
+    restart: always
+    container_name: sourcegraph
+    hostname: sourcegraph
+    volumes:
+      - sourcegraph-config:/etc/sourcegraph
+      - sourcegraph-data:/var/opt/sourcegraph
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=sourcegraph"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:sourcegraph.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
