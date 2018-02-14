@@ -24,6 +24,8 @@ services:
     extends:
       file: docker-traefik/docker-compose.yml
       service: traefik
+    volumes:
+      - traefik-ssl:/ssl
     restart: always
     ports:
       - 80:80
@@ -72,9 +74,12 @@ services:
       - "traefik.enable=false"
 
   pandora-server:
+    build: docker-pandorafms/pandorafms-server/
     image: pandorafms/pandorafms-server:6
     container_name: pandora-server
     hostname: pandora-server
+    volumes:
+      - traefik-ssl:/ssl
     environment:
       PANDORA_DB_HOST: ${PANDORA_DB_HOST}
       PANDORA_DB_NAME: ${PANDORA_DB_NAME}
@@ -93,9 +98,12 @@ services:
       - "traefik.enable=false"
 
   pandora-console:
+    build: docker-pandorafms/pandorafms-console/
     image: pandorafms/pandorafms-console:6
     container_name: pandora-console
     hostname: console.${DNS_DOMAIN}
+    volumes:
+      - traefik-ssl:/ssl
     ports:
 #    - 80:80
     - 8022:8022
@@ -115,7 +123,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.backend=console"
-      - "traefik.port=8022"
+      - "traefik.port=80"
       - "traefik.frontend.rule=Host:console.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
