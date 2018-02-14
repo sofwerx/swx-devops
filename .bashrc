@@ -295,7 +295,7 @@ swx_environment_del ()
     trousseau del "environment:${SWX_ENVIRONMENT}:$1"
     unset $1
   else
-    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
   fi
 }
 
@@ -304,7 +304,7 @@ swx_environment_get ()
   if [ -n "${SWX_ENVIRONMENT}" ]; then
     trousseau get "environment:${SWX_ENVIRONMENT}:$1"
   else
-    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
   fi
 }
 
@@ -314,7 +314,7 @@ swx_environment_set ()
     trousseau set "environment:${SWX_ENVIRONMENT}:$1" "$2"
     export "$1=$2"
   else
-    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
   fi
 }
 
@@ -325,7 +325,7 @@ swx_environment_show ()
       echo "${key}=$(trousseau get environment:${SWX_ENVIRONMENT}:${key})"
     done
   else
-    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
   fi
 }
 swx_environment_keys ()
@@ -333,7 +333,19 @@ swx_environment_keys ()
   if [ -n "${SWX_ENVIRONMENT}" ]; then
     trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"
   else
-    echo 'No enviroment selected. Please use `swx switch` to switch to an environment first'
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
+  fi
+}
+
+swx_environment_create ()
+{
+  environment=$1
+
+  if trousseau keys | grep -e "^environment:${environment}:" > /dev/null ; then
+    echo "Environment variables already exist in trousseau for environment: $environment" 1>&2
+    return 1
+  else
+    export SWX_ENVIRONMENT="$environment"
   fi
 }
 
@@ -365,6 +377,7 @@ swx_environment ()
 {
   case $1 in
 ls) shift; swx_environment_ls ;;
+create) shift; swx_environment_create $@ ;;
 switch) shift; swx_environment_switch $@ ;;
 del) shift; swx_environment_del $@ ;;
 get) shift; swx_environment_get $@ ;;
@@ -374,6 +387,7 @@ keys) shift; swx_environment_keys $@ ;;
 *) cat <<EOU 1>&2
 Usage: swx dm environment {action}
   ls     - List environments
+  create - Create a new environment
   switch - Switch to an environment
   del    - Delete an environment variable from the current environment
   get    - Get an environment variable from the current environment
@@ -439,6 +453,7 @@ _swx ()
     "swx dm"*) COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
     "swx gpg"*) COMPREPLY=( $( compgen -W "prepare remember forget reset" -- $cur ) ) ;;
     "swx environment ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx environment create"*) COMPREPLY=( $( $cur ) ) ;;
     "swx environment switch"*) COMPREPLY=( $( compgen -W "$(swx_environment_ls)" -- $cur ) ) ;;
     "swx environment del"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
     "swx environment get"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
