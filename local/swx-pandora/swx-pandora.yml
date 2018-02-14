@@ -1,0 +1,122 @@
+version: '2.1'
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  mysql-data:
+    driver: local
+  pandorafms-data:
+    driver: local
+
+services:
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  pandora-mysql:
+    image: pandorafms/pandorafms-mysql:6
+    container_name: pandora-mysql
+    hostname: pandora-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${PANDORA_DB_NAME}
+      MYSQL_USER: ${PANDORA_DB_USER}
+      MYSQL_PASSWORD: ${PANDORA_DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - default
+    restart: always
+    healthcheck:
+      test: mysqladmin -h localhost -u $${MYSQL_USER} -p$${MYSQL_PASSWORD} ping
+      timeout: 20s
+      retries: 10
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  pandora-server:
+    image: pandorafms/pandorafms-server:6
+    container_name: pandora-server
+    hostname: pandora-server
+    environment:
+      PANDORA_DB_HOST: ${PANDORA_DB_HOST}
+      PANDORA_DB_NAME: ${PANDORA_DB_NAME}
+      PANDORA_DB_USER: ${PANDORA_DB_USER}
+      PANDORA_DB_PASSWORD: ${PANDORA_DB_PASSWORD}
+    ports:
+      - 41121:41121
+    depends_on:
+      pandora-mysql:
+        condition: service_healthy
+    networks:
+      - default
+    restart: always
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  pandora-console:
+    image: pandorafms/pandorafms-console:6
+    container_name: pandora-console
+    hostname: console.${DNS_DOMAIN}
+    ports:
+#    - 80:80
+    - 8022:8022
+    - 8023:8023
+    environment:
+      PANDORA_DB_HOST: ${PANDORA_DB_HOST}
+      PANDORA_DB_NAME: ${PANDORA_DB_NAME}
+      PANDORA_DB_USER: ${PANDORA_DB_USER}
+      PANDORA_DB_PASSWORD: ${PANDORA_DB_PASSWORD}
+    depends_on:
+      pandora-mysql:
+        condition: service_healthy
+    networks:
+      - default
+    restart: always
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=console"
+      - "traefik.port=8022"
+      - "traefik.frontend.rule=Host:console.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
