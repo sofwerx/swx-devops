@@ -142,3 +142,9 @@
 [submodule "local/ibm-minsky/isf-jclient"]
 	path = local/ibm-minsky/isf-jclient
 	url = https://github.com/sofwerx/isf-jclient
+[submodule "aws/swx-blueteam/RecordRTC"]
+	path = aws/swx-blueteam/RecordRTC
+	url = https://github.com/sofwerx/RecordRTC
+[submodule "local/swx-pandora/docker-pandorafms"]
+	path = local/swx-pandora/docker-pandorafms
+	url = https://github.com/sofwerx/docker-pandorafms.git
