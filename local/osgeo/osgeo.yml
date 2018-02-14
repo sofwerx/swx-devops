@@ -24,6 +24,7 @@ services:
     extends:
       file: docker-traefik/docker-compose.yml
       service: traefik
+    restart: always
     ports:
       - 9080:80
       - 9443:443
@@ -43,6 +44,7 @@ services:
     extends:
       file: docker-guacamole/docker-compose.yml
       service: postgres
+    restart: always
     networks:
       - default
     volumes:
@@ -54,6 +56,7 @@ services:
     extends:
       file: docker-guacamole/docker-compose.yml
       service: adminer
+    restart: always
     networks:
       - default
     labels:
@@ -68,6 +71,7 @@ services:
     extends:
       file: docker-guacamole/docker-compose.yml
       service: guacd
+    restart: always
     networks:
       - default
     volumes:
@@ -77,6 +81,7 @@ services:
     extends:
       file: docker-guacamole/docker-compose.yml
       service: guacamole
+    restart: always
     networks:
       - default
     volumes:
@@ -96,6 +101,7 @@ services:
       service: rethinkdb
     hostname: rethinkdb
     container_name: rethinkdb
+    restart: always
     networks:
       - default
     volumes:
@@ -109,6 +115,7 @@ services:
       service: adbd
     hostname: adbd
     container_name: adbd
+    restart: always
     networks:
       - default
     labels:
@@ -120,6 +127,7 @@ services:
       service: stf-local
     hostname: stf
     container_name: stf
+    restart: always
     depends_on:
       - adbd
       - rethinkdb
@@ -133,23 +141,23 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  wse:
-    image: wowzamedia/wowza-streaming-engine-linux:4.7.1
-    container_name: wowza
-    hostname: wowza
-    restart: always
-    ports:
-      - "1935:1935"
-      - "8086:8086"
-      - "8087:8087"
-      - "8088:8088"
-    volumes:
-      - "wowza-logs:/usr/local/WowzaStreamingEngine/logs"
-    environment:
-      WSE_MGR_USER: 'admin'
-      WSE_MGR_PASS: ${WSE_MGR_PASS}
-
-    command:
-      - /sbin/entrypoint.sh
+#  wse:
+#    image: wowzamedia/wowza-streaming-engine-linux:4.7.1
+#    container_name: wowza
+#    hostname: wowza
+#    restart: always
+#    ports:
+#      - "1935:1935"
+#      - "8086:8086"
+#      - "8087:8087"
+#      - "8088:8088"
+#    volumes:
+#      - "wowza-logs:/usr/local/WowzaStreamingEngine/logs"
+#    environment:
+#      WSE_MGR_USER: 'admin'
+#      WSE_MGR_PASS: ${WSE_MGR_PASS}
+#
+#    command:
+#      - /sbin/entrypoint.sh
 
 
