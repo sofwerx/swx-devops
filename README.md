@@ -34,6 +34,7 @@ Non-cloud resources:
 - [local/mobile](local/mobile) - A mint box setup to run OpenSTF
 - [local/orange](local/orange/README.md) - Our tranquilpc 8-blade docker swarm server in our Data Science pit
 - [local/osgeo](local/osgeo) - A mint box setup to run OSGEO and guacamole
+- [local/swx-pandora](local/swx-pandora) - Pandora-FMS box
 - [local/vmhost](local/vmhost) - The pop-os based System76 Silverback server
 - [local/pi-r-squared](local/pi-r-squared/README.md) - A shared raspberry-pi docker host in our Data Science pit
 - ~~[local/swx-gpu](local/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
