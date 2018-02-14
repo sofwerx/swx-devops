@@ -25,11 +25,29 @@ The dependencies, and how to use them, are enumerated below.
 
 # Project Environments
 
+Non-cloud resources:
+
 - [local/dev](local/dev/README.md) - Your local `dev` environment
 - [local/geo](local/geo/README.md) - Our `geo` mintpc in our Data Science pit
+- [local/ibm-minsky](local/ibm-minsky) - The IBM Minsky box (ppc64le)
+- [local/icbgamingpc](local/icbgamingpc) - Ian's home gaming rig
+- [local/mobile](local/mobile) - A mint box setup to run OpenSTF
 - [local/orange](local/orange/README.md) - Our tranquilpc 8-blade docker swarm server in our Data Science pit
-- [local/swx-pi](local/swx-pi/README.md) - A shared raspberry-pi docker host in our Data Science pit
-- [local/swx-gpu](local/swx-gpu/README.md) - Our shared IBM Minsky ppc64le GPU server in our datacenter
+- [local/osgeo](local/osgeo) - A mint box setup to run OSGEO and guacamole
+- [local/vmhost](local/vmhost) - The pop-os based System76 Silverback server
+- [local/pi-r-squared](local/pi-r-squared/README.md) - A shared raspberry-pi docker host in our Data Science pit
+- ~~[local/swx-gpu](local/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
+
+Cloud based resources:
+
+- [aws/huntclub-moodle](aws/huntclub-moodle) - Moodle deploy for Hunt Club
+- [aws/jumpbox-kali](aws/jumpbox-kali) - Kali guacamole jump box
+- [aws/marklogic-datahub](aws/marklogic-datahub) - Apache Nifi + Marklogic
+- [aws/nerdherd-vpn](aws/nerdherd-vpn) - Nerdherd VPN box
+- [aws/swx-blueteam](aws/swx-blueteam) - Blue Team box
+- [aws/swx-geotools1](aws/swx-geotools1) - GIS Tools box
+- [aws/swx-redteam](aws/swx-redteam) - Red Team box
+- [aws/swx-xmpp](aws/swx-xmpp) - XMPP Server for ATAK
 - ~~[aws/swx-dev](aws/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
 - ~~[aws/rcloud-dev](aws/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
 
