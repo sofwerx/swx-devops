@@ -21,7 +21,7 @@ resource "aws_route53_record" "project-name-cname" {
   name    = "${var.Lifecycle}.${var.dns_zone}"
   type    = "CNAME"
   ttl     = "300"
-  records = ["sofwerxbrange.araknisdns.com"]
+  records = ["sofwerxguest.araknisdns.com"]
 }
 
 /* Define a *.pandora.devwerx.org CNAME record */
@@ -30,6 +30,6 @@ resource "aws_route53_record" "project-name-wildcard" {
   name    = "*.${var.Lifecycle}.${var.dns_zone}"
   type    = "CNAME"
   ttl     = "300"
-  records = ["sofwerxbrange.araknisdns.com"]
+  records = ["sofwerxguest.araknisdns.com"]
 }
 
