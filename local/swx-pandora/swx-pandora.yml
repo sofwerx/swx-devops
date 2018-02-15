@@ -113,6 +113,7 @@ services:
       PANDORA_DB_NAME: ${PANDORA_DB_NAME}
       PANDORA_DB_USER: ${PANDORA_DB_USER}
       PANDORA_DB_PASSWORD: ${PANDORA_DB_PASSWORD}
+      HOMEURL: /
     depends_on:
       pandora-mysql:
         condition: service_healthy
@@ -124,7 +125,6 @@ services:
       - "traefik.enable=true"
       - "traefik.backend=console"
       - "traefik.port=80"
-      - "traefik.frontend.rule=Host:console.${DNS_DOMAIN}"
+      - "traefik.frontend.rule=Host:console.${DNS_DOMAIN};AddPrefix:/pandora_console"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
-
