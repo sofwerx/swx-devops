@@ -7,9 +7,6 @@
 [submodule "local/swx-gpu/synthetic-target-area-of-interest"]
 	path = local/swx-gpu/synthetic-target-area-of-interest
 	url = https://github.com/sofwerx/synthetic-target-area-of-interest
-[submodule "local/geo/synthetic-target-area-of-interest"]
-	path = local/geo/synthetic-target-area-of-interest
-	url = https://github.com/sofwerx/synthetic-target-area-of-interest
 [submodule "local/geo/docker-geoserver"]
 	path = local/geo/docker-geoserver
 	url = https://github.com/sofwerx/docker-geoserver
@@ -151,6 +148,6 @@
 [submodule "local/swx-pandora/docker-traefik"]
 	path = local/swx-pandora/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
-[submodule "local/synthetic-target-area-of-interest"]
-	path = local/synthetic-target-area-of-interest
-	url = https://github.com/sofwerx/synthetic-target-area-of-interest.git
+[submodule "local/geo/synthetic-target-area-of-interest"]
+	path = local/geo/synthetic-target-area-of-interest
+	url = git@github.com:sofwerx/synthetic-target-area-of-interest.git
