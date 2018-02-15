@@ -24,6 +24,8 @@ volumes:
     driver: local
   sourcegraph-data:
     driver: local
+  rtc-reports:
+    driver: local
 
 services:
 
@@ -161,6 +163,7 @@ services:
     image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
     container_name: kibana
     hostname: kibana
+    restart: always
     environment:
       ELASTICSEARCH_USERNAME: kibana
       ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
@@ -186,6 +189,7 @@ services:
     image: sofwerx/logstash:${ELASTICSEARCH_VERSION}
     container_name: logstash
     hostname: logstash
+    restart: always
     environment:
       - 'xpack.monitoring.elasticsearch.password=${ELASTIC_PASSWORD}'
     depends_on: ['elasticsearch', 'setup_logstash']
@@ -199,6 +203,7 @@ services:
     image: docker.elastic.co/beats/auditbeat:${ELASTICSEARCH_VERSION}
     container_name: auditbeat
     hostname: auditbeat
+    restart: always
     command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     cap_add:
       - AUDIT_CONTROL
@@ -217,6 +222,7 @@ services:
     image: docker.elastic.co/beats/filebeat:${ELASTICSEARCH_VERSION}
     container_name: filebeat
     hostname: filebeat
+    restart: always
     command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     # If the host system has logs at "/var/log", mount them at "/mnt/log"
     # inside the container, where Filebeat can find them.
@@ -235,6 +241,7 @@ services:
     image: docker.elastic.co/beats/heartbeat:${ELASTICSEARCH_VERSION}
     container_name: heartbeat
     hostname: heartbeat
+    restart: always
     command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     depends_on:
       - elasticsearch
@@ -249,6 +256,7 @@ services:
     image: docker.elastic.co/beats/metricbeat:${ELASTICSEARCH_VERSION}
     container_name: metricbeat
     hostname: metricbeat
+    restart: always
     # The commented sections below enable Metricbeat to monitor the Docker host,
     # rather than the Metricbeat container. It's problematic with Docker for
     # Windows, however, since "/proc", "/sys" etc. don't exist on Windows.
@@ -282,7 +290,7 @@ services:
     # that the other containers are connected to, and thus can't resolve the
     # hostname "elasticsearch". Instead, we'll tell it to find Elasticsearch
     # on "localhost", which is the Docker host machine in this context.
-    command: -e -E 'output.elasticsearch.hosts=["localhost:9200"]' -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    command: -e -E 'output.elasticsearch.hosts=["localhost:9200"]' -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}' -E 'packetbeat.interfaces.device=eth0'
     depends_on:
       - elasticsearch
     logging: *default-logging
@@ -293,6 +301,7 @@ services:
     image: docker.elastic.co/apm/apm-server:${ELASTICSEARCH_VERSION}
     container_name: apm_server
     hostname: apm_server
+    restart: always
     ports: ['127.0.0.1:8200:8200']
     command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     depends_on:
@@ -562,4 +571,26 @@ services:
     logging: *default-logging
     labels:
       - "traefik.enable=false"
+
+  rtc:
+    build: RecordRTC/rtc/
+    image: sofwerx/recordrtc
+    container_name: rtc
+    hostname: rtc
+    volumes:
+      - rtc-reports:/rtc/reports
+    networks:
+      - default
+    environment:
+      LISTEN_ADDR: 0.0.0.0
+      URL: https://rtc.${DNS_DOMAIN}
+      PORT: 9001
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=rtc"
+      - "traefik.port=9001"
+      - "traefik.frontend.rule=Host:rtc.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
