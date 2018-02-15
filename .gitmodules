@@ -153,4 +153,4 @@
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "local/synthetic-target-area-of-interest"]
 	path = local/synthetic-target-area-of-interest
-	url = git@github.com:sofwerx/synthetic-target-area-of-interest.git
+	url = https://github.com/sofwerx/synthetic-target-area-of-interest.git
