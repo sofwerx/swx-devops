@@ -422,7 +422,7 @@ swx_secrets_encrypt ()
 
 swx_secrets_pull ()
 {
-  trousseau keys | grep -e ^file:secrets/ | sed -e s/^file:// | while read file; do swx_secrets_decrypt "$file"; done
+  trousseau keys | grep -e ^file:secrets/ | sed -e s/^file:// | while read file; do mkdir -p $(dirname "$file"); swx_secrets_decrypt "$file"; done
 }
 
 swx_secrets ()
