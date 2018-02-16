@@ -8,6 +8,15 @@ fi
 devops="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 alias ch="cd ${devops}"
 
+# To prevent ambiguity, impose AWS environemnt variables through convention.
+unset AWS_SHARED_CREDENTIALS_FILE \
+      AWS_CONFIG_FILE \
+      AWS_ACCESS_KEY_ID \
+      AWS_SECRET_ACCESS_KEY \
+      AWS_REGION \
+      AWS_DEFAULT_REGION \
+      AWS_DEFAULT_OUTPUT
+
 if [ -d "${devops}/secrets/aws" ] ; then
   export AWS_SHARED_CREDENTIALS_FILE="${devops}/secrets/aws/credentials"
   export AWS_CONFIG_FILE="${devops}/secrets/aws/config"
