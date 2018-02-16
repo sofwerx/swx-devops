@@ -37,7 +37,6 @@ Non-cloud resources:
 - [local/swx-pandora](local/swx-pandora) - Pandora-FMS box
 - [local/vmhost](local/vmhost) - The pop-os based System76 Silverback server
 - [local/pi-r-squared](local/pi-r-squared/README.md) - A shared raspberry-pi docker host in our Data Science pit
-- ~~[local/swx-gpu](local/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
 
 Cloud based resources:
 
@@ -49,8 +48,12 @@ Cloud based resources:
 - [aws/swx-geotools1](aws/swx-geotools1) - GIS Tools box
 - [aws/swx-redteam](aws/swx-redteam) - Red Team box
 - [aws/swx-xmpp](aws/swx-xmpp) - XMPP Server for ATAK
-- ~~[aws/swx-dev](aws/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
-- ~~[aws/rcloud-dev](aws/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
+
+Archived resources:
+
+- [cellar/swx-gpu](cellar/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
+- [cellar/swx-dev](cellar/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
+- [cellar/rcloud-dev](cellar/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
 
 # Secrets
 

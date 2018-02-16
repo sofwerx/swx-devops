@@ -1,11 +1,11 @@
-[submodule "aws/swx-dev/orient"]
-	path = aws/swx-dev/orient
+[submodule "cellar/swx-dev/orient"]
+	path = cellar/swx-dev/orient
 	url = https://github.com/sofwerx/orient
-[submodule "local/swx-gpu/tor-moneropool"]
-	path = local/swx-gpu/tor-moneropool
+[submodule "cellar/swx-gpu/tor-moneropool"]
+	path = cellar/swx-gpu/tor-moneropool
 	url = https://github.com/sofwerx/tor-moneropool
-[submodule "local/swx-gpu/synthetic-target-area-of-interest"]
-	path = local/swx-gpu/synthetic-target-area-of-interest
+[submodule "cellar/swx-gpu/synthetic-target-area-of-interest"]
+	path = cellar/swx-gpu/synthetic-target-area-of-interest
 	url = https://github.com/sofwerx/synthetic-target-area-of-interest
 [submodule "local/geo/docker-geoserver"]
 	path = local/geo/docker-geoserver
@@ -13,8 +13,8 @@
 [submodule "local/geo/docker-guacamole"]
 	path = local/geo/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
-[submodule "local/swx-gpu/docker-guacamole"]
-	path = local/swx-gpu/docker-guacamole
+[submodule "cellar/swx-gpu/docker-guacamole"]
+	path = cellar/swx-gpu/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "local/pi-r-squared/docker-guacamole"]
 	path = local/pi-r-squared/docker-guacamole
@@ -34,8 +34,8 @@
 [submodule "local/osgeo/docker-traefik"]
 	path = local/osgeo/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
-[submodule "local/swx-gpu/docker-ethminer"]
-	path = local/swx-gpu/docker-ethminer
+[submodule "cellar/swx-gpu/docker-ethminer"]
+	path = cellar/swx-gpu/docker-ethminer
 	url = https://github.com/sofwerx/docker-ethminer
 [submodule "local/osgeo/docker-openstf"]
 	path = local/osgeo/docker-openstf
@@ -97,8 +97,8 @@
 [submodule "local/orange/fuel-nat/docker-nat"]
 	path = local/orange/fuel-nat/docker-nat
 	url = https://github.com/sofwerx/docker-geoserver.git
-[submodule "local/swx-gpu/tor-moneropool/tor-monero"]
-	path = local/swx-gpu/tor-moneropool/tor-monero
+[submodule "cellar/swx-gpu/tor-moneropool/tor-monero"]
+	path = cellar/swx-gpu/tor-moneropool/tor-monero
 	url = https://github.com/sofwerx/tor-moneropool.git
 [submodule "aws/swx-redteam/docker-traefik"]
 	path = aws/swx-redteam/docker-traefik
