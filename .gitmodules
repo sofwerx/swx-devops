@@ -151,3 +151,9 @@
 [submodule "local/geo/synthetic-target-area-of-interest"]
 	path = local/geo/synthetic-target-area-of-interest
 	url = git@github.com:sofwerx/synthetic-target-area-of-interest.git
+[submodule "local/securedrop-system76/docker-guacamole"]
+	path = local/securedrop-system76/docker-guacamole
+	url = https://github.com/ianblenke/docker-guacamole.git
+[submodule "local/securedrop-system76/docker-traefik"]
+	path = local/securedrop-system76/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
