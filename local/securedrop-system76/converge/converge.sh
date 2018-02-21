@@ -10,13 +10,6 @@ apt-get -y upgrade
 apt-get -y dist-upgrade
 apt-get -y autoremove --purge
 
-# Install latest xrdp
-cat <<EOF > /etc/apt/sources.list.d/xrdp.list
-deb http://ppa.launchpad.net/hermlnx/xrdp/ubuntu xenial main
-deb-src http://ppa.launchpad.net/hermlnx/xrdp/ubuntu xenial main
-EOF
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CAB0B10F
-
 apt-get update
 apt-get install -y xrdp
 
