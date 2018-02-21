@@ -40,9 +40,9 @@ services:
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       SUBDOMAINS: ${SUBDOMAINS}
-#      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-#      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-#      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
     logging: *default-logging
     labels:
       - "traefik.enable=true"
@@ -228,7 +228,7 @@ services:
     # that the other containers are connected to, and thus can't resolve the
     # hostname "elasticsearch". Instead, we'll tell it to find Elasticsearch
     # on "localhost", which is the Docker host machine in this context.
-    command: -e -E 'output.elasticsearch.hosts=["localhost:9200"]' -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}' -E 'packetbeat.interfaces.device=eth0'
+    command: -e -E 'output.elasticsearch.hosts=["localhost:9200"]' -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}' -E 'packetbeat.interfaces.device=wlp4s0'
     depends_on:
       - elasticsearch
     logging: *default-logging
