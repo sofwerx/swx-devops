@@ -160,3 +160,6 @@
 [submodule "local/swx-range2/docker-elastic"]
 	path = local/swx-range2/docker-elastic
 	url = https://github.com/sofwerx/docker-elastic.git
+[submodule "local/swx-range2/docker-traefik"]
+	path = local/swx-range2/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
