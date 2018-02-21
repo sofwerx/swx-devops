@@ -39,16 +39,20 @@ services:
       service: traefik
     restart: always
     ports:
-      - 9080:80
-      - 9443:443
+      - 10080:10080
+      - 10443:10443
     networks:
       - default
     environment:
+      HTTP_PORT: "10080"
+      HTTPS_PORT: "10443"
       REST_PORT: "7080"
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_REGION: ${AWS_REGION}
-
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      #AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      #AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      #AWS_REGION: ${AWS_REGION}
     labels:
       - "traefik.enable=true"
       - "traefik.backend=traefik"
