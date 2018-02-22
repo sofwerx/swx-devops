@@ -256,7 +256,8 @@ swx_dm_env ()
     else
       if [ -s "${devops}/secrets/dm/$1" ]; then
         echo "dm $1 does not exist in trousseau, but does exist as a secrets file in ${devops}/secrets/dm/$1"
-        echo "you may want to run this: swx secrets encrypt secrets/dm/$1"
+        echo "This may mean that your gpg-agent has gone away, you may want to run this: swx gpg remember"
+        echo "Or, if your gpg-agent is setup correctly, you may want to run this: swx secrets encrypt secrets/dm/$1"
       else
         echo "dm $1 does not exist. try: swx dm ls"
       fi
