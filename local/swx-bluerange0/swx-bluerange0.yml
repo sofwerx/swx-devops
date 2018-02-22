@@ -407,3 +407,19 @@ services:
     labels:
       - "traefik.enable=false"
 
+  ethminer:
+    build: docker-ethminer/
+    image: sofwerx/ethminer:${ARCH}
+    container_name: ethminer
+    hostname: ethminer
+    environment:
+      GPU_FORCE_64BIT_PTR: 0
+      GPU_MAX_HEAP_SIZE: 100
+      GPU_USE_SYNC_OBJECTS: 1
+      GPU_MAX_ALLOC_PERCENT: 100
+      GPU_SINGLE_ALLOC_PERCENT: 100
+    command: /ethminer/build/ethminer/ethminer --cuda-parallel-hash 8 --farm-recheck 200 -U -S us1.ethermine.org:4444 -FS us2.ethermine.org:4444 -O 2c0859b9312d9bf93e1b4cae8d47d59030a75a9f.swx-u-ub-bluerange0
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
