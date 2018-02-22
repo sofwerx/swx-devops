@@ -178,3 +178,15 @@
 [submodule "local/swx-bluerange0/xmr-stak"]
 	path = local/swx-bluerange0/xmr-stak
 	url = https://github.com/sofwerx/xmr-stak.git
+[submodule "local/swx-bluerange2/docker-elastic"]
+	path = local/swx-bluerange2/docker-elastic
+	url = https://github.com/sofwerx/docker-elastic
+[submodule "local/swx-bluerange2/docker-ethminer"]
+	path = local/swx-bluerange2/docker-ethminer
+	url = https://github.com/sofwerx/docker-ethminer
+[submodule "local/swx-bluerange2/docker-traefik"]
+	path = local/swx-bluerange2/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
+[submodule "local/swx-bluerange2/xmr-stak"]
+	path = local/swx-bluerange2/xmr-stak
+	url = https://github.com/sofwerx/xmr-stak
