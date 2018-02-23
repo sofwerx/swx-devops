@@ -16,6 +16,8 @@ volumes:
     driver: local
   elasticsearch-data:
     driver: local
+  gdelt-data:
+    driver: local
 
 services:
 
@@ -125,7 +127,9 @@ services:
     hostname: logstash
     restart: always
     environment:
-      - 'xpack.monitoring.elasticsearch.password=${ELASTIC_PASSWORD}'
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     depends_on: ['elasticsearch', 'setup_logstash']
     networks:
       - default
@@ -434,4 +438,56 @@ services:
     restart: always
     command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
     tty: true
+
+  gdelt_create_index:
+    extends:
+      file: es-gdelt/docker-compose.yml
+      service: gdelt_create_index
+    environment:
+      ES_HOST_URL: http://elasticsearch:9200
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_GDELT_INDEX: /gdelt
+      ES_DELETE_INDEX: N
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  gdelt_realtime_downloader:
+    extends:
+      file: es-gdelt/docker-compose.yml
+      service: gdelt_realtime_downloader
+    volumes:
+      - gdelt-data:/es-gde
+    restart: always
+    environment:
+      GDELT_HISTORIC_FILE_PATH: ${GDELT_HISTORIC_FILE_PATH}
+      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+      SLACK_NOTIFICATIONS_ENABLED: ${SLACK_NOTIFICATIONS_ENABLED}
+      SLACK_NOTIFICATIONS_URL: ${SLACK_NOTIFICATIONS_URL}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  gdelt_realtime_logstash:
+    extends:
+      file: es-gdelt/docker-compose.yml
+      service: gdelt_realtime_logstash
+    restart: always
+    environment:
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+      ES_HOST: elasticsearch:9200
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_GDELT_INDEX: /gdelt
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 
