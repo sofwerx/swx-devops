@@ -19,17 +19,17 @@ data "aws_route53_zone" "selected" {
 resource "aws_route53_record" "project-name-cname" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
   name    = "${var.Lifecycle}.${var.dns_zone}"
-  type    = "CNAME"
+  type    = "A"
   ttl     = "300"
-  records = ["sofwerxbrange.araknisdns.com"]
+  records = ["172.109.143.74"]
 }
 
 /* Define a *.range2.devwerx.org CNAME record */
 resource "aws_route53_record" "project-name-wildcard" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
   name    = "*.${var.Lifecycle}.${var.dns_zone}"
-  type    = "CNAME"
+  type    = "A"
   ttl     = "300"
-  records = ["sofwerxbrange.araknisdns.com"]
+  records = ["172.109.143.74"]
 }
 
