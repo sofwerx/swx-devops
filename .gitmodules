@@ -202,3 +202,9 @@
 [submodule "local/swx-bluerange0/es-gdelt"]
 	path = local/swx-bluerange0/es-gdelt
 	url = http://github.com/sofwerx/es-gdelt
+[submodule "local/swx-range2/es-gdelt"]
+	path = local/swx-range2/es-gdelt
+	url = http://github.com/sofwerx/es-gdelt
+[submodule "local/swx-range2/docker-ethminer"]
+	path = local/swx-range2/docker-ethminer
+	url = http://github.com/sofwerx/docker-ethminer
