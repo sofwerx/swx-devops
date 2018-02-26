@@ -21,7 +21,7 @@ resource "aws_route53_record" "project-name-cname" {
   name    = "${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
- records = ["47.204.11.61"]
+ records = ["172.109.143.74"]
 }
 
 /* Define a *.bluerange2.devwerx.org CNAME record */
@@ -30,6 +30,6 @@ resource "aws_route53_record" "project-name-wildcard" {
   name    = "*.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
- records = ["47.204.11.61"]
+ records = ["172.109.143.74"]
 }
 
