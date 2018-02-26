@@ -94,7 +94,7 @@ variable aws_instance_count {
 
 variable aws_instance_type {
     description = "AWS instance type to use"
-    default = "c5.xlarge"
+    default = "c5.2xlarge"
 }
 
 variable linux_distro_name {
