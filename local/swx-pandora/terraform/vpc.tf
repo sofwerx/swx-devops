@@ -21,7 +21,7 @@ resource "aws_route53_record" "project-name-cname" {
   name    = "${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["172.109.143.98"]
+  records = ["172.109.143.90"]
 }
 
 /* Define a *.pandora.devwerx.org CNAME record */
@@ -30,6 +30,6 @@ resource "aws_route53_record" "project-name-wildcard" {
   name    = "*.${var.Lifecycle}.${var.dns_zone}"
   type    = "A"
   ttl     = "300"
-  records = ["172.109.143.98"]
+  records = ["172.109.143.90"]
 }
 
