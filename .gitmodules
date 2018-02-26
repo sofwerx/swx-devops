@@ -199,3 +199,6 @@
 [submodule "aws/swx-blueteam/xmr-stak"]
 	path = aws/swx-blueteam/xmr-stak
 	url = https://github.com/sofwerx/xmr-stak
+[submodule "local/swx-bluerange0/es-gdelt"]
+	path = local/swx-bluerange0/es-gdelt
+	url = http://github.com/sofwerx/es-gdelt
