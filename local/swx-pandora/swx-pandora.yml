@@ -18,8 +18,8 @@ volumes:
     driver: local
   pandorafms-data:
     driver: local
-  tmate-keys:
-    driver: local
+#  tmate-keys:
+#    driver: local
   takserver-logs:
     driver: local
 
@@ -135,23 +135,23 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  tmate:
-    extends:
-      file: docker-tmate-slave/docker-compose.yml
-      service: tmate
-    volumes:
-      - tmate-keys:/keys
-    restart: always
-    ports:
-      - 10022:10022
-    environment:
-      TMATE_HOST: tmate.${DNS_DOMAIN}
-      TMATE_PORT: 10022
-    networks:
-      - default
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
+#  tmate:
+#    extends:
+#      file: docker-tmate-slave/docker-compose.yml
+#      service: tmate
+#    volumes:
+#      - tmate-keys:/keys
+#    restart: always
+#    ports:
+#      - 10022:10022
+#    environment:
+#      TMATE_HOST: tmate.${DNS_DOMAIN}
+#      TMATE_PORT: 10022
+#    networks:
+#      - default
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
 
   takserver:
     extends:
