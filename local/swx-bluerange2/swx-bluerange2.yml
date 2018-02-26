@@ -77,7 +77,8 @@ services:
       http.host: 0.0.0.0
       transport.host: 127.0.0.1
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      cluster.name: blueteam
+      discovery.type: single-node
+      cluster.name: bluerange2
       bootstrap.memory_lock: "true"
       ES_JAVA_OPTS: -Xms2g -Xmx2g
     ulimits:
@@ -126,7 +127,14 @@ services:
     container_name: logstash
     hostname: logstash
     restart: always
+    ports:
+      - 9600:9600
+      - 5000:5000/tcp
+      - 5000:5000/udp
     environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
       XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
       XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
@@ -142,7 +150,18 @@ services:
     container_name: auditbeat
     hostname: auditbeat
     restart: always
-    command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     cap_add:
       - AUDIT_CONTROL
       - AUDIT_READ
@@ -161,7 +180,19 @@ services:
     container_name: filebeat
     hostname: filebeat
     restart: always
-    command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    user: root
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     # If the host system has logs at "/var/log", mount them at "/mnt/log"
     # inside the container, where Filebeat can find them.
     volumes:
@@ -180,7 +211,18 @@ services:
     container_name: heartbeat
     hostname: heartbeat
     restart: always
-    command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     depends_on:
       - elasticsearch
       - setup_heartbeat
@@ -191,24 +233,45 @@ services:
       - "traefik.enable=false"
 
   metricbeat:
-    image: docker.elastic.co/beats/metricbeat:${ELASTICSEARCH_VERSION}
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.metricbeat
+    image: sofwerx/metricbeat:${ELASTICSEARCH_VERSION}
     container_name: metricbeat
     hostname: metricbeat
     restart: always
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      OUTPUT_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      OUTPUT_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     # The commented sections below enable Metricbeat to monitor the Docker host,
     # rather than the Metricbeat container. It's problematic with Docker for
     # Windows, however, since "/proc", "/sys" etc. don't exist on Windows.
     # The same likely applies to OSX (needs testing).
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - /proc:/hostfs/proc:ro
       - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
       - /:/hostfs:ro
-    command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD} -system.hostfs=/hostfs'
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+      -system.hostfs=/hostfs
     depends_on:
       - elasticsearch
       - setup_metricbeat
     networks:
       - default
+    pid: host
     logging: *default-logging
     labels:
       - "traefik.enable=false"
@@ -217,6 +280,13 @@ services:
     image: docker.elastic.co/beats/packetbeat:${ELASTICSEARCH_VERSION}
     container_name: packetbeat
     hostname: packetbeat
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     # Packetbeat needs some elevated privileges to capture network traffic.
     # We'll grant them with POSIX capabilities.
     cap_add: ['NET_RAW', 'NET_ADMIN']
@@ -228,7 +298,12 @@ services:
     # that the other containers are connected to, and thus can't resolve the
     # hostname "elasticsearch". Instead, we'll tell it to find Elasticsearch
     # on "localhost", which is the Docker host machine in this context.
-    command: -e -E 'output.elasticsearch.hosts=["localhost:9200"]' -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}' -E 'packetbeat.interfaces.device=wlp4s0'
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+      -E 'packetbeat.interfaces.device=wlp4s0'
     depends_on:
       - elasticsearch
     logging: *default-logging
@@ -239,9 +314,20 @@ services:
     image: docker.elastic.co/apm/apm-server:${ELASTICSEARCH_VERSION}
     container_name: apm_server
     hostname: apm_server
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     restart: always
     ports: ['127.0.0.1:8200:8200']
-    command: -e -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
     depends_on:
       - elasticsearch
       - setup_apm_server
@@ -363,6 +449,8 @@ services:
     hostname: setup_metricbeat
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      OUTPUT_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      OUTPUT_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     depends_on:
       - kibana
     networks:
@@ -448,7 +536,9 @@ services:
       ES_USER: ${ELASTIC_USER}
       ES_PASSWORD: ${ELASTIC_PASSWORD}
       ES_GDELT_INDEX: /gdelt
-      ES_DELETE_INDEX: N
+      ES_DELETE_INDEX: Y
+    networks:
+      - default
     logging: *default-logging
     labels:
       - "traefik.enable=false"
@@ -458,7 +548,7 @@ services:
       file: es-gdelt/docker-compose.yml
       service: gdelt_realtime_downloader
     volumes:
-      - gdelt-data:/es-gde
+      - gdelt-data:/es-gdelt/data
     restart: always
     environment:
       GDELT_HISTORIC_FILE_PATH: ${GDELT_HISTORIC_FILE_PATH}
@@ -467,7 +557,14 @@ services:
       GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
       SLACK_NOTIFICATIONS_ENABLED: ${SLACK_NOTIFICATIONS_ENABLED}
       SLACK_NOTIFICATIONS_URL: ${SLACK_NOTIFICATIONS_URL}
-    logging: *default-logging
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://172.18.0.1:5000"
+    networks:
+      - default
+    depends_on:
+      - logstash
     labels:
       - "traefik.enable=false"
 
@@ -476,6 +573,8 @@ services:
       file: es-gdelt/docker-compose.yml
       service: gdelt_realtime_logstash
     restart: always
+    volumes:
+      - gdelt-data:/es-gdelt/data
     environment:
       XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
       XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
@@ -486,7 +585,9 @@ services:
       ES_HOST: elasticsearch:9200
       ES_USER: ${ELASTIC_USER}
       ES_PASSWORD: ${ELASTIC_PASSWORD}
-      ES_GDELT_INDEX: /gdelt
+      ES_GDELT_INDEX: gdelt
+    networks:
+      - default
     logging: *default-logging
     labels:
       - "traefik.enable=false"
