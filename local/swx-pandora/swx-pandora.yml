@@ -22,6 +22,8 @@ volumes:
 #    driver: local
   takserver-logs:
     driver: local
+  takserver-certs:
+    driver: local
 
 services:
   traefik:
@@ -110,6 +112,7 @@ services:
       - traefik-ssl:/ssl
     ports:
 #    - 80:80
+    - 60080:80
     - 8022:8022
     - 8023:8023
     environment:
@@ -157,11 +160,17 @@ services:
     extends:
       file: docker-tak/docker-compose.yml
       service: takserver
-    networks:
-      - default
+    restart: always
+    network_mode: host
     logging: *default-logging
     volumes:
       - takserver-logs:/opt/tak/logs
+      - takserver-certs:/opt/tak/certs
+    environment:
+      ENABLE_TLS: 1
+      ANNOUNCE_ADDRESS: 192.168.16.100
+      TAKSERVER_USER: $TAKSERVER_USER
+      TAKSERVER_PASSWORD: $TAKSERVER_PASSWORD
     labels:
       - "traefik.enable=true"
       - "traefik.backend=tak"
@@ -170,13 +179,26 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  takreflector:
-    extends:
-      file: docker-tak/docker-compose.yml
-      service: takreflector
-    networks:
-      - default
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
+#  takreflector:
+#    extends:
+#      file: docker-tak/docker-compose.yml
+#      service: takreflector
+#    restart: always
+#    network_mode: host
+#    environment:
+#      INPUT_ADDRESS: 192.168.16.100
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
+
+#  takplayrecording1:
+#    extends:
+#      file: docker-tak/docker-compose.yml
+#      service: takplayrecording1
+#    restart: always
+#    network_mode: host
+#    command: /takplayrecording.sh ./publish_file --output-address 192.168.16.100 --output-port 3080 --input-file raven1
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
 
