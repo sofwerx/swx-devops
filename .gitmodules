@@ -20,7 +20,7 @@
 	path = local/pi-r-squared/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "local/osgeo/docker-guacamole"]
-	path = local/osgeo/docker-guacamole
+	path = cellar/osgeo/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "local/mobile/docker-openstf"]
 	path = local/mobile/docker-openstf
@@ -32,13 +32,13 @@
 	path = local/mobile/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "local/osgeo/docker-traefik"]
-	path = local/osgeo/docker-traefik
+	path = cellar/osgeo/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "cellar/swx-gpu/docker-ethminer"]
 	path = cellar/swx-gpu/docker-ethminer
 	url = https://github.com/sofwerx/docker-ethminer
 [submodule "local/osgeo/docker-openstf"]
-	path = local/osgeo/docker-openstf
+	path = cellar/osgeo/docker-openstf
 	url = https://github.com/sofwerx/docker-openstf
 [submodule "aws/swx-geotools1/docker-guacamole"]
 	path = aws/swx-geotools1/docker-guacamole
