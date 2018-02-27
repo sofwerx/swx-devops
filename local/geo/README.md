@@ -13,3 +13,9 @@ Due to `DOCKER_COMPOSE=geo.yml` in the swx-gpu environment, the `geo.yml` here i
 
 This docker-compose will spin up a traefik SSL reverse proxy that will allocate an SSL cert automatically from Let's Encrypt using ACME.
 
+## dm creation
+
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 8022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user docker --generic-engine-port 8376 --engine-storage-driver overlay2 geo
+    swx dm import geo
+
+
