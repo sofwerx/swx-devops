@@ -22,7 +22,8 @@ add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
 #echo "deb http://ppa.launchpad.net/osgeolive/nightly/ubuntu xenial main" > /etc/apt/sources.list.d/osgeolive-nightly.list
 #echo "deb http://ppa.launchpad.net/ubuntugis/ubuntugis-unstable/ubuntu xenial main" > /etc/apt/sources.list.d/ubuntugis-ubuntu-ubuntugis-unstable-xenial.list
 
-echo "deb http://qgis.org/ubuntugis-nightly xenial main" > /etc/apt/sources.list.d/qgis.list
+#echo "deb http://qgis.org/ubuntugis-nightly xenial main" > /etc/apt/sources.list.d/qgis.list
+echo "deb http://qgis.org/ubuntugis xenial main" > /etc/apt/sources.list.d/qgis.list
 curl -sL https://qgis.org/downloads/qgis-2017.gpg.key | apt-key add -
 
 apt-get update
