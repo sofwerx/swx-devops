@@ -626,6 +626,7 @@ services:
     extends:
       file: es-tshark/docker-compose.yml
       service: tshark_template
+    image: sofwerx/es-tshark_template
     network_mode: host
     environment:
       ES_HOST: 127.0.0.1:9200
@@ -641,6 +642,7 @@ services:
     extends:
       file: es-tshark/docker-compose.yml
       service: tshark_pcap
+    image: sofwerx/es-tshark_pcap
     restart: always
     environment:
       XPACK_MONITORING_ELASTICSEARCH_URL: http://localhost:9200
