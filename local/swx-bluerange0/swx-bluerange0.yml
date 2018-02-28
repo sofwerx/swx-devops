@@ -649,7 +649,7 @@ services:
       ES_HOST: 127.0.0.1:9200
       ES_USER: ${ELASTIC_USER}
       ES_PASSWORD: ${ELASTIC_PASSWORD}
-      NETWORK_INTERFACE: wlp110s0
+      NETWORK_INTERFACE: enp109s0f1
     network_mode: host
     privileged: true
     logging: *default-logging
