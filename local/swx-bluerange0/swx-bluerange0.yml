@@ -657,3 +657,21 @@ services:
       - "traefik.enable=false"
     command: /pcap.sh not port 22 and not port 20443 and not port 22376
 
+  spot:
+    extends:
+      file: docker-spot/docker-compose.yml
+      service: spot
+    image: sofwerx/spot-demo
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=spot"
+      - "traefik.port=8889"
+      - "traefik.frontend.rule=Host:spot.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+

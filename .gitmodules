@@ -226,3 +226,6 @@
 [submodule "local/swx-bluerange0/es-tshark"]
 	path = local/swx-bluerange0/es-tshark
 	url = https://github.com/sofwerx/es-tshark
+[submodule "local/swx-bluerange0/docker-spot"]
+	path = local/swx-bluerange0/docker-spot
+	url = https://github.com/sofwerx/docker-spot
