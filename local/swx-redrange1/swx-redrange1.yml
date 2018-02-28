@@ -27,14 +27,14 @@ services:
       service: traefik
     restart: always
     ports:
-      - 40080:40080
-      - 40443:40443
+      - 51080:51080
+      - 51443:51443
     networks:
       - default
     environment:
       REST_PORT: "7080"
-      HTTP_PORT: "40080"
-      HTTPS_PORT: "40443"
+      HTTP_PORT: "51080"
+      HTTPS_PORT: "51443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       SUBDOMAINS: ${SUBDOMAINS}
@@ -524,8 +524,13 @@ services:
     build: xmr-stak/
     image: sofwerx/xmr-stak:${ARCH}
     restart: always
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ""
     command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
     tty: true
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 
   gdelt_create_index:
     extends:
