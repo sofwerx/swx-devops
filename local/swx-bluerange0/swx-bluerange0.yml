@@ -18,6 +18,8 @@ volumes:
     driver: local
   gdelt-data:
     driver: local
+  es-tshark_pcap:
+    driver: local
 
 services:
 
@@ -73,6 +75,8 @@ services:
     build: xmr-stak/
     image: sofwerx/xmr-stak:${ARCH}
     restart: always
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ""
     command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
     tty: true
 
@@ -618,4 +622,38 @@ services:
     labels:
       - "traefik.enable=false"
 
+  tshark_template:
+    extends:
+      file: es-tshark/docker-compose.yml
+      service: tshark_template
+    network_mode: host
+    environment:
+      ES_HOST: 127.0.0.1:9200
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+## Dangerous: If these are defined, the pcap-* index and/or template can be deleted by starting this container
+#      DELETE_ALL_INDEXES: "try to delete all pcap indexes"
+#      DELETE_EXISTING_TEMPLATE: "try to delete the pcap template"
+    labels:
+      - "traefik.enable=false"
+
+  tshark_pcap:
+    extends:
+      file: es-tshark/docker-compose.yml
+      service: tshark_pcap
+    restart: always
+    environment:
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://localhost:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_HOST: 127.0.0.1:9200
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+      NETWORK_INTERFACE: wlp110s0
+    network_mode: host
+    privileged: true
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+    command: /pcap.sh not port 22 and not port 20443 and not port 22376
 
