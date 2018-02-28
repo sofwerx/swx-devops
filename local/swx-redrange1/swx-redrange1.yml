@@ -1,0 +1,594 @@
+version: "2.1"
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  elasticsearch-data:
+    driver: local
+  gdelt-data:
+    driver: local
+
+services:
+
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    restart: always
+    ports:
+      - 40080:40080
+      - 40443:40443
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "40080"
+      HTTPS_PORT: "40443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+#      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+#      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+#      AWS_REGION: ${AWS_REGION}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  # The environment variable "ELASTICSEARCH_VERSION" is used throughout this file to
+  # specify the version of the images to run. The default is set in the
+  # '.env' file in this folder. It can be overridden with any normal
+  # technique for setting environment variables, for example:
+  #
+  #   ELASTICSEARCH_VERSION=6.0.0-beta1 docker-compose up
+  #
+  # REF: https://docs.docker.com/compose/compose-file/#variable-substitution
+  #
+  # Also be sure to set the ELASTIC_VERSION variable. For released versions,
+  # ${ELASTICSEARCH_VERSION} and ${ELASTIC_VERSION} will be identical, but for pre-release
+  # versions, ${ELASTICSEARCH_VERSION} might contain an extra build identifier, like
+  # "6.0.0-beta1-3eab5b40", so a full invocation might look like:
+  #
+  #   ELASTIC_VERSION=6.0.0-beta1 ELASTICSEARCH_VERSION=6.0.0-beta1-3eab5b40 docker-compose up
+  #
+  elasticsearch:
+    privileged: true
+    image: docker.elastic.co/elasticsearch/elasticsearch-platinum:${ELASTICSEARCH_VERSION}
+    container_name: elasticsearch
+    hostname: elasticsearch
+    ports: ['127.0.0.1:9200:9200']
+    restart: always
+    environment:
+      http.host: 0.0.0.0
+      transport.host: 127.0.0.1
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      discovery.type: single-node
+      cluster.name: redrange1
+      bootstrap.memory_lock: "true"
+      ES_JAVA_OPTS: -Xms2g -Xmx2g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
+    container_name: kibana
+    hostname: kibana
+    restart: always
+    environment:
+      ELASTICSEARCH_USERNAME: kibana
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    ports: ['127.0.0.1:5601:5601']
+    depends_on: ['elasticsearch']
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=kibana"
+      - "traefik.port=5601"
+      - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  logstash:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.logstash
+    image: sofwerx/logstash:${ELASTICSEARCH_VERSION}
+    container_name: logstash
+    hostname: logstash
+    restart: always
+    ports:
+      - 9600:9600
+      - 5000:5000/tcp
+      - 5000:5000/udp
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on: ['elasticsearch', 'setup_logstash']
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  auditbeat:
+    image: docker.elastic.co/beats/auditbeat:${ELASTICSEARCH_VERSION}
+    container_name: auditbeat
+    hostname: auditbeat
+    restart: always
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    cap_add:
+      - AUDIT_CONTROL
+      - AUDIT_READ
+    # Auditbeat must run in the main process namespace.
+    pid: host
+    depends_on:
+      - elasticsearch
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${ELASTICSEARCH_VERSION}
+    container_name: filebeat
+    hostname: filebeat
+    restart: always
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    user: root
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    # If the host system has logs at "/var/log", mount them at "/mnt/log"
+    # inside the container, where Filebeat can find them.
+    volumes:
+      - /var/log:/mnt/log:ro
+    depends_on:
+      - elasticsearch
+      - setup_filebeat
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  heartbeat:
+    image: docker.elastic.co/beats/heartbeat:${ELASTICSEARCH_VERSION}
+    container_name: heartbeat
+    hostname: heartbeat
+    restart: always
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    depends_on:
+      - elasticsearch
+      - setup_heartbeat
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  metricbeat:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.metricbeat
+    image: sofwerx/metricbeat:${ELASTICSEARCH_VERSION}
+    container_name: metricbeat
+    hostname: metricbeat
+    restart: always
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      OUTPUT_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      OUTPUT_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    # The commented sections below enable Metricbeat to monitor the Docker host,
+    # rather than the Metricbeat container. It's problematic with Docker for
+    # Windows, however, since "/proc", "/sys" etc. don't exist on Windows.
+    # The same likely applies to OSX (needs testing).
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+      -system.hostfs=/hostfs
+    depends_on:
+      - elasticsearch
+      - setup_metricbeat
+    networks:
+      - default
+    pid: host
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  packetbeat:
+    image: docker.elastic.co/beats/packetbeat:${ELASTICSEARCH_VERSION}
+    container_name: packetbeat
+    hostname: packetbeat
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    # Packetbeat needs some elevated privileges to capture network traffic.
+    # We'll grant them with POSIX capabilities.
+    cap_add: ['NET_RAW', 'NET_ADMIN']
+    # Use "host mode" networking to allow Packetbeat to capture traffic from
+    # the real network interface on the host, rather than being isolated to the
+    # container's virtual interface.
+    network_mode: host
+    # Since we did that, Packetbeat is not part of the "stack" Docker network
+    # that the other containers are connected to, and thus can't resolve the
+    # hostname "elasticsearch". Instead, we'll tell it to find Elasticsearch
+    # on "localhost", which is the Docker host machine in this context.
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+      -E 'packetbeat.interfaces.device=wlp4s0'
+    depends_on:
+      - elasticsearch
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  apm_server:
+    image: docker.elastic.co/apm/apm-server:${ELASTICSEARCH_VERSION}
+    container_name: apm_server
+    hostname: apm_server
+    environment:
+      ELASTIC_HOST: elasticsearch:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: kibana
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    restart: always
+    ports: ['127.0.0.1:8200:8200']
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["elasticsearch:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+    depends_on:
+      - elasticsearch
+      - setup_apm_server
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  # Run a short-lived container to set up Logstash.
+  setup_logstash:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_logstash
+    image: sofwerx/setup_logstash:${ELASTICSEARCH_VERSION}
+    container_name: setup_logstash
+    hostname: setup_logstash
+    environment: 
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on:
+      - elasticsearch
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  setup_kibana:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_kibana
+    image: sofwerx/setup_kibana:${ELASTICSEARCH_VERSION}
+    container_name: setup_kibana
+    hostname: setup_kibana
+    environment: 
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    networks:
+      - default
+    depends_on:
+      - elasticsearch
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  setup_auditbeat:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_auditbeat
+    image: sofwerx/auditbeat:${ELASTICSEARCH_VERSION}
+    container_name: setup_auditbeat
+    hostname: setup_auditbeat
+    environment: 
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    cap_add:
+      - AUDIT_CONTROL
+      - AUDIT_READ
+    # Auditbeat must run in the main process namespace.
+    pid: host
+    depends_on:
+      - kibana
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  setup_filebeat:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_filebeat
+    image: sofwerx/filebeat:${ELASTICSEARCH_VERSION}
+    container_name: setup_filebeat
+    hostname: setup_filebeat
+    environment: 
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on:
+      - kibana
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  setup_heartbeat:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_heartbeat
+    image: sofwerx/heartbeat:${ELASTICSEARCH_VERSION}
+    container_name: setup_heartbeat
+    hostname: setup_heartbeat
+    environment: 
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on:
+      - kibana
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  setup_metricbeat:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_metricbeat
+    image: sofwerx/metricbeat:${ELASTICSEARCH_VERSION}
+    container_name: setup_metricbeat
+    hostname: setup_metricbeat
+    environment: 
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      OUTPUT_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      OUTPUT_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on:
+      - kibana
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  setup_packetbeat:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_packetbeat
+    image: sofwerx/packetbeat:${ELASTICSEARCH_VERSION}
+    container_name: setup_packetbeat
+    hostname: setup_packetbeat
+    cap_add: ['NET_RAW', 'NET_ADMIN']
+    environment: 
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on:
+      - kibana
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  setup_apm_server:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_apm_server
+    image: sofwerx/apm-server:${ELASTICSEARCH_VERSION}
+    container_name: setup_apm_server
+    hostname: setup_apm_server
+    environment: 
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  ethminer:
+    build:
+      context: docker-ethminer/
+      dockerfile: Dockerfile.${ARCH}
+    image: sofwerx/ethminer:${ARCH}
+    container_name: ethminer
+    hostname: ethminer
+    restart: always
+    environment:
+      GPU_FORCE_64BIT_PTR: 0
+      GPU_MAX_HEAP_SIZE: 100
+      GPU_USE_SYNC_OBJECTS: 1
+      GPU_MAX_ALLOC_PERCENT: 100
+      GPU_SINGLE_ALLOC_PERCENT: 100
+    command: /ethminer/build/ethminer/ethminer --cuda-parallel-hash 8 --farm-recheck 200 -U -S us1.ethermine.org:4444 -FS us2.ethermine.org:4444 -O 2c0859b9312d9bf93e1b4cae8d47d59030a75a9f.${DOCKER_MACHINE_NAME}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  xmr-stak:
+    container_name: xmr-stak
+    hostname: xmr-stak
+    build: xmr-stak/
+    image: sofwerx/xmr-stak:${ARCH}
+    restart: always
+    command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
+    tty: true
+
+  gdelt_create_index:
+    extends:
+      file: es-gdelt/docker-compose.yml
+      service: gdelt_create_index
+    environment:
+      ES_HOST_URL: http://elasticsearch:9200
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_GDELT_INDEX: /gdelt
+      ES_DELETE_INDEX: Y
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  gdelt_realtime_downloader:
+    extends:
+      file: es-gdelt/docker-compose.yml
+      service: gdelt_realtime_downloader
+    volumes:
+      - gdelt-data:/es-gdelt/data
+    restart: always
+    environment:
+      GDELT_HISTORIC_FILE_PATH: ${GDELT_HISTORIC_FILE_PATH}
+      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+      SLACK_NOTIFICATIONS_ENABLED: ${SLACK_NOTIFICATIONS_ENABLED}
+      SLACK_NOTIFICATIONS_URL: ${SLACK_NOTIFICATIONS_URL}
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://172.18.0.1:5000"
+    networks:
+      - default
+    depends_on:
+      - logstash
+    labels:
+      - "traefik.enable=false"
+
+  gdelt_realtime_logstash:
+    extends:
+      file: es-gdelt/docker-compose.yml
+      service: gdelt_realtime_logstash
+    restart: always
+    volumes:
+      - gdelt-data:/es-gdelt/data
+    environment:
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+      ES_HOST: elasticsearch:9200
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_GDELT_INDEX: gdelt
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+

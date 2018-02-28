@@ -211,3 +211,15 @@
 [submodule "local/swx-pandora/docker-tak"]
 	path = local/swx-pandora/docker-tak
 	url = https://github.com/sofwerx/docker-tak
+[submodule "local/swx-redrange1/docker-ethminer"]
+	path = local/swx-redrange1/docker-ethminer
+	url = https://github.com/sofwerx/docker-ethminer
+[submodule "local/swx-redrange1/docker-traefik"]
+	path = local/swx-redrange1/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
+[submodule "local/swx-redrange1/es-gdelt"]
+	path = local/swx-redrange1/es-gdelt
+	url = https://github.com/sofwerx/es-gdelt
+[submodule "local/swx-redrange1/docker-elastic"]
+	path = local/swx-redrange1/docker-elastic
+	url = https://github.com/sofwerx/docker-elastic
