@@ -127,3 +127,8 @@ variable ebs_docker_volume_size {
     default = "50"
 }
 
+variable ebs_docker2_volume_size {
+    description = "EBS Second Docker Volume Size"
+    default = "200"
+}
+
