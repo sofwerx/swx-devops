@@ -285,16 +285,6 @@ To find out what AWS IAM user you are currently using the credentials for:
 
 The "glue" of this harness is currently in the `.bashrc` file.
 
-The `swx` command provides the interface to the functions that interact with this devops harness:
-
-    $ swx
-    Usage: swx {command}
-      gpg         - Interact with your gpg-agent
-      dm          - Manage dm (docker-machines)
-      environment - Source project-lifecycle environment variables
-      secrets     - Deal with secrets/ folder
-      tf          - Run Terraform for a project-lifecycle
-
 This will eventually get broken out into a script directory tree as simplicity demands it.
 
 ## `shell.bash`
@@ -306,6 +296,31 @@ Before running trousseau or any other tools against a project environment, you w
 After doing this, you will get a prompt that tells you the `AWS_PROFILE`, `SWX_ENVIRONMENT`, and `DOCKER_MACHINE_NAME` variables like so:
 
     [sofwerx::] icbvtcmbp:swx-devops ianblenke$
+
+## swx
+
+When running under `shell.bash`, which merely sources the `.bashrc` here, your primary interation with this harness is through the `swx` command.
+
+Implemented as a series of bash functions, the `swx` command has _full tab completion_, which makes it easier to interact with the components in this harness.
+
+The `swx` command also has full usage instructions. Merely run the commands without arguments, and usage will be shown:
+
+    $ swx
+    Usage: swx {command}
+      dm          - Manage dm (docker-machines)
+      environment - Source project-lifecycle environment variables
+      gpg         - Interact with your gpg-agent
+      secrets     - Deal with secrets/ folder
+      ssh         - Attempt to ssh into a dm
+      tf          - Run Terraform for a project-lifecycle
+
+This also works for subcommands. For example:
+
+    $ swx dm
+    Usage: swx dm {action}
+      ls     - List dm instances
+      env    - Source the environment to interact with a dm instance using docker
+      import - Import a docker-machine instance into a dm
 
 ## Using trousseau
 
