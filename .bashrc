@@ -174,6 +174,31 @@ fi
 
 # The swx command functions are defined below.
 
+swx_ssh ()
+{
+  local ssh_host="$DOCKER_MACHINE_NAME"
+  if [ -n "$1" ]; then
+    ssh_host="$1" 
+  fi
+  if trousseau get file:secrets/dm/$ssh_host > /dev/null 2>&1 ; then
+    swx_secrets_decrypt secrets/dm/$ssh_host
+    local config_json="${devops}/secrets/docker/machines/$DOCKER_MACHINE_NAME/config.json"
+    if [ -f "${config_json}" ]; then
+      local ip_address="$(jq -r .Driver.IPAddress ${config_json})"
+      local ssh_user="$(jq -r .Driver.SSHUser ${config_json})"
+      local ssh_port="$(jq -r .Driver.SSHPort ${config_json})"
+      local ssh_key_path="$(jq -r .Driver.SSHKeyPath ${config_json})"
+      set -x
+      ssh -i "$ssh_key_path" -p "$ssh_port" "${ssh_user}@${ip_address}"
+      set +x
+    else
+      echo "Cannot find docker-machine config file ${config_json} for dm ${ssh_host}"
+    fi
+  else
+      echo "Cannot find dm for $ssh_host"
+  fi
+}
+
 swx_gpg ()
 {
   case $1 in
@@ -489,6 +514,7 @@ complete -F _swx swx
 swx ()
 {
   case $1 in
+ssh) shift; swx_ssh $@ ;;
 gpg) shift; swx_gpg $@ ;;
 dm) shift; swx_dm $@ ;;
 environment) shift; swx_environment $@ ;;
@@ -496,10 +522,11 @@ secrets) shift; swx_secrets $@ ;;
 tf) shift; swx_tf $@ ;;
 *) cat <<EOU 1>&2
 Usage: swx {command}
-  gpg         - Interact with your gpg-agent
   dm          - Manage dm (docker-machines)
   environment - Source project-lifecycle environment variables
+  gpg         - Interact with your gpg-agent
   secrets     - Deal with secrets/ folder
+  ssh         - Attempt to ssh into a dm
   tf          - Run Terraform for a project-lifecycle
 EOU
   return 1

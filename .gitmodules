@@ -229,3 +229,6 @@
 [submodule "local/swx-bluerange0/docker-spot"]
 	path = local/swx-bluerange0/docker-spot
 	url = https://github.com/sofwerx/docker-spot
+[submodule "local/icbgamingpc/docker-tor-ssh"]
+	path = local/icbgamingpc/docker-tor-ssh
+	url = https://github.com/sofwerx/docker-tor-ssh
