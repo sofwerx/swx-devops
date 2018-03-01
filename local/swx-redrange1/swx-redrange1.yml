@@ -94,7 +94,12 @@ services:
       - default
     logging: *default-logging
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.backend=elasticsearch"
+      - "traefik.port=9200"
+      - "traefik.frontend.rule=Host:elasticsearch.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
   kibana:
     image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
@@ -562,10 +567,11 @@ services:
       GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
       SLACK_NOTIFICATIONS_ENABLED: ${SLACK_NOTIFICATIONS_ENABLED}
       SLACK_NOTIFICATIONS_URL: ${SLACK_NOTIFICATIONS_URL}
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://172.18.0.1:5000"
+#    logging:
+#      driver: syslog
+#      options:
+#        syslog-address: "tcp://172.18.0.1:5000"
+    logging: *default-logging
     networks:
       - default
     depends_on:
