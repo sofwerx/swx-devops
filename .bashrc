@@ -182,7 +182,7 @@ swx_ssh ()
   fi
   if trousseau get file:secrets/dm/$ssh_host > /dev/null 2>&1 ; then
     swx_secrets_decrypt secrets/dm/$ssh_host
-    local config_json="${devops}/secrets/docker/machines/$DOCKER_MACHINE_NAME/config.json"
+    local config_json="${devops}/secrets/docker/machines/${ssh_host}/config.json"
     if [ -f "${config_json}" ]; then
       local ip_address="$(jq -r .Driver.IPAddress ${config_json})"
       local ssh_user="$(jq -r .Driver.SSHUser ${config_json})"
@@ -489,6 +489,7 @@ _swx ()
     "swx dm ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx dm env"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
     "swx dm"*) COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
+    "swx ssh"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
     "swx gpg"*) COMPREPLY=( $( compgen -W "prepare remember forget reset" -- $cur ) ) ;;
     "swx environment ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx environment create"*) COMPREPLY=( $( $cur ) ) ;;
