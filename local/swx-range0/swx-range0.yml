@@ -45,6 +45,7 @@ services:
       - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=${WEB_USERNAME}:${WEB_PASSWORD}"
 
   gammarf:
     extends:
@@ -71,6 +72,7 @@ services:
       - "traefik.frontend.rule=Host:gammarf.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=${WEB_USERNAME}:${WEB_PASSWORD}"
 
   gpsd:
     extends:
@@ -83,4 +85,5 @@ services:
       - "traefik.enable=false"
     environment:
       COMMAND: "gpsd -n -N -G -D3 -S 2947 -F /var/run/gpsd.sock /dev/ttyUSB0"
-
+    labels:
+      - "traefik.enable=false"
