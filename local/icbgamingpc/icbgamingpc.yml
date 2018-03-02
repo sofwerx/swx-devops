@@ -1,5 +1,12 @@
 version: '2'
 
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
 networks: 
 
   default:
@@ -9,8 +16,22 @@ volumes:
 
   iri-data:
     driver: local
+  tor-data:
+    driver: local
 
 services:
+
+  tor:
+    build: docker-tor-ssh/
+    image: sofwerx/tor
+    container_name: tor
+    logging: *default-logging
+    volumes:
+      - tor-data:/var/lib/tor
+    network_mode: host
+    environment:
+      ssh_host_ip: 127.0.0.1
+      OTHER_PORTS: "2376"
 
   # IOTA Reference Implementation
   iri:
