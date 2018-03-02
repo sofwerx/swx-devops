@@ -238,3 +238,6 @@
 [submodule "local/swx-range0/docker-gpsd"]
 	path = local/swx-range0/docker-gpsd
 	url = https://github.com/sofwerx/docker-gpsd
+[submodule "local/swx-range0/es-gammarf"]
+	path = local/swx-range0/es-gammarf
+	url = https://github.com/sofwerx/es-gammarf
