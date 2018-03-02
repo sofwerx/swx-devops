@@ -348,11 +348,16 @@ swx_environment_get ()
 
 swx_environment_set ()
 {
-  if [ -n "${SWX_ENVIRONMENT}" ]; then
-    trousseau set "environment:${SWX_ENVIRONMENT}:$1" "$2"
-    export "$1=$2"
+  if echo "$1" | grep = > /dev/null ; then
+    echo 'Do not put a = sign in the variable name.'
   else
-    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
+    if [ -n "${SWX_ENVIRONMENT}" ]; then
+      trousseau set "environment:${SWX_ENVIRONMENT}:$1" "$2"
+      export "$1=$2"
+      echo "$1=$2"
+    else
+      echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
+    fi
   fi
 }
 
