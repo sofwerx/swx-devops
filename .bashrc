@@ -398,6 +398,9 @@ swx_environment_switch ()
 
   if trousseau keys | grep -e "^environment:${environment}:" > /dev/null ; then
 
+    # Preemptively undefine some variables that cause problems if defined in one environment and not another
+    unset COMPOSE_PROJECT_NAME COMPOSE_FILE COMPOSE_HTTP_TIMEOUT
+
     # Undefine any variables from an already sourced environment
     if [ -n $SWX_ENVIRONMENT ]; then
       for variable in $(trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"); do
