@@ -401,6 +401,9 @@ swx_environment_switch ()
     # Preemptively undefine some variables that cause problems if defined in one environment and not another
     unset COMPOSE_PROJECT_NAME COMPOSE_FILE COMPOSE_HTTP_TIMEOUT
 
+    # Default to having docker-compose timeout after 5 minutes if it cannot communicate to a docker-engine
+    export COMPOSE_HTTP_TIMEOUT=${COMPOSE_HTTP_TIMEOUT:-300}
+
     # Undefine any variables from an already sourced environment
     if [ -n $SWX_ENVIRONMENT ]; then
       for variable in $(trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"); do
