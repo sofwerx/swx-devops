@@ -250,3 +250,9 @@
 [submodule "local/swx-range1/es-gammarf"]
 	path = local/swx-range1/es-gammarf
 	url = https://github.com/sofwerx/es-gammarf
+[submodule "local/swx-bluerange1/xmr-stak"]
+	path = local/swx-bluerange1/xmr-stak
+	url = https://github.com/sofwerx/xmr-stak/
+[submodule "local/swx-bluerange1/docker-ethminer"]
+	path = local/swx-bluerange1/docker-ethminer
+	url = https://github.com/sofwerx/docker-ethminer
