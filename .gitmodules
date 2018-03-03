@@ -256,3 +256,6 @@
 [submodule "local/swx-bluerange1/docker-ethminer"]
 	path = local/swx-bluerange1/docker-ethminer
 	url = https://github.com/sofwerx/docker-ethminer
+[submodule "local/swx-range3/xmr-stak"]
+	path = local/swx-range3/xmr-stak
+	url = https://github.com/sofwerx/xmr-stak

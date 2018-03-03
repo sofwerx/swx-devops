@@ -1,0 +1,28 @@
+version: "2.1"
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks: 
+  default:
+    driver: bridge
+
+services:
+
+  xmr-stak:
+    container_name: xmr-stak
+    hostname: xmr-stak
+    build: xmr-stak/
+    image: sofwerx/xmr-stak:${ARCH}
+    restart: always
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ""
+    command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
+    tty: true
+    labels:
+      - "traefik.enable=false"
+
