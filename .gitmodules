@@ -286,9 +286,6 @@
 [submodule "local/swx-rangecontrol0/docker-ethminer"]
 	path = local/swx-rangecontrol0/docker-ethminer
 	url = https://github.com/sofwerx/docker-ethminer
-[submodule "local/swx-rangecontrol0/es-gdelt"]
-	path = local/swx-rangecontrol0/es-gdelt
-	url = https://github.com/sofwerx/es-gdelt
 [submodule "local/swx-rangecontrol0/docker-ravencoin"]
 	path = local/swx-rangecontrol0/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
