@@ -179,17 +179,19 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-#  takreflector:
-#    extends:
-#      file: docker-tak/docker-compose.yml
-#      service: takreflector
-#    restart: always
-#    network_mode: host
-#    environment:
-#      INPUT_ADDRESS: 192.168.16.100
-#    logging: *default-logging
-#    labels:
-#      - "traefik.enable=false"
+  takreflector:
+    extends:
+      file: docker-tak/docker-compose.yml
+      service: takreflector
+    restart: always
+    network_mode: host
+    environment:
+      INPUT_ADDRESS: 192.168.16.100
+      FORCED_WIDTH: 1920
+      FORCED_HEIGHT: 1080
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 
 #  takplayrecording1:
 #    extends:
