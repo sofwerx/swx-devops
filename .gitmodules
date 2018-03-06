@@ -289,3 +289,15 @@
 [submodule "local/swx-rangecontrol0/docker-ravencoin"]
 	path = local/swx-rangecontrol0/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/swx-bluerange0/docker-ravencoin"]
+	path = local/swx-bluerange0/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/swx-bluerange1/docker-ravencoin"]
+	path = local/swx-bluerange1/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/swx-redrange1/docker-ravencoin"]
+	path = local/swx-redrange1/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/swx-bluerange2/docker-ravencoin"]
+	path = local/swx-bluerange2/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin
