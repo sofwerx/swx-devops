@@ -259,3 +259,15 @@
 [submodule "local/swx-range3/xmr-stak"]
 	path = local/swx-range3/xmr-stak
 	url = https://github.com/sofwerx/xmr-stak
+[submodule "local/swx-vmhost/docker-traefik"]
+	path = local/swx-vmhost/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
+[submodule "local/swx-vmhost/docker-ethminer"]
+	path = local/swx-vmhost/docker-ethminer
+	url = https://github.com/sofwerx/docker-ethminer
+[submodule "local/swx-vmhost/xmr-stak"]
+	path = local/swx-vmhost/xmr-stak
+	url = https://github.com/sofwerx/xmr-stak
+[submodule "local/swx-vmhost/docker-ravencoin"]
+	path = local/swx-vmhost/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin

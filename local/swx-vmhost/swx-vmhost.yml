@@ -1,0 +1,97 @@
+version: "2.1"
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+
+  traefik-ssl:
+    driver: local
+  ravencoin-data:
+    driver: local
+
+services:
+
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    restart: always
+    ports:
+      - 20080:20080
+      - 20443:20443
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "20080"
+      HTTPS_PORT: "20443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+#      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+#      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+#      AWS_REGION: ${AWS_REGION}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  ethminer:
+    build: docker-ethminer/
+    image: sofwerx/ethminer:${ARCH}
+    container_name: ethminer
+    hostname: ethminer
+    restart: always
+    environment:
+      GPU_FORCE_64BIT_PTR: 0
+      GPU_MAX_HEAP_SIZE: 100
+      GPU_USE_SYNC_OBJECTS: 1
+      GPU_MAX_ALLOC_PERCENT: 100
+      GPU_SINGLE_ALLOC_PERCENT: 100
+    command: /ethminer/build/ethminer/ethminer --cuda-parallel-hash 8 --farm-recheck 200 -U -S us1.ethermine.org:4444 -FS us2.ethermine.org:4444 -O 2c0859b9312d9bf93e1b4cae8d47d59030a75a9f.${DOCKER_MACHINE_NAME}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  xmr-stak:
+    container_name: xmr-stak
+    hostname: xmr-stak
+    build: xmr-stak/
+    image: sofwerx/xmr-stak:${ARCH}
+    restart: always
+    environment:
+      NVIDIA_VISIBLE_DEVICES: ""
+    command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
+    tty: true
+    labels:
+      - "traefik.enable=false"
+
+  ravencoin-wallet:
+    extends:
+      file: docker-ravencoin/docker-compose.yml
+      service: ravencoin-wallet
+    volumes:
+      - ravencoin-data:/root/.raven
+    labels:
+      - "traefik.enable=false"
+
+  ravencoin-gpu-ccminer:
+    extends:
+      file: docker-ravencoin/docker-compose.yml
+      service: ravencoin-gpu-ccminer
+    labels:
+      - "traefik.enable=false"
+
