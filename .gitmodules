@@ -271,3 +271,6 @@
 [submodule "local/swx-vmhost/docker-ravencoin"]
 	path = local/swx-vmhost/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/icbgamingpc/docker-ravencoin"]
+	path = local/icbgamingpc/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin
