@@ -76,6 +76,7 @@ services:
       NVIDIA_VISIBLE_DEVICES: ""
     command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
     tty: true
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
@@ -83,8 +84,10 @@ services:
     extends:
       file: docker-ravencoin/docker-compose.yml
       service: ravencoin-wallet
+    restart: always
     volumes:
       - ravencoin-data:/root/.raven
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
@@ -92,6 +95,8 @@ services:
     extends:
       file: docker-ravencoin/docker-compose.yml
       service: ravencoin-gpu-ccminer
+    restart: always
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
