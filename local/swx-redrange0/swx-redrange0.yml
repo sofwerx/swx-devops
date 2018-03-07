@@ -1,0 +1,35 @@
+version: "2.1"
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  elasticsearch-data:
+    driver: local
+  gdelt-data:
+    driver: local
+  es-tshark_pcap:
+    driver: local
+
+services:
+
+  ravencoin-gpu-ccminer:
+    extends:
+      file: docker-ravencoin/docker-compose.yml
+      service: ravencoin-gpu-ccminer
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    command: /run.sh -p ${DOCKER_MACHINE_NAME}
+
+
