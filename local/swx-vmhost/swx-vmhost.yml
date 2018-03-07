@@ -99,4 +99,5 @@ services:
     logging: *default-logging
     labels:
       - "traefik.enable=false"
+    command: /run.sh -p ${DOCKER_MACHINE_NAME}
 
