@@ -1,0 +1,18 @@
+version: '2.1'
+
+volumes:
+
+  tmate-keys:
+    driver: local
+
+services:
+
+  tmate:
+    build: .
+    image: sofwerx/tmate
+    container_name: tmate
+    hostname: tmate
+    volumes:
+      - tmate-keys:/keys
+    restart: always
+
