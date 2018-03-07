@@ -205,27 +205,27 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-#  mongoexpress:
-#    image: sofwerx/mongo-express
-#    container_name: mongoexpress
-#    hostname: mongoexpress
+  mongoexpress:
+    image: mongo-express
+    container_name: mongoexpress
+    hostname: mongoexpress
 ##    environment:
 ##      ME_CONFIG_OPTIONS_EDITORTHEME: ambiance
 ##      ME_CONFIG_BASICAUTH_USERNAME: manager
 ##      ME_CONFIG_BASICAUTH_PASSWORD: correcthorsebatterystaple
-#    networks:
-#      - default
-#    depends_on:
-#      - mongo
-#    links:
-#      - mongo
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.backend=mongoexpress"
-#      - "traefik.port=8081"
-#      - "traefik.frontend.rule=Host:mongoexpress.${DNS_DOMAIN}"
-#      - "traefik.frontend.passHostHeader=true"
-#      - "traefik.frontend.entryPoints=http,https"
+    networks:
+      - default
+    depends_on:
+      - mongo
+    links:
+      - mongo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mongoexpress"
+      - "traefik.port=8081"
+      - "traefik.frontend.rule=Host:mongoexpress.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
   opensphere:
     extends:
