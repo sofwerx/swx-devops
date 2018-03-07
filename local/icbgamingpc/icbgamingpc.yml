@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 
 x-logging:
   &default-logging
@@ -18,6 +18,8 @@ volumes:
     driver: local
   tor-data:
     driver: local
+  ravencoin-data:
+    driver: local
 
 services:
 
@@ -32,6 +34,8 @@ services:
     environment:
       ssh_host_ip: 127.0.0.1
       OTHER_PORTS: "2376"
+    labels:
+      - "traefik.enable=false"
 
   # IOTA Reference Implementation
   iri:
@@ -66,6 +70,8 @@ services:
     container_name: nelson
     hostname: nelson
     command: -r iri -i 14265 -u 14777 -t 15777 --neighbors "mainnet.deviota.com/16600 mainnet2.deviota.com/16600 mainnet3.deviota.com/16600 iotairi.tt-tec.net/16600"
+    labels:
+      - "traefik.enable=false"
 
   # IOTA Spam Fund
   isf:
@@ -86,6 +92,8 @@ services:
       NODE_LIST: ${IOTA_NODE_LIST}
       EMAIL: ${ISF_EMAIL}
       PASSWORD: ${ISF_PASSWORD}
+    labels:
+      - "traefik.enable=false"
 
   # IOTA Peer Manager
   ipm:
@@ -105,4 +113,25 @@ services:
        - "--iri=http://iri:14265"
        - "--port=0.0.0.0:8888"
        - "--refresh=10"
+    labels:
+      - "traefik.enable=false"
+
+  ravencoin-wallet:
+    extends:
+      file: docker-ravencoin/docker-compose.yml
+      service: ravencoin-wallet
+    restart: always
+    volumes:
+      - ravencoin-data:/root/.raven
+    labels:
+      - "traefik.enable=false"
+
+  ravencoin-gpu-ccminer:
+    extends:
+      file: docker-ravencoin/docker-compose.yml
+      service: ravencoin-gpu-ccminer
+#    restart: always
+    labels:
+      - "traefik.enable=false"
+
 
