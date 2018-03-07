@@ -301,3 +301,12 @@
 [submodule "local/swx-bluerange2/docker-ravencoin"]
 	path = local/swx-bluerange2/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/swx-redrange0/docker-ravencoin"]
+	path = local/swx-redrange0/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/swx-pandora/docker-ravencoin"]
+	path = local/swx-pandora/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/swx-redrange2/docker-ravencoin"]
+	path = local/swx-redrange2/docker-ravencoin
+	url = https://github.com/sofwerx/docker-ravencoin
