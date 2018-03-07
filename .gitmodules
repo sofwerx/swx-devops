@@ -310,3 +310,6 @@
 [submodule "local/swx-redrange2/docker-ravencoin"]
 	path = local/swx-redrange2/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "local/swx-brangepandora/docker-pandorafms"]
+	path = local/swx-brangepandora/docker-pandorafms
+	url = https://github.com/sofwerx/docker-pandorafms.git
