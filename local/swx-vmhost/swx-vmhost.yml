@@ -97,7 +97,10 @@ services:
       service: ravencoin-gpu-ccminer
     restart: always
     logging: *default-logging
+    environment:
+      URL: ${URL}
+      USERNAME: ${USERNAME}
+      PASSWORD: ${DOCKER_MACHINE_NAME}
     labels:
       - "traefik.enable=false"
-    command: /run.sh -p ${DOCKER_MACHINE_NAME}
 
