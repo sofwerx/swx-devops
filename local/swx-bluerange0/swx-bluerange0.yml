@@ -40,9 +40,9 @@ services:
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       SUBDOMAINS: ${SUBDOMAINS}
-#      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-#      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-#      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
     logging: *default-logging
     labels:
       - "traefik.enable=true"
@@ -124,7 +124,13 @@ services:
       - default
     logging: *default-logging
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.backend=elasticsearch"
+      - "traefik.port=9200"
+      - "traefik.frontend.rule=Host:elasticsearch.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
   kibana:
     image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
@@ -157,10 +163,12 @@ services:
     container_name: logstash
     hostname: logstash
     restart: always
+    privileged: true
+    user: root
     ports:
       - 9600:9600
-      - 5000:5000/tcp
-      - 5000:5000/udp
+      - 514:514/tcp
+      - 514:514/udp
     environment:
       ELASTIC_HOST: elasticsearch:9200
       ELASTIC_USER: ${ELASTIC_USER}
@@ -681,8 +689,11 @@ services:
       file: docker-ravencoin/docker-compose.yml
       service: ravencoin-gpu-ccminer
     restart: always
+    environment:
+      URL: ${URL}
+      USERNAME: ${USERNAME}
+      PASSWORD: ${DOCKER_MACHINE_NAME}
     labels:
       - "traefik.enable=false"
-    command: /run.sh -p ${DOCKER_MACHINE_NAME}
 
 
