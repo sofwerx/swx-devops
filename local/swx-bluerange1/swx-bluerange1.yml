@@ -48,8 +48,11 @@ services:
       file: docker-ravencoin/docker-compose.yml
       service: ravencoin-gpu-ccminer
     restart: always
+    environment:
+      URL: ${URL}
+      USER: ${USER}
+      PASS: ${DOCKER_MACHINE_NAME}
     labels:
       - "traefik.enable=false"
-    command: /run.sh -p ${DOCKER_MACHINE_NAME}
 
 
