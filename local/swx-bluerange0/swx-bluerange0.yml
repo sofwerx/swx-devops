@@ -133,13 +133,27 @@ services:
 
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
+#    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.kibana
+    image: sofwerx/kibana
     container_name: kibana
     hostname: kibana
     restart: always
     environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
       ELASTICSEARCH_USERNAME: kibana
       ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      SENTINEL_SETTINGS_AUTHENTICATION_ENABLED: 'true'
+      SENTINEL_SETTINGS_AUTHENTICATION_IMPERSONATE: 'true'
+      SENTINEL_SETTINGS_AUTHENTICATION_USERNAME: elastic
+      SENTINEL_SETTINGS_AUTHENTICATION_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: elastic
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     ports: ['127.0.0.1:5601:5601']
     depends_on: ['elasticsearch']
     networks:
@@ -684,16 +698,16 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-#  ravencoin-gpu-ccminer:
-#    extends:
-#      file: docker-ravencoin/docker-compose.yml
-#      service: ravencoin-gpu-ccminer
-#    restart: always
-#    environment:
-#      URL: ${URL}
-#      USERNAME: ${USERNAME}
-#      PASSWORD: ${DOCKER_MACHINE_NAME}
-#    labels:
-#      - "traefik.enable=false"
+  ravencoin-gpu-ccminer:
+    extends:
+      file: docker-ravencoin/docker-compose.yml
+      service: ravencoin-gpu-ccminer
+    restart: always
+    environment:
+      URL: ${URL}
+      USERNAME: ${USERNAME}
+      PASSWORD: ${DOCKER_MACHINE_NAME}
+    labels:
+      - "traefik.enable=false"
 
 
