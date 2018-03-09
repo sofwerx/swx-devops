@@ -319,3 +319,9 @@
 [submodule "aws/swx-blueteam/es-sync"]
 	path = aws/swx-blueteam/es-sync
 	url = https://github.com/sofwerx/es-sync
+[submodule "local/swx-bluerange1/docker-domoticz"]
+	path = local/swx-bluerange1/docker-domoticz
+	url = https://github.com/sofwerx/docker-domoticz
+[submodule "local/swx-bluerange1/docker-traefik"]
+	path = local/swx-bluerange1/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
