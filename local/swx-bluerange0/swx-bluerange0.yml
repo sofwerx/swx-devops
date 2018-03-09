@@ -684,16 +684,16 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  ravencoin-gpu-ccminer:
-    extends:
-      file: docker-ravencoin/docker-compose.yml
-      service: ravencoin-gpu-ccminer
-    restart: always
-    environment:
-      URL: ${URL}
-      USERNAME: ${USERNAME}
-      PASSWORD: ${DOCKER_MACHINE_NAME}
-    labels:
-      - "traefik.enable=false"
+#  ravencoin-gpu-ccminer:
+#    extends:
+#      file: docker-ravencoin/docker-compose.yml
+#      service: ravencoin-gpu-ccminer
+#    restart: always
+#    environment:
+#      URL: ${URL}
+#      USERNAME: ${USERNAME}
+#      PASSWORD: ${DOCKER_MACHINE_NAME}
+#    labels:
+#      - "traefik.enable=false"
 
 
