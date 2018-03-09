@@ -103,7 +103,7 @@ services:
 #    restart: always
     privileged: true
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyACM0:/dev/ttyACM0
     labels:
       - "traefik.enable=true"
       - "traefik.backend=domoticz"
