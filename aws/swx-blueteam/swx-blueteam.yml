@@ -24,8 +24,8 @@ volumes:
     driver: local
   sourcegraph-data:
     driver: local
-  rtc-reports:
-    driver: local
+# rtc-reports:
+#   driver: local
   gdelt-data:
     driver: local
 
@@ -215,36 +215,36 @@ services:
     labels:
       - "traefik.enable=false"
 
-  rtc:
-    build: RecordRTC/rtc/
-    image: sofwerx/recordrtc
-    container_name: rtc
-    hostname: rtc
-    volumes:
-      - rtc-reports:/rtc/reports
-    networks:
-      - default
-    environment:
-      LISTEN_ADDR: 0.0.0.0
-      URL: https://rtc.${DNS_DOMAIN}
-      PORT: 9001
-    logging: *default-logging
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=rtc"
-      - "traefik.port=9001"
-      - "traefik.frontend.rule=Host:rtc.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
+#  rtc:
+#    build: RecordRTC/rtc/
+#    image: sofwerx/recordrtc
+#    container_name: rtc
+#    hostname: rtc
+#    volumes:
+#      - rtc-reports:/rtc/reports
+#    networks:
+#      - default
+#    environment:
+#      LISTEN_ADDR: 0.0.0.0
+#      URL: https://rtc.${DNS_DOMAIN}
+#      PORT: 9001
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=rtc"
+#      - "traefik.port=9001"
+#      - "traefik.frontend.rule=Host:rtc.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
 
-  xmr-stak:
-    container_name: xmr-stak
-    hostname: xmr-stak
-    build: xmr-stak/
-    image: sofwerx/xmr-stak:${ARCH}
-    restart: always
-    command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
-    tty: true
+#  xmr-stak:
+#    container_name: xmr-stak
+#    hostname: xmr-stak
+#    build: xmr-stak/
+#    image: sofwerx/xmr-stak:${ARCH}
+#    restart: always
+#    command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
+#    tty: true
 
   # The environment variable "ELASTICSEARCH_VERSION" is used throughout this file to
   # specify the version of the images to run. The default is set in the
@@ -264,7 +264,7 @@ services:
   #
   elasticsearch:
     privileged: true
-    image: docker.elastic.co/elasticsearch/elasticsearch-platinum:${ELASTICSEARCH_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
     container_name: elasticsearch
     hostname: elasticsearch
     ports: ['127.0.0.1:9200:9200']
@@ -277,6 +277,7 @@ services:
       cluster.name: ${ELASTIC_CLUSTER_NAME}
       bootstrap.memory_lock: "true"
       ES_JAVA_OPTS: -Xms2g -Xmx2g
+      reindex.remote.whitelist: "*.*"
     ulimits:
       memlock:
         soft: -1
@@ -290,16 +291,57 @@ services:
       - default
     logging: *default-logging
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.backend=elasticsearch"
+      - "traefik.port=9200"
+      - "traefik.frontend.rule=Host:elasticsearch.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  kibi:
+    image: sirensolutions/kibi-community-standalone:5.5.2-SNAPSHOT
+    container_name: kibi
+    hostname: kibi
+    restart: always
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: kibana
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on: ['elasticsearch']
+    networks:
+      - default
+    command: /opt/kibi/bin/../node/bin/node --no-warnings /opt/kibi/bin/../src/cli --elasticsearch.password=${ELASTIC_PASSWORD} --elasticsearch.url=http://elasticsearch:9200 --elasticsearch.username=kibana --port 5062 -H 0.0.0.0
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=kibi"
+      - "traefik.port=5062"
+      - "traefik.frontend.rule=Host:kibi.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
+    #image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.kibana
+    image: sofwerx/kibana
     container_name: kibana
     hostname: kibana
     restart: always
     environment:
-      ELASTICSEARCH_USERNAME: kibana
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: elastic
       ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      SENTINEL_SETTINGS_AUTHENTICATION_ENABLED: 'true'
+      SENTINEL_SETTINGS_AUTHENTICATION_IMPERSONATE: 'true'
+      SENTINEL_SETTINGS_AUTHENTICATION_USERNAME: elastic
+      SENTINEL_SETTINGS_AUTHENTICATION_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: elastic
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     ports: ['127.0.0.1:5601:5601']
     depends_on: ['elasticsearch']
     networks:
@@ -760,4 +802,39 @@ services:
     labels:
       - "traefik.enable=false"
 
+  es-sync_wifi_logs:
+    extends:
+      file: es-sync/docker-compose.yml
+      service: es-sync
+    container_name: es-sync_wifi_logs
+    hostname: es-sync_wifi_logs
+    restart: always
+    environment:
+      SLEEP: "300"
+      DST_URL: https://elasticsearch.${DNS_DOMAIN}
+      DST_USER: ${ELASTIC_USER}
+      DST_PASS: ${ELASTIC_PASSWORD}
+      SRC_URL: ${ES_SYNC_WIFI_LOGS_URL}
+      SRC_USER: ${ES_SYNC_WIFI_LOGS_USER}
+      SRC_PASS: ${ES_SYNC_WIFI_LOGS_PASS}
+      SRC_INCLUDE_FILTER: logstash
+      SRC_EXCLUDE_FILTER: monitor
+
+  es-sync_gammarf:
+    extends:
+      file: es-sync/docker-compose.yml
+      service: es-sync
+    container_name: es-sync_gammarf
+    hostname: es-sync_gammarf
+    restart: always
+    environment:
+      SLEEP: "300"
+      DST_URL: https://elasticsearch.${DNS_DOMAIN}
+      DST_USER: ${ELASTIC_USER}
+      DST_PASS: ${ELASTIC_PASSWORD}
+      SRC_URL: ${ES_SYNC_GAMMARF_URL}
+      SRC_USER: ${ES_SYNC_GAMMARF_USER}
+      SRC_PASS: ${ES_SYNC_GAMMARF_PASS}
+      SRC_INCLUDE_FILTER: gammarf
+      SRC_EXCLUDE_FILTER: monitor
 

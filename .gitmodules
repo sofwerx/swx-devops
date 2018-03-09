@@ -316,3 +316,6 @@
 [submodule "local/ibm-minsky/docker-ravencoin"]
 	path = local/ibm-minsky/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
+[submodule "aws/swx-blueteam/es-sync"]
+	path = aws/swx-blueteam/es-sync
+	url = https://github.com/sofwerx/es-sync
