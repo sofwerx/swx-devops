@@ -325,3 +325,6 @@
 [submodule "local/swx-bluerange1/docker-traefik"]
 	path = local/swx-bluerange1/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
+[submodule "local/ibm-minsky/docker-xmr-miner"]
+	path = local/ibm-minsky/docker-xmr-miner
+	url = https://github.com/sofwerx/docker-xmr-miner
