@@ -328,3 +328,6 @@
 [submodule "local/ibm-minsky/docker-xmr-miner"]
 	path = local/ibm-minsky/docker-xmr-miner
 	url = https://github.com/sofwerx/docker-xmr-miner
+[submodule "local/swx-tak/docker-tak"]
+	path = local/swx-tak/docker-tak
+	url = https://github.com/sofwerx/docker-tak

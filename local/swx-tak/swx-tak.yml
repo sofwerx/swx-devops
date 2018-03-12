@@ -1,0 +1,86 @@
+version: '2.1'
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+volumes:
+  postgis-data:
+    driver: local
+  takserver-logs:
+    driver: local
+  takserver-certs:
+    driver: local
+
+services:
+
+  takserver:
+    extends:
+      file: docker-tak/docker-compose.yml
+      service: takserver
+    restart: always
+    network_mode: host
+    logging: *default-logging
+    volumes:
+      - takserver-logs:/opt/tak/logs
+      - takserver-certs:/opt/tak/certs
+      - postgis-data:/var/lib/postgresql/data
+    user: root
+    environment:
+      ENABLE_TLS: 1
+      ANNOUNCE_ADDRESS: $ANNOUNCE_ADDRESS
+      TAKSERVER_USER: ${TAKSERVER_USERNAME}
+      TAKSERVER_PASSWORD: $TAKSERVER_PASSWORD
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: postgres
+      POSTGIS_HOST: 127.0.0.1
+      POSTGIS_PORT: 5432
+      POSTGIS_DATABASE: ${COT_DATABASE}
+      POSTGIS_USERNAME: ${TAKSERVER_USERNAME}
+      POSTGIS_PASSWORD: ${TAKSERVER_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+    command: /takserver.sh
+
+  takreflector:
+    extends:
+      file: docker-tak/docker-compose.yml
+      service: takreflector
+    restart: always
+    network_mode: host
+    environment:
+      INPUT_ADDRESS: $INPUT_ADDRESS
+      FORCED_WIDTH: 1280
+      FORCED_HEIGHT: 720
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+#  takplayrecording1:
+#    extends:
+#      file: docker-tak/docker-compose.yml
+#      service: takplayrecording1
+#    restart: always
+#    network_mode: host
+#    command: /takplayrecording.sh ./publish_file --output-address $INPUT_ADDRESS --output-port 3080 --input-file raven1
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
+
+  postgis:
+    image: postgres:9.5
+    restart: always
+    container_name: postgis
+    hostname: postgis
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
