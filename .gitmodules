@@ -226,6 +226,9 @@
 [submodule "local/swx-redrange1/docker-elastic"]
 	path = local/swx-redrange1/docker-elastic
 	url = https://github.com/sofwerx/docker-elastic
+[submodule "local/swx-redrange1/xmr-stak"]
+	path = local/swx-redrange1/xmr-stak
+	url = https://github.com/sofwerx/xmr-stak
 [submodule "local/swx-bluerange0/es-tshark"]
 	path = local/swx-bluerange0/es-tshark
 	url = https://github.com/sofwerx/es-tshark
