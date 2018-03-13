@@ -331,3 +331,6 @@
 [submodule "local/swx-tak/docker-tak"]
 	path = local/swx-tak/docker-tak
 	url = https://github.com/sofwerx/docker-tak
+[submodule "aws/swx-blueteam/docker-bimserver"]
+	path = aws/swx-blueteam/docker-bimserver
+	url = https://github.com/sofwerx/docker-bimserver

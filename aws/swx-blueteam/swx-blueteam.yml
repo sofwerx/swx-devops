@@ -838,3 +838,19 @@ services:
       SRC_INCLUDE_FILTER: gammarf
       SRC_EXCLUDE_FILTER: monitor
 
+  bimserver:  
+    extends:
+      file: docker-bimserver/docker-compose.yml
+      service: bimserver
+    environment:
+      TOMCAT_USER: ${TOMCAT_USER}
+      TOMCAT_PASSWORD: ${TOMCAT_PASSWORD}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=bimserver"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:bimserver.${DNS_DOMAIN};AddPrefix:/bimserver"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
