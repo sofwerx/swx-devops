@@ -153,7 +153,7 @@
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "local/geo/synthetic-target-area-of-interest"]
 	path = local/geo/synthetic-target-area-of-interest
-	url = git@github.com:sofwerx/synthetic-target-area-of-interest.git
+	url = https://github.com/sofwerx/synthetic-target-area-of-interest.git
 [submodule "local/securedrop-system76/docker-guacamole"]
 	path = local/securedrop-system76/docker-guacamole
 	url = https://github.com/ianblenke/docker-guacamole.git
@@ -343,3 +343,12 @@
 [submodule "aws/swx-blueteam/docker-bimserver"]
 	path = aws/swx-blueteam/docker-bimserver
 	url = https://github.com/sofwerx/docker-bimserver
+[submodule "local/swx-range3/docker-gpsd"]
+	path = local/swx-range3/docker-gpsd
+	url = https://github.com/sofwerx/docker-gpsd
+[submodule "local/swx-range3/docker-traefik"]
+	path = local/swx-range3/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik
+[submodule "local/swx-range3/es-gammarf"]
+	path = local/swx-range3/es-gammarf
+	url = https://github.com/sofwerx/es-gammarf

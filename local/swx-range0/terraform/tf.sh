@@ -1,3 +1,3 @@
 if [ ! -d .terraform ] ; then
-  terraform init --backend-config="key=swx/range3/terraform.tfstate"
+  terraform init --backend-config="key=swx/range0/terraform.tfstate"
 fi
