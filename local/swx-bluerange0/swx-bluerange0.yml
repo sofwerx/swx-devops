@@ -110,7 +110,7 @@ services:
       discovery.type: single-node
       cluster.name: ${ELASTIC_CLUSTER_NAME}
       bootstrap.memory_lock: "true"
-      ES_JAVA_OPTS: -Xms2g -Xmx2g
+      ES_JAVA_OPTS: -Xms8g -Xmx8g
     ulimits:
       memlock:
         soft: -1
