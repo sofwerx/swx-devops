@@ -31,6 +31,9 @@
 [submodule "local/mobile/docker-traefik"]
 	path = local/mobile/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/mobile/docker-openstf"]
+	path = local/mobile/docker-openstf
+	url = https://github.com/sofwerx/docker-openstf.git
 [submodule "cellar/osgeo/docker-traefik"]
 	path = cellar/osgeo/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
