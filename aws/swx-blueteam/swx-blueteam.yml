@@ -28,6 +28,10 @@ volumes:
 #   driver: local
   gdelt-data:
     driver: local
+  bimserver-logs:
+    driver: local
+  bimserver-database:
+    driver: local
 
 services:
 
@@ -845,12 +849,16 @@ services:
     environment:
       TOMCAT_USER: ${TOMCAT_USER}
       TOMCAT_PASSWORD: ${TOMCAT_PASSWORD}
+    volumes:
+      - bimserver-database:/usr/local/tomcat/webapps/bimserver/WEB-INF/database
+      - bimserver-logs:/usr/local/tomcat/webapps/bimserver/WEB-INF/database
     logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=bimserver"
       - "traefik.port=8080"
-      - "traefik.frontend.rule=Host:bimserver.${DNS_DOMAIN};AddPrefix:/bimserver"
+      - "traefik.frontend.rule=Host:bimserver.${DNS_DOMAIN}"
+#;AddPrefix:/bimserver"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
