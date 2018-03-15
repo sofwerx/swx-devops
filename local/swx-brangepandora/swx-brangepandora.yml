@@ -115,7 +115,7 @@ services:
       PANDORA_DB_USER: ${PANDORA_DB_USER}
       PANDORA_DB_PASSWORD: ${PANDORA_DB_PASSWORD}
       HOMEURL: /pandora_console
-      PUBLIC_URL: https://console.${DNS_DOMAIN}/pandora_console
+      PUBLIC_URL: https://console.${DNS_DOMAIN}:8443/pandora_console
       HTTPS: 'true'
     depends_on:
       pandora-mysql:
