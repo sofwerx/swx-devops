@@ -352,3 +352,6 @@
 [submodule "local/swx-range3/es-gammarf"]
 	path = local/swx-range3/es-gammarf
 	url = https://github.com/sofwerx/es-gammarf
+[submodule "local/swx-tegra0/docker-ethminer"]
+	path = local/swx-tegra0/docker-ethminer
+	url = https://github.com/sofwerx/docker-ethminer
