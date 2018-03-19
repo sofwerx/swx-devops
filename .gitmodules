@@ -355,3 +355,9 @@
 [submodule "local/swx-tegra0/docker-ethminer"]
 	path = local/swx-tegra0/docker-ethminer
 	url = https://github.com/sofwerx/docker-ethminer
+[submodule "local/swx-bluerange1/es-domoticz-notify"]
+	path = local/swx-bluerange1/es-domoticz-notify
+	url = https://github.com/sofwerx/es-domoticz-notify
+[submodule "local/swx-bluerange1/es-ifttt"]
+	path = local/swx-bluerange1/es-ifttt
+	url = https://github.com/sofwerx/es-ifttt

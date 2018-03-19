@@ -100,7 +100,7 @@ services:
     extends:
       file: docker-domoticz/docker-compose.yml
       service: domoticz
-#    restart: always
+    restart: always
     privileged: true
     devices:
       - /dev/ttyACM0:/dev/ttyACM0
@@ -111,4 +111,41 @@ services:
       - "traefik.frontend.rule=Host:domoticz.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  es-domoticz-notify:
+    extends:
+      file: es-domoticz-notify/docker-compose.yml
+      service: es-domoticz-notify
+    restart: always
+    environment:
+      ES_URL: ${ES_DOMOTICZ_URL}
+      ES_HTTP_AUTH: ${ES_DOMOTICZ_HTTP_AUTH}
+    ports:
+      - 3000:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-domoticz-notify"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-domoticz-notify.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-ifttt:
+    extends:
+      file: es-ifttt/docker-compose.yml
+      service: es-ifttt
+    restart: always
+    environment:
+      ES_URL: ${ES_DOMOTICZ_URL}
+      ES_HTTP_AUTH: ${ES_DOMOTICZ_HTTP_AUTH}
+    ports:
+      - 21001:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-ifttt"
+      - "traefik.port=21001"
+      - "traefik.frontend.rule=Host:es-ifttt.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
