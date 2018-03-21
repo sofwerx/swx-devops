@@ -748,7 +748,7 @@ services:
     logging: *default-logging
     labels:
       - "traefik.enable=false"
-    command: /pcap.sh not port 22 and not port 10443 and not port 11443 and not port 20443 and not port 20376 and not port 22376 and not port 10554 and not port 443
+    command: /pcap.sh not port 22 and not port 10443 and not port 11443 and not port 20443 and not port 20376 and not port 22376 and not port 10554 and not port 443 and not port 51443
 
   spot:
     extends:
