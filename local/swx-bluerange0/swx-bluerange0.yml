@@ -556,7 +556,7 @@ services:
     container_name: elasticsearch-hq
     hostname: elasticsearch-hq
     environment:
-      SCHEME: https
+      SCHEME: http
       USERNAME: elastic
       PASSWORD: ${ELASTIC_PASSWORD}
       ES_HOST: elasticsearch
@@ -595,6 +595,30 @@ services:
       - "traefik.frontend.rule=Host:cerebro.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  curator:
+    build:
+      context: docker-elastic/
+      dockerfile: Dockerfile.curator
+    image: sofwerx/es-curator
+    hostname: curator
+    container_name: curator
+    depends_on: ['elasticsearch']
+    networks:
+      - default
+    environment:
+      SCHEME: http
+      ES_USER: elastic
+      ES_PASS: ${ELASTIC_PASSWORD}
+      ES_HOST: elasticsearch
+      ES_PORT: 9200
+      ES_URL: http://elasticsearch:9200
+    stdin_open: true
+    tty: true
+    command: /curator.sh
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 
 #  ethminer:
 #    build:
@@ -724,7 +748,7 @@ services:
     logging: *default-logging
     labels:
       - "traefik.enable=false"
-    command: /pcap.sh not port 22 and not port 20443 and not port 22376
+    command: /pcap.sh not port 22 and not port 10443 and not port 11443 and not port 20443 and not port 20376 and not port 22376 and not port 10554 and not port 443
 
   spot:
     extends:
