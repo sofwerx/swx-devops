@@ -22,6 +22,8 @@ volumes:
     driver: local
   domoticz-scripts:
     driver: local
+  motion-data:
+    driver: local
 
 services:
 
@@ -148,4 +150,21 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  motion:
+    extends:
+      file: docker-motion/docker-compose.yml
+      service: motion
+    image: sofwerx/motion
+    restart: always
+    ports:
+      - 8080:8080
+      - 8081:8081
+    logging: *default-logging
+    networks:
+      - default
+    environment:
+      RTSP_URL: ${RTSP_URL}
+      RTSP_AUTH: ${RTSP_AUTH}
+    labels:
+      - "traefik.enable=false"
 

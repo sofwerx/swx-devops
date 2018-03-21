@@ -361,3 +361,6 @@
 [submodule "local/swx-bluerange1/es-ifttt"]
 	path = local/swx-bluerange1/es-ifttt
 	url = https://github.com/sofwerx/es-ifttt
+[submodule "local/swx-bluerange1/docker-motion"]
+	path = local/swx-bluerange1/docker-motion
+	url = https://github.com/sofwerx/docker-motion
