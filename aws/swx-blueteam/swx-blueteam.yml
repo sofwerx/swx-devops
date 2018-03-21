@@ -842,6 +842,24 @@ services:
       SRC_INCLUDE_FILTER: gammarf
       SRC_EXCLUDE_FILTER: monitor
 
+  es-sync_pcap:
+    extends:
+      file: es-sync/docker-compose.yml
+      service: es-sync
+    container_name: es-sync_pcap
+    hostname: es-sync_pcap
+    restart: always
+    environment:
+      SLEEP: "14400"
+      DST_URL: https://elasticsearch.${DNS_DOMAIN}
+      DST_USER: ${ELASTIC_USER}
+      DST_PASS: ${ELASTIC_PASSWORD}
+      SRC_URL: ${ES_SYNC_PCAP_URL}
+      SRC_USER: ${ES_SYNC_PCAP_USER}
+      SRC_PASS: ${ES_SYNC_PCAP_PASS}
+      SRC_INCLUDE_FILTER: pcap
+      SRC_EXCLUDE_FILTER: monitor
+
   bimserver:  
     extends:
       file: docker-bimserver/docker-compose.yml
