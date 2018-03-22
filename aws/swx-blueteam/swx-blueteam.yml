@@ -886,6 +886,7 @@ services:
       service: tshark_template
     image: sofwerx/es-tshark_template
     network_mode: host
+    restart: always
     environment:
       ES_HOST: 127.0.0.1:9200
       ES_USER: elastic
