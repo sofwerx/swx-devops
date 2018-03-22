@@ -719,6 +719,7 @@ services:
       service: tshark_template
     image: sofwerx/es-tshark_template
     network_mode: host
+    restart: always
     environment:
       ES_HOST: 127.0.0.1:9200
       ES_USER: ${ELASTIC_USER}
@@ -748,7 +749,7 @@ services:
     logging: *default-logging
     labels:
       - "traefik.enable=false"
-    command: /pcap.sh not port 22 and not port 10443 and not port 11443 and not port 20443 and not port 20376 and not port 22376 and not port 10554 and not port 443 and not port 51443
+    command: /pcap.sh not port 22 and not port 10443 and not port 11443 and not port 20443 and not port 20376 and not port 22376 and not port 10554 and not port 443 and not port 51443 and not host 192.168.0.109
 
   spot:
     extends:
