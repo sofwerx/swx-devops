@@ -159,12 +159,17 @@ services:
     ports:
       - 8080:8080
       - 8081:8081
-    logging: *default-logging
-    networks:
-      - default
     environment:
       RTSP_URL: ${RTSP_URL}
       RTSP_AUTH: ${RTSP_AUTH}
+      ES_MOTION_URL: ${ES_MOTION_URL}
+      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - motion-data:/data
+    logging: *default-logging
+    networks:
+      - default
     labels:
       - "traefik.enable=false"
 
