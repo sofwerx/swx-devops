@@ -352,3 +352,18 @@
 [submodule "local/swx-range3/es-gammarf"]
 	path = local/swx-range3/es-gammarf
 	url = https://github.com/sofwerx/es-gammarf
+[submodule "local/swx-tegra0/docker-ethminer"]
+	path = local/swx-tegra0/docker-ethminer
+	url = https://github.com/sofwerx/docker-ethminer
+[submodule "local/swx-bluerange1/es-domoticz-notify"]
+	path = local/swx-bluerange1/es-domoticz-notify
+	url = https://github.com/sofwerx/es-domoticz-notify
+[submodule "local/swx-bluerange1/es-ifttt"]
+	path = local/swx-bluerange1/es-ifttt
+	url = https://github.com/sofwerx/es-ifttt
+[submodule "local/swx-bluerange1/docker-motion"]
+	path = local/swx-bluerange1/docker-motion
+	url = https://github.com/sofwerx/docker-motion
+[submodule "aws/swx-blueteam/es-tshark"]
+	path = aws/swx-blueteam/es-tshark
+	url = https://github.com/sofwerx/es-tshark

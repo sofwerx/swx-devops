@@ -183,6 +183,10 @@ swx_ssh ()
   if trousseau get file:secrets/dm/$ssh_host > /dev/null 2>&1 ; then
     swx_secrets_decrypt secrets/dm/$ssh_host
     local config_json="${devops}/secrets/docker/machines/${ssh_host}/config.json"
+    if [ ! -f "${config_json}" ]; then
+      mkdir -p $(dirname "${config_json}")
+      dmport --export "$ssh_host" | jq -r .machines[\""$ssh_host"\"][\""config.json"\"] | base64 -D > ${config_json}
+    fi
     if [ -f "${config_json}" ]; then
       local ip_address="$(jq -r .Driver.IPAddress ${config_json})"
       local ssh_user="$(jq -r .Driver.SSHUser ${config_json})"
@@ -294,14 +298,39 @@ swx_dm_env ()
   fi
 }
 
+# Allow importing a docker-machine as a dm
 swx_dm_import ()
 {
   if which dmport > /dev/null ; then
-    dmport --export $1 > "${devops}/secrets/dm/$1"
+    dmport --export "$1" > "${devops}/secrets/dm/$1"
     swx_secrets_encrypt secrets/dm/$1
   else
     echo "You need to do a npm install of dmport to use this function." 1>&2
     return 1
+  fi
+}
+
+# Allow exporting a dm for docker-machine to use
+swx_dm_export ()
+{
+  local dm_host="$1"
+  if swx_dm_env "$dm_host" ; then
+    if [ ! -d "${devops}/secrets/docker/machines/$dm_host/" ]; then
+      mkdir -p "${devops}/secrets/docker/machines/$dm_host/"
+      for key in $( cat "${devops}/secrets/dm/$dm_host" | jq -r .machines[\""$dm_host"\"] | jq keys | jq -r .[]) ; do
+        cat "${devops}/secrets/dm/$dm_host" | jq -r .machines[\""$dm_host"\"][\""$key"\"] | base64 -D > "${devops}/secrets/docker/machines/${dm_host}/${key}"
+      done
+      sed -i% -e "s%__MACHINE_PATH__%${devops}/secrets/docker/machines/${dm_host}/%" \
+        -e "s%__MACHINE_CERT_PATH__%${devops}/secrets/docker/machines/${dm_host}/%" \
+        -e "s%__MACHINE_STORE_PATH__%${devops}/secrets/docker/machines/${dm_host}/%" \
+        "${devops}/secrets/docker/machines/${dm_host}/config.json"
+      if [ -f "${devops}/secrets/docker/machines/${dm_host}/config.json%" ]; then
+        rm -f "${devops}/secrets/docker/machines/${dm_host}/config.json%"
+      fi
+    else
+      echo "Cannot export. There is already a docker-machine directory at ${devops}/secrets/docker/machines/$dm_host/"
+      return 1
+    fi
   fi
 }
 
@@ -311,11 +340,13 @@ swx_dm ()
 ls) shift; swx_dm_ls $@ ;;
 env) shift; swx_dm_env $@ ;;
 import) shift; swx_dm_import $@ ;;
+export) shift; swx_dm_export $@ ;;
 *) cat <<EOU 1>&2
 Usage: swx dm {action}
   ls     - List dm instances
   env    - Source the environment to interact with a dm instance using docker
   import - Import a docker-machine instance into a dm
+  export - Export a dm into a docker-machine
 EOU
   return 1
   ;;
@@ -498,6 +529,8 @@ _swx ()
   case "${COMP_WORDS[*]}" in
     "swx dc"*) COMPREPLY=( $( compgen -W "build bundle config create down events exec help images kill logs pause port ps pull push restart rm run scale start stop top unpause up version" -- $cur ) ) ;;
     "swx dm ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx dm import"*) COMPREPLY=( $( compgen -W "$(docker-machine ls -q)" -- $cur ) ) ;;
+    "swx dm export"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
     "swx dm env"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
     "swx dm"*) COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
     "swx ssh"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;

@@ -110,7 +110,7 @@ services:
       discovery.type: single-node
       cluster.name: ${ELASTIC_CLUSTER_NAME}
       bootstrap.memory_lock: "true"
-      ES_JAVA_OPTS: -Xms2g -Xmx2g
+      ES_JAVA_OPTS: -Xms8g -Xmx8g
     ulimits:
       memlock:
         soft: -1
@@ -551,6 +551,75 @@ services:
     labels:
       - "traefik.enable=false"
 
+  elasticsearch-hq:
+    image: elastichq/elasticsearch-hq
+    container_name: elasticsearch-hq
+    hostname: elasticsearch-hq
+    environment:
+      SCHEME: http
+      USERNAME: elastic
+      PASSWORD: ${ELASTIC_PASSWORD}
+      ES_HOST: elasticsearch
+      ES_PORT: 9200
+      PORT: 5000
+    ports:
+      - 9199:5000
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=elasticsearch-hq"
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=Host:elasticsearch-hq.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  cerebro:
+    build:
+      context: docker-elastic/
+      args:
+        CEREBRO_VERSION: ${CEREBRO_VERSION}
+      dockerfile: Dockerfile.cerebro
+    image: local/cerebro:${CEREBRO_VERSION}
+    hostname: cerebro
+    container_name: cerebro
+    depends_on: ['elasticsearch']
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=cerebro"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:cerebro.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  curator:
+    build:
+      context: docker-elastic/
+      dockerfile: Dockerfile.curator
+    image: sofwerx/es-curator
+    hostname: curator
+    container_name: curator
+    depends_on: ['elasticsearch']
+    networks:
+      - default
+    environment:
+      SCHEME: http
+      ES_USER: elastic
+      ES_PASS: ${ELASTIC_PASSWORD}
+      ES_HOST: elasticsearch
+      ES_PORT: 9200
+      ES_URL: http://elasticsearch:9200
+    stdin_open: true
+    tty: true
+    command: /curator.sh
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
 #  ethminer:
 #    build:
 #      context: docker-ethminer/
@@ -650,6 +719,7 @@ services:
       service: tshark_template
     image: sofwerx/es-tshark_template
     network_mode: host
+    restart: always
     environment:
       ES_HOST: 127.0.0.1:9200
       ES_USER: ${ELASTIC_USER}
@@ -679,7 +749,7 @@ services:
     logging: *default-logging
     labels:
       - "traefik.enable=false"
-    command: /pcap.sh not port 22 and not port 20443 and not port 22376
+    command: /pcap.sh not port 22 and not port 10443 and not port 11443 and not port 20443 and not port 20376 and not port 22376 and not port 10554 and not port 443 and not port 51443 and not host 192.168.0.109
 
   spot:
     extends:

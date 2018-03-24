@@ -38,6 +38,18 @@ Package: gnupg2
 Pin: release n=yakkety
 Pin-Priority: -10
 
+Package: dirmngr
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: python3-software-properties
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: software-properties-common
+Pin: release n=yakkety
+Pin-Priority: -10
+
 Package: gnupg-agent
 Pin: release n=yakkety
 Pin-Priority: -10
@@ -54,6 +66,18 @@ Package: gnupg2
 Pin: release n=zesty
 Pin-Priority: -10
 
+Package: dirmngr
+Pin: release n=zesty
+Pin-Priority: -10
+
+Package: python3-software-properties
+Pin: release n=zesty
+Pin-Priority: -10
+
+Package: software-properties-common
+Pin: release n=zesty
+Pin-Priority: -10
+
 Package: gnupg-agent
 Pin: release n=zesty
 Pin-Priority: -10
@@ -70,6 +94,18 @@ Package: gnupg2
 Pin: release n=artful
 Pin-Priority: -10
 
+Package: dirmngr
+Pin: release n=artful
+Pin-Priority: -10
+
+Package: python3-software-properties
+Pin: release n=artful
+Pin-Priority: -10
+
+Package: software-properties-common
+Pin: release n=artful
+Pin-Priority: -10
+
 Package: gnupg-agent
 Pin: release n=artful
 Pin-Priority: -10
@@ -86,6 +122,18 @@ Package: gnupg2
 Pin: release n=xenial
 Pin-Priority: -10
 
+Package: dirmngr
+Pin: release n=xenial
+Pin-Priority: -10
+
+Package: python3-software-properties
+Pin: release n=xenial
+Pin-Priority: -10
+
+Package: software-properties-common
+Pin: release n=xenial
+Pin-Priority: -10
+
 Package: gnupg-agent
 Pin: release n=xenial
 Pin-Priority: -10
@@ -99,6 +147,18 @@ Pin: release n=trusty
 Pin-Priority: 900
 
 Package: gnupg2
+Pin: release n=trusty
+Pin-Priority: 900
+
+Package: dirmngr
+Pin: release n=trusty
+Pin-Priority: 900
+
+Package: python3-software-properties
+Pin: release n=trusty
+Pin-Priority: 900
+
+Package: software-properties-common
 Pin: release n=trusty
 Pin-Priority: 900
 

@@ -68,7 +68,18 @@ services:
 #      service: takplayrecording1
 #    restart: always
 #    network_mode: host
-#    command: /takplayrecording.sh ./publish_file --output-address $INPUT_ADDRESS --output-port 3080 --input-file raven1
+#    command: /takplayrecording.sh ./publish_file --output-address $INPUT_ADDRESS --output-port 3081 --input-file raven1
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
+
+#  takplayrecording3:
+#    extends:
+#      file: docker-tak/docker-compose.yml
+#      service: takplayrecording3
+#    restart: always
+#    network_mode: host
+#    command: /takplayrecording.sh ./publish_file --output-address $INPUT_ADDRESS --output-port 3083 --input-file raven3
 #    logging: *default-logging
 #    labels:
 #      - "traefik.enable=false"

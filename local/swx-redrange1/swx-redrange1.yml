@@ -16,8 +16,8 @@ volumes:
     driver: local
   elasticsearch-data:
     driver: local
-  gdelt-data:
-    driver: local
+#  gdelt-data:
+#    driver: local
 
 services:
 
@@ -537,71 +537,71 @@ services:
 #    labels:
 #      - "traefik.enable=false"
 
-  gdelt_create_index:
-    extends:
-      file: es-gdelt/docker-compose.yml
-      service: gdelt_create_index
-    environment:
-      ES_HOST_URL: http://elasticsearch:9200
-      ES_USER: ${ELASTIC_USER}
-      ES_PASSWORD: ${ELASTIC_PASSWORD}
-      ES_GDELT_INDEX: /gdelt
-      ES_DELETE_INDEX: Y
-    networks:
-      - default
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
+#  gdelt_create_index:
+#    extends:
+#      file: es-gdelt/docker-compose.yml
+#      service: gdelt_create_index
+#    environment:
+#      ES_HOST_URL: http://elasticsearch:9200
+#      ES_USER: ${ELASTIC_USER}
+#      ES_PASSWORD: ${ELASTIC_PASSWORD}
+#      ES_GDELT_INDEX: /gdelt
+#      ES_DELETE_INDEX: Y
+#    networks:
+#      - default
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
 
-  gdelt_realtime_downloader:
-    extends:
-      file: es-gdelt/docker-compose.yml
-      service: gdelt_realtime_downloader
-    volumes:
-      - gdelt-data:/es-gdelt/data
-    restart: always
-    environment:
-      GDELT_HISTORIC_FILE_PATH: ${GDELT_HISTORIC_FILE_PATH}
-      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
-      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
-      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
-      SLACK_NOTIFICATIONS_ENABLED: ${SLACK_NOTIFICATIONS_ENABLED}
-      SLACK_NOTIFICATIONS_URL: ${SLACK_NOTIFICATIONS_URL}
-#    logging:
-#      driver: syslog
-#      options:
-#        syslog-address: "tcp://172.18.0.1:5000"
-    logging: *default-logging
-    networks:
-      - default
-    depends_on:
-      - logstash
-    labels:
-      - "traefik.enable=false"
+#  gdelt_realtime_downloader:
+#    extends:
+#      file: es-gdelt/docker-compose.yml
+#      service: gdelt_realtime_downloader
+#    volumes:
+#      - gdelt-data:/es-gdelt/data
+#    restart: always
+#    environment:
+#      GDELT_HISTORIC_FILE_PATH: ${GDELT_HISTORIC_FILE_PATH}
+#      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+#      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+#      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+#      SLACK_NOTIFICATIONS_ENABLED: ${SLACK_NOTIFICATIONS_ENABLED}
+#      SLACK_NOTIFICATIONS_URL: ${SLACK_NOTIFICATIONS_URL}
+##    logging:
+##      driver: syslog
+##      options:
+##        syslog-address: "tcp://172.18.0.1:5000"
+#    logging: *default-logging
+#    networks:
+#      - default
+#    depends_on:
+#      - logstash
+#    labels:
+#      - "traefik.enable=false"
 
-  gdelt_realtime_logstash:
-    extends:
-      file: es-gdelt/docker-compose.yml
-      service: gdelt_realtime_logstash
-    restart: always
-    volumes:
-      - gdelt-data:/es-gdelt/data
-    environment:
-      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
-      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
-      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
-      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
-      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
-      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
-      ES_HOST: elasticsearch:9200
-      ES_USER: ${ELASTIC_USER}
-      ES_PASSWORD: ${ELASTIC_PASSWORD}
-      ES_GDELT_INDEX: gdelt
-    networks:
-      - default
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
+#  gdelt_realtime_logstash:
+#    extends:
+#      file: es-gdelt/docker-compose.yml
+#      service: gdelt_realtime_logstash
+#    restart: always
+#    volumes:
+#      - gdelt-data:/es-gdelt/data
+#    environment:
+#      XPACK_MONITORING_ELASTICSEARCH_URL: http://elasticsearch:9200
+#      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+#      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+#      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+#      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+#      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+#      ES_HOST: elasticsearch:9200
+#      ES_USER: ${ELASTIC_USER}
+#      ES_PASSWORD: ${ELASTIC_PASSWORD}
+#      ES_GDELT_INDEX: gdelt
+#    networks:
+#      - default
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
 
 # This laptop can't handling mining this
 #  ravencoin-gpu-ccminer:

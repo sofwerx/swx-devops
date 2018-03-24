@@ -842,6 +842,24 @@ services:
       SRC_INCLUDE_FILTER: gammarf
       SRC_EXCLUDE_FILTER: monitor
 
+  es-sync_pcap:
+    extends:
+      file: es-sync/docker-compose.yml
+      service: es-sync
+    container_name: es-sync_pcap
+    hostname: es-sync_pcap
+    restart: always
+    environment:
+      SLEEP: "14400"
+      DST_URL: https://elasticsearch.${DNS_DOMAIN}
+      DST_USER: ${ELASTIC_USER}
+      DST_PASS: ${ELASTIC_PASSWORD}
+      SRC_URL: ${ES_SYNC_PCAP_URL}
+      SRC_USER: ${ES_SYNC_PCAP_USER}
+      SRC_PASS: ${ES_SYNC_PCAP_PASS}
+      SRC_INCLUDE_FILTER: pcap
+      SRC_EXCLUDE_FILTER: monitor
+
   bimserver:  
     extends:
       file: docker-bimserver/docker-compose.yml
@@ -861,4 +879,21 @@ services:
 #;AddPrefix:/bimserver"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  tshark_template:
+    extends:
+      file: es-tshark/docker-compose.yml
+      service: tshark_template
+    image: sofwerx/es-tshark_template
+    network_mode: host
+    restart: always
+    environment:
+      ES_HOST: 127.0.0.1:9200
+      ES_USER: elastic
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+## Dangerous: If these are defined, the pcap-* index and/or template can be deleted by starting this container
+#      DELETE_ALL_INDEXES: "try to delete all pcap indexes"
+#      DELETE_EXISTING_TEMPLATE: "try to delete the pcap template"
+    labels:
+      - "traefik.enable=false"
 
