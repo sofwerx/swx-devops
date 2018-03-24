@@ -426,7 +426,7 @@ resource "aws_volume_attachment" "instance-docker2" {
   count = "${var.aws_instance_count}"
   device_name = "xvdj"
   instance_id = "${element(aws_instance.instance.*.id, count.index)}"
-  volume_id = "${element(aws_ebs_volume.docker.*.id, count.index)}"
+  volume_id = "${element(aws_ebs_volume.docker2.*.id, count.index)}"
   force_detach = true
 }
 
