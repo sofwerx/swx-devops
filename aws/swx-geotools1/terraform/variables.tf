@@ -122,6 +122,11 @@ variable ebs_home_volume_size {
     default = "50"
 }
 
+variable ebs_home2_volume_size {
+    description = "EBS Home2 Volume Size"
+    default = "100"
+}
+
 variable ebs_docker_volume_size {
     description = "EBS Docker Volume Size"
     default = "50"
@@ -131,4 +136,10 @@ variable ebs_docker2_volume_size {
     description = "EBS Docker2 Volume Size"
     default = "200"
 }
+
+variable ebs_varlog_volume_size {
+    description = "EBS Var Log Volume Size"
+    default = "20"
+}
+
 
