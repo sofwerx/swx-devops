@@ -317,21 +317,6 @@ resource "aws_eip_association" "eip_assoc" {
   allocation_id = "${element(aws_eip.instance.*.id, count.index)}"
 }
 
-resource "aws_ebs_volume" "home" {
-  count = "${var.aws_instance_count}"
-
-  availability_zone = "${element(split(",",lookup(var.aws_availability_zones, var.aws_region)), count.index % length(split(",",lookup(var.aws_availability_zones, var.aws_region))))}"
-
-  size = "${var.ebs_home_volume_size}"
-  type = "standard"
-
-  encrypted = true
-
-  tags {
-    Name = "${var.Project}-${var.Lifecycle}-${count.index}"
-  }
-}
-
 resource "aws_ebs_volume" "home2" {
   count = "${var.aws_instance_count}"
 
@@ -419,14 +404,6 @@ resource "aws_instance" "instance" {
 data "aws_route53_zone" "selected" {
   name         = "${var.dns_zone}"
   private_zone = false
-}
-
-resource "aws_volume_attachment" "instance-home" {
-  count = "${var.aws_instance_count}"
-  device_name = "xvdh"
-  instance_id = "${element(aws_instance.instance.*.id, count.index)}"
-  volume_id = "${element(aws_ebs_volume.home.*.id, count.index)}"
-  force_detach = true
 }
 
 resource "aws_volume_attachment" "instance-home2" {

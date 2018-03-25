@@ -117,11 +117,6 @@ variable ebs_root_volume_size {
     default = "20"
 }
 
-variable ebs_home_volume_size {
-    description = "EBS Home Volume Size"
-    default = "50"
-}
-
 variable ebs_home2_volume_size {
     description = "EBS Home2 Volume Size"
     default = "100"
