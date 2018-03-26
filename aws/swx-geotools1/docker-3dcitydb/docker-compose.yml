@@ -1,0 +1,50 @@
+version: '2.0'
+
+volumes:
+  3dcitydb-postgis-data:
+    driver: local
+  3dcitydb-web-map-data:
+    driver: local
+
+services:
+  3dcitydb-postgis:
+    image: tumgis/3dcitydb-postgis
+    container_name: 3dcitydb-postgis
+    hostname: 3dcitydb-postgis
+    environment:
+      CITYDBNAME: ${CITYDBNAME}
+      SRID: ${SRID}
+      SRSNAME: $SRSNAME}
+      POSTGRES_DB: ${CITYDBNAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - 3dcitydb-postgis-data:/var/lib/postgresql/data
+
+  3dcitydb-wfs:
+    image: tumgis/3dcitydb-wfs
+    container_name: 3dcitydb-wfs
+    hostname: 3dcitydb-wfs
+    environment:
+     TOMCAT_MAX_HEAP: ${TOMCAT_MAX_HEAP}
+     CITYDB_CONNECTION_TYPE: ${CITYDB_CONNECTION_TYPE}
+     CITYDB_CONNECTION_SERVER: ${CITYDB_CONNECTION_SERVER}
+     CITYDB_CONNECTION_PORT: ${CITYDB_CONNECTION_PORT}
+     CITYDB_CONNECTION_SID: ${CITYDB_CONNECTION_SID}
+     CITYDB_CONNECTION_USER: ${CITYDB_CONNECTION_USER}
+     CITYDB_CONNECTION_PASSWORD: ${CITYDB_CONNECTION_PASSWORD}
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      - 3dcitydb-postgis
+    command: ["wait-for-psql.sh","60","${CITYDB_CONNECTION_SERVER}","${CITYDB_CONNECTION_PORT}","${CITYDB_CONNECTION_USER}","${CITYDB_CONNECTION_PASSWORD}","citydb-wfs.sh","catalina.sh","run"]
+
+  3dcitydb-web-map:
+    image: tumgis/3dcitydb-web-map
+    container_name: 3dcitydb-web-map
+    hostname: 3dcitydb-web-map
+#    ports:
+#      - 80:8080
+    volumes:
+      - 3dcitydb-web-map-data:/var/www/data
+

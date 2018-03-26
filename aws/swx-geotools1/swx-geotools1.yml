@@ -42,6 +42,10 @@ volumes:
     driver: local
   owncloud-redis:
     driver: local
+  3dcitydb-postgis-data:
+    driver: local
+  3dcitydb-web-map-data:
+    driver: local
 
 services:
 
@@ -440,4 +444,48 @@ services:
       - "traefik.frontend.rule=Host:cesium.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  3dcitydb-postgis:
+    extends:
+      file: docker-3dcitydb/docker-compose.yml
+      service: 3dcitydb-postgis
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  3dcitydb-wfs:
+    extends:
+      file: docker-3dcitydb/docker-compose.yml
+      service: 3dcitydb-wfs
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=3dcitydb-wfs"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:3dcitydb-wfs.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  3dcitydb-web-map:
+    extends:
+      file: docker-3dcitydb/docker-compose.yml
+      service: 3dcitydb-web-map
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=3dcitydb-web-map"
+      - "traefik.port=8000"
+      - "traefik.frontend.rule=Host:3dcitydb.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
