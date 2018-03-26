@@ -367,3 +367,6 @@
 [submodule "aws/swx-blueteam/es-tshark"]
 	path = aws/swx-blueteam/es-tshark
 	url = https://github.com/sofwerx/es-tshark
+[submodule "aws/swx-geotools1/docker-cesium"]
+	path = aws/swx-geotools1/docker-cesium
+	url = https://github.com/sofwerx/docker-cesium

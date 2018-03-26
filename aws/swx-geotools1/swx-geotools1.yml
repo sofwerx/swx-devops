@@ -1,5 +1,12 @@
 version: "2"
 
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
 networks: 
   default:
     driver: bridge
@@ -91,6 +98,7 @@ services:
       - default
     environment:
       REST_PORT: "7080"
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=traefik"
@@ -416,4 +424,20 @@ services:
       - default
     labels:
       - "traefik.enable=false"
+
+  cesium:
+    extends:
+      file: docker-cesium/docker-compose.yml
+      service: cesium
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=cesium"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:cesium.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
