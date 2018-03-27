@@ -156,51 +156,51 @@ services:
 #    labels:
 #      - "traefik.enable=false"
 
-  takserver:
-    extends:
-      file: docker-tak/docker-compose.yml
-      service: takserver
-    restart: always
-    network_mode: host
-    logging: *default-logging
-    volumes:
-      - takserver-logs:/opt/tak/logs
-      - takserver-certs:/opt/tak/certs
-    environment:
-      ENABLE_TLS: 1
-      ANNOUNCE_ADDRESS: 192.168.16.100
-      TAKSERVER_USER: $TAKSERVER_USER
-      TAKSERVER_PASSWORD: $TAKSERVER_PASSWORD
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=tak"
-      - "traefik.port=8080"
-      - "traefik.frontend.rule=Host:tak.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
-
-  takreflector:
-    extends:
-      file: docker-tak/docker-compose.yml
-      service: takreflector
-    restart: always
-    network_mode: host
-    environment:
-      INPUT_ADDRESS: 192.168.16.100
-      FORCED_WIDTH: 1280
-      FORCED_HEIGHT: 720
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
-
-#  takplayrecording1:
+#  takserver:
 #    extends:
 #      file: docker-tak/docker-compose.yml
-#      service: takplayrecording1
+#      service: takserver
 #    restart: always
 #    network_mode: host
-#    command: /takplayrecording.sh ./publish_file --output-address 192.168.16.100 --output-port 3080 --input-file raven1
+#    logging: *default-logging
+#    volumes:
+#      - takserver-logs:/opt/tak/logs
+#      - takserver-certs:/opt/tak/certs
+#    environment:
+#      ENABLE_TLS: 1
+#      ANNOUNCE_ADDRESS: 192.168.16.100
+#      TAKSERVER_USER: $TAKSERVER_USER
+#      TAKSERVER_PASSWORD: $TAKSERVER_PASSWORD
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=tak"
+#      - "traefik.port=8080"
+#      - "traefik.frontend.rule=Host:tak.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+#
+#  takreflector:
+#    extends:
+#      file: docker-tak/docker-compose.yml
+#      service: takreflector
+#    restart: always
+#    network_mode: host
+#    environment:
+#      INPUT_ADDRESS: 192.168.16.100
+#      FORCED_WIDTH: 1280
+#      FORCED_HEIGHT: 720
 #    logging: *default-logging
 #    labels:
 #      - "traefik.enable=false"
+#
+##  takplayrecording1:
+##    extends:
+##      file: docker-tak/docker-compose.yml
+##      service: takplayrecording1
+##    restart: always
+##    network_mode: host
+##    command: /takplayrecording.sh ./publish_file --output-address 192.168.16.100 --output-port 3080 --input-file raven1
+##    logging: *default-logging
+##    labels:
+##      - "traefik.enable=false"
 
