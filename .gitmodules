@@ -373,3 +373,6 @@
 [submodule "local/swx-supermicro0/docker-traefik"]
 	path = local/swx-supermicro0/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/swx-bluerange1/terraform/alexa_domo"]
+	path = local/swx-bluerange1/terraform/alexa_domo
+	url = https://github.com/madgeni/alexa_domo
