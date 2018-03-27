@@ -12,7 +12,7 @@ There are a number of tools that will need to be installed:
 - docker-compose
 - docker-machine (optional)
 
-Or you can install Vagrant and spin up a VM:
+Or you can install Vagrant and spin up a local VM:
 
     https://www.vagrantup.com/
 
@@ -20,6 +20,12 @@ There is a `Vagrantfile` in this project that should prepare a functional ubuntu
 
     vagrant up
     vagrant ssh
+
+Or you can install a local docker-engine that has volume share access to this working directory, then you can run this:
+
+    ./docker.sh
+
+The key here is having a local docker-engine installed that has volume mount access to this directory.
 
 The dependencies, and how to use them, are enumerated below.
 
