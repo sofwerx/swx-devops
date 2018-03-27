@@ -17,6 +17,17 @@ volumes:
 
 services:
 
+  takweb:
+    extends:
+      file: docker-tak/docker-compose.yml
+      service: takweb
+    restart: always
+    volumes:
+      - takserver-logs:/opt/tak/logs
+      - takserver-certs:/opt/tak/certs
+    network_mode: host
+    logging: *default-logging
+
   takserver:
     extends:
       file: docker-tak/docker-compose.yml
