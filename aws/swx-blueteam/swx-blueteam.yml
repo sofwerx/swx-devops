@@ -280,7 +280,7 @@ services:
       discovery.type: single-node
       cluster.name: ${ELASTIC_CLUSTER_NAME}
       bootstrap.memory_lock: "true"
-      ES_JAVA_OPTS: -Xms2g -Xmx2g
+      ES_JAVA_OPTS: -Xms16g -Xmx16g
       reindex.remote.whitelist: "*.*"
     ulimits:
       memlock:
