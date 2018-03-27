@@ -1,9 +1,6 @@
 # .bash_profile
 # Prepare our devops environment with variables, useful functions, and aliases.
 
-# TODO: pull secrets or at least do mkdirs
-# TODO: set all the AWS env vars for terraform
-
 if [ -n "${HOME}" -a -d ${HOME}/bin ] ; then
   export PATH=${PATH}:${HOME}/bin
 fi
