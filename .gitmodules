@@ -370,3 +370,6 @@
 [submodule "aws/swx-geotools1/docker-cesium"]
 	path = aws/swx-geotools1/docker-cesium
 	url = https://github.com/sofwerx/docker-cesium
+[submodule "local/swx-supermicro0/docker-traefik"]
+	path = local/swx-supermicro0/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
