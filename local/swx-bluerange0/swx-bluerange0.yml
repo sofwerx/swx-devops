@@ -412,14 +412,13 @@ services:
   setup_kibana:
     build:
       context: docker-elastic/
-      args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
       dockerfile: Dockerfile.setup_kibana
     image: sofwerx/setup_kibana:${ELASTICSEARCH_VERSION}
     container_name: setup_kibana
     hostname: setup_kibana
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
     networks:
       - default
     depends_on:
