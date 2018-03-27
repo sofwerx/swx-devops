@@ -8,6 +8,9 @@ which sudo > /dev/null || (
 which wget > /dev/null || (
   apt-get install -y wget
 )
+which pinentry-curses > /dev/null || (
+  apt-get install -y pinentry-curses pinentry-tty
+)
 which pip > /dev/null || (
   sudo apt-get install -y python-pip
   sudo pip install --upgrade pip
