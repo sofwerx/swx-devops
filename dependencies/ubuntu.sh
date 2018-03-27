@@ -1,5 +1,13 @@
 #!/bin/bash
 set -e
+# Install dependencies for this script
+apt-get update
+which sudo > /dev/null || (
+  apt-get install -y sudo
+)
+which wget > /dev/null || (
+  apt-get install -y wget
+)
 which pip > /dev/null || (
   sudo apt-get install -y python-pip
   sudo pip install --upgrade pip
@@ -204,3 +212,11 @@ which docker-machine > /dev/null || (
 which haveged > /dev/null || (
   sudo apt-get install -y haveged
 )
+mkdir -p secrets/gnupg
+if [ ! -f secrets/gnupg/gpg-agent.conf ]; then
+  cat <<EOF > secrets/gnupg/gpg-agent.conf
+allow-preset-passphrase
+pinentry-program /usr/bin/pinentry-curses
+enable-ssh-support
+EOF
+fi
