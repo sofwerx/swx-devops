@@ -130,7 +130,7 @@ services:
       - "traefik.frontend.rule=Host:elasticsearch.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
-
+      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
 
   kibana:
 #    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
@@ -166,6 +166,7 @@ services:
       - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
 
   logstash:
     build:
