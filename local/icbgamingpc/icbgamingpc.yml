@@ -126,12 +126,16 @@ services:
     labels:
       - "traefik.enable=false"
 
-  ravencoin-gpu-ccminer:
+  ravencoin-nevermore:
     extends:
       file: docker-ravencoin/docker-compose.yml
-      service: ravencoin-gpu-ccminer
+      service: ravencoin-nevermore
 #    restart: always
     labels:
       - "traefik.enable=false"
-    command: /run.sh -p ${DOCKER_MACHINE_NAME}
+    environment:
+      URL: ${URL}
+      USERNAME: ${USERNAME}
+      PASSWORD: ${DOCKER_MACHINE_NAME}
+    command: /nevermore.sh -p ${DOCKER_MACHINE_NAME}
 
