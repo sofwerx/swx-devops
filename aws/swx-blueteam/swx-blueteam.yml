@@ -301,6 +301,7 @@ services:
       - "traefik.frontend.rule=Host:elasticsearch.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
 
   kibi:
     image: sirensolutions/kibi-community-standalone:5.5.2-SNAPSHOT
@@ -358,6 +359,7 @@ services:
       - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
 
   logstash:
     build:
@@ -602,14 +604,13 @@ services:
   setup_kibana:
     build:
       context: docker-elastic/
-      args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
       dockerfile: Dockerfile.setup_kibana
     image: sofwerx/setup_kibana:${ELASTICSEARCH_VERSION}
     container_name: setup_kibana
     hostname: setup_kibana
     environment: 
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
     networks:
       - default
     depends_on:
