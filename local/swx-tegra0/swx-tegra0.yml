@@ -1,2 +1,38 @@
 version: '2.1'
 
+service:
+
+    volumes:
+      - /usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu
+      - /usr/local/cuda/lib64:/usr/local/cuda/lib64
+      - /usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu
+      - /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra
+    devices:
+      - /dev/nvhost-ctrl:/dev/nvhost-ctrl
+      - /dev/nvhost-ctrl-gpu:/dev/nvhost-ctrl-gpu
+      - /dev/nvhost-prof-gpu:/dev/nvhost-prof-gpu
+      - /dev/nvmap:/dev/nvmap
+      - /dev/nvhost-gpu:/dev/nvhost-gpu
+      - /dev/nvhost-as-gpu:/dev/nvhost-as-gpu
+    environment:
+      LD_LIBRARY_PATH: /usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu/tegra:/usr/local/cuda/lib64
+
+  ethminer:
+    build:
+      context: docker-ethminer/
+      dockerfile: Dockerfile.${ARCH}
+    image: sofwerx/ethminer:${ARCH}
+    container_name: ethminer
+    hostname: ethminer
+    restart: always
+    environment:
+      GPU_FORCE_64BIT_PTR: 0
+      GPU_MAX_HEAP_SIZE: 100
+      GPU_USE_SYNC_OBJECTS: 1
+      GPU_MAX_ALLOC_PERCENT: 100
+      GPU_SINGLE_ALLOC_PERCENT: 100
+    command: /ethminer/build/ethminer/ethminer --cuda-parallel-hash 8 --farm-recheck 200 -U -S us1.ethermine.org:4444 -FS us2.ethermine.org:4444 -O 2c0859b9312d9bf93e1b4cae8d47d59030a75a9f.${DOCKER_MACHINE_NAME}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
