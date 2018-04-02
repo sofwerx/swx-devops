@@ -7,36 +7,23 @@ Each blade has 64G of DDR4 RAM, an 8 core Xeon, and two drives:
 - /dev/sda - 120G SSD
 - /dev/sdb - 1TB SSD
 
-# OpenStack Fuel
+These blades are running Ubuntu 18.04 Bionic:
 
-The first blade, `swx-u-r-node0` [192.168.1.120], was deployed from a USB install of the OpenStack fuel 11.0 stable `.iso` image.
-
-# OpenStack
-
-The remaining blades are:
-
-- `swx-u-r-node1` [192.168.1.121]
-- `swx-u-r-node2` [192.168.1.122]
-- `swx-u-r-node3` [192.168.1.123]
-- `swx-u-r-node4` [192.168.1.124]
-- `swx-u-r-node5` [192.168.1.125]
-- `swx-u-r-node6` [192.168.1.126]
-- `swx-u-r-node7` [192.168.1.127]
+- `swx-u-ub-orange0` [192.168.1.120]
+- `swx-u-ub-orange1` [192.168.1.121]
+- `swx-u-ub-orange2` [192.168.1.122]
+- `swx-u-ub-orange3` [192.168.1.123]
+- `swx-u-ub-orange4` [192.168.1.124]
+- `swx-u-ub-orange5` [192.168.1.125]
+- `swx-u-ub-orange6` [192.168.1.126]
+- `swx-u-ub-orange7` [192.168.1.127]
 
 ## environment
 
 Before using docker commands in this directory, please be sure to source the dm of a node in the cluster:
 
-    [sofwerx::] icbmbp:orange ianblenke$ swx dm env swx-r-u-node0
-    [sofwerx:orange:swx-r-u-node0] icbmbp:orange ianblenke$
+    [sofwerx::] icbmbp:orange ianblenke$ swx dm env swx-r-u-orange0
+    [sofwerx:orange:swx-r-u-orange0] icbmbp:orange ianblenke$
 
 Due to `DOCKER_COMPOSE=orange.yml` in the orange environment, the `orange.yml` here is the `docker-compose.yml` that is used when a `docker-compose` is run.
-
-## Public NAT
-
-The (fuel-nat/)[fuel-nat/] folder contains what was used to deploy the `public-nat` container onto `swx-u-or-node0` that is acting as the default route NATting gateway for the OpenStack public segment.
-
-## nerdherdvpn
-
-The (nerdherdvpn/)[nerdherdvpn/] folder contains what was used to deploy the `nerdherdvpn` container, which is holding open some temporary ssh port forwards from an AWS instance to get around some weird networking problems on our Frontier connection at the office where the orange cluster is located.
 
