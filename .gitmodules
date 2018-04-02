@@ -104,7 +104,7 @@
 	path = cellar/swx-gpu/tor-moneropool/tor-monero
 	url = https://github.com/sofwerx/tor-moneropool.git
 [submodule "aws/swx-redteam/docker-traefik"]
-	path = aws/swx-redteam/docker-traefik
+	path = cellar/swx-redteam/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "aws/swx-blueteam/docker-traefik"]
 	path = aws/swx-blueteam/docker-traefik
