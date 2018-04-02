@@ -91,10 +91,23 @@ services:
     labels:
       - "traefik.enable=false"
 
-  ravencoin-gpu-ccminer:
+#  ravencoin-gpu-ccminer:
+#    extends:
+#      file: docker-ravencoin/docker-compose.yml
+#      service: ravencoin-gpu-ccminer
+#    restart: always
+#    logging: *default-logging
+#    environment:
+#      URL: ${URL}
+#      USERNAME: ${USERNAME}
+#      PASSWORD: ${DOCKER_MACHINE_NAME}
+#    labels:
+#      - "traefik.enable=false"
+
+  ravencoin-nevermore:
     extends:
       file: docker-ravencoin/docker-compose.yml
-      service: ravencoin-gpu-ccminer
+      service: ravencoin-nevermore
     restart: always
     logging: *default-logging
     environment:
