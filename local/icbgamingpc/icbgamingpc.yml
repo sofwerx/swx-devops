@@ -20,6 +20,8 @@ volumes:
     driver: local
   ravencoin-data:
     driver: local
+  znc-data:
+    driver: local
 
 services:
 
@@ -33,7 +35,7 @@ services:
     network_mode: host
     environment:
       ssh_host_ip: 127.0.0.1
-      OTHER_PORTS: "2376"
+      OTHER_PORTS: "6697"
     labels:
       - "traefik.enable=false"
 
@@ -138,4 +140,18 @@ services:
       USERNAME: ${USERNAME}
       PASSWORD: ${DOCKER_MACHINE_NAME}
     command: /nevermore.sh -p ${DOCKER_MACHINE_NAME}
+
+  znc:
+    container_name: znc
+    hostname: znc
+    image: znc:1.6
+    restart: always
+    volumes:
+      - znc-data:/znc-data
+    command: /entrypoint.sh -D
+    network_mode: host
+    ports:
+      - 6697:6697
+    labels:
+      - "traefik.enable=false"
 
