@@ -211,6 +211,10 @@ which docker-machine > /dev/null || (
   sudo curl -Lo /usr/local/bin/docker-machine https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m`
   sudo chmod ugo+rx /usr/local/bin/docker-machine
 )
+which kops > /dev/null || (
+  sudo curl -Lo /usr/local/bin/kops https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+  sudo chmod ugo+rx /usr/local/bin/kops
+)
 # Install a simple entropy gathering daemon, to speed up key generation
 which haveged > /dev/null || (
   sudo apt-get install -y haveged
