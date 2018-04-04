@@ -382,6 +382,3 @@
 [submodule "aws/swx-geotools1/teamengine-docker"]
 	path = aws/swx-geotools1/teamengine-docker
 	url = git@github.com:opengeospatial/teamengine-docker.git
-[submodule "aws/swx-geotools1/teamengine"]
-	path = aws/swx-geotools1/teamengine
-	url = git@github.com:opengeospatial/teamengine.git
