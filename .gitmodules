@@ -379,6 +379,9 @@
 [submodule "local/swx-orange/docker-traefik"]
 	path = local/swx-orange/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
+[submodule "local/swx-bluerange0/es-json"]
+	path = local/swx-bluerange0/es-json
+	url = https://github.com/sofwerx/es-json
 [submodule "aws/swx-geotools1/teamengine-docker"]
 	path = aws/swx-geotools1/teamengine-docker
-	url = git@github.com:opengeospatial/teamengine-docker.git
+	url = https://github.com/sofwerx/teamengine-docker.git
