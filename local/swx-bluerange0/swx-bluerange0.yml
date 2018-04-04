@@ -780,4 +780,25 @@ services:
 #    labels:
 #      - "traefik.enable=false"
 
+  es-webcam-pcap:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-webcam-pcap
+    hostname: es-webcam-pcap
+    restart: always
+    environment:
+      ES_URL: http://elasticsearch:9200
+      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_INDEX: webcam-pcap
+    ports:
+      - 20001:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-webcam-pcap"
+      - "traefik.port=20001"
+      - "traefik.frontend.rule=Host:es-webcamp-pcap.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
