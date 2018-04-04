@@ -382,3 +382,9 @@
 [submodule "local/swx-bluerange0/es-json"]
 	path = local/swx-bluerange0/es-json
 	url = https://github.com/sofwerx/es-json
+[submodule "aws/swx-geotools1/teamengine-docker"]
+	path = aws/swx-geotools1/teamengine-docker
+	url = https://github.com/opengeospatial/teamengine-docker.git
+[submodule "aws/swx-geotools1/teamengine"]
+	path = aws/swx-geotools1/teamengine
+	url = https://github.com/opengeospatial/teamengine.git
