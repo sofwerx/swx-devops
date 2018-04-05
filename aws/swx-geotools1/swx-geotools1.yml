@@ -46,6 +46,8 @@ volumes:
     driver: local
   3dcitydb-web-map-data:
     driver: local
+  django-geopackage-server_data:
+    driver: local
 
 services:
 
@@ -499,7 +501,10 @@ services:
     hostname: django-geopackage-server
     restart: always
     logging: *default-logging
+    volumes:
+      - django-geopackage-server_data:/data
     environment:
+      SQLITE_DB_PATH: /data/db.sqlite3
       DJANGO_HOSTNAME: django-geopackage-server.${DNS_DOMAIN}
     networks:
       - default
