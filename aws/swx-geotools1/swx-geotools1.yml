@@ -490,4 +490,24 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  django-geopackage-server:
+    extends:
+      file: DjangoGeoPackageServer/docker-compose.yml
+      service: django-geopackage-server
+    image: sofwerx/django-geopackage-server
+    container_name: django-geopackage-server
+    hostname: django-geopackage-server
+    restart: always
+    logging: *default-logging
+    environment:
+      DJANGO_HOSTNAME: django-geopackage-server.${DNS_DOMAIN}
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=django-geopackage-server"
+      - "traefik.port=7999"
+      - "traefik.frontend.rule=Host:django-geopackage-server.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 

@@ -388,3 +388,6 @@
 [submodule "aws/swx-geotools1/teamengine"]
 	path = aws/swx-geotools1/teamengine
 	url = https://github.com/opengeospatial/teamengine.git
+[submodule "aws/swx-geotools1/DjangoGeoPackageServer"]
+	path = aws/swx-geotools1/DjangoGeoPackageServer
+	url = https://github.com/sofwerx/DjangoGeoPackageServer
