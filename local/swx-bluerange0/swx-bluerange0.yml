@@ -801,4 +801,47 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  es-safehouse-ap-ssh:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-safehouse-ap-ssh
+    hostname: es-safehouse-ap-ssh
+    restart: always
+    environment:
+      ES_URL: http://elasticsearch:9200
+      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_INDEX: safehouse-ap-ssh
+    ports:
+      - 20002:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-webcam-pcap"
+      - "traefik.port=20001"
+      - "traefik.frontend.rule=Host:es-safehouse-ap-ssh.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-safehouse-ap-devices:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-safehouse-ap-devices
+    hostname: es-safehouse-ap-devices
+    restart: always
+    environment:
+      ES_URL: http://elasticsearch:9200
+      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_INDEX: safehouse-ap-devices
+    ports:
+      - 20003:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-webcam-pcap"
+      - "traefik.port=20001"
+      - "traefik.frontend.rule=Host:es-safehouse-ap-devices.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+
 
