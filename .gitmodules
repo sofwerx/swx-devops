@@ -391,3 +391,6 @@
 [submodule "aws/swx-geotools1/DjangoGeoPackageServer"]
 	path = aws/swx-geotools1/DjangoGeoPackageServer
 	url = https://github.com/sofwerx/DjangoGeoPackageServer
+[submodule "local/swx-bluerange1/es-json"]
+	path = local/swx-bluerange1/es-json
+	url = https://github.com/sofwerx/es-json
