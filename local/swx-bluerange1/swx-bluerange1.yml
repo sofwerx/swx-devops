@@ -173,3 +173,45 @@ services:
     labels:
       - "traefik.enable=false"
 
+  es-minicam-motion:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-minicam-motion
+    hostname: es-minicam-motion
+    restart: always
+    environment:
+      ES_URL: ${ES_MINICAM_MOTION_URL}
+      ES_HTTP_AUTH: ${ES_MINICAM_MOTION_HTTP_AUTH}
+      ES_INDEX: minicam-motion
+    ports:
+      - 21002:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-minicam-motion"
+      - "traefik.port=21002"
+      - "traefik.frontend.rule=Host:es-minicam-motion.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-alexa-trigger:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-alexa-trigger
+    hostname: es-alexa-trigger
+    restart: always
+    environment:
+      ES_URL: ${ES_ALEXA_TRIGGER_URL}
+      ES_HTTP_AUTH: ${ES_ALEXA_TRIGGER_HTTP_AUTH}
+      ES_INDEX: alexa-trigger
+    ports:
+      - 21003:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-alexa-trigger"
+      - "traefik.port=21003"
+      - "traefik.frontend.rule=Host:es-alexa-trigger.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
