@@ -394,3 +394,6 @@
 [submodule "local/swx-bluerange1/es-json"]
 	path = local/swx-bluerange1/es-json
 	url = https://github.com/sofwerx/es-json
+[submodule "aws/swx-blueteam/safehouse"]
+	path = aws/swx-blueteam/safehouse
+	url = https://github.com/sofwerx/safehouse
