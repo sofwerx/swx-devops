@@ -796,7 +796,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.backend=es-webcam-pcap"
-      - "traefik.port=20001"
+      - "traefik.port=3000"
       - "traefik.frontend.rule=Host:es-webcamp-pcap.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
@@ -816,8 +816,8 @@ services:
       - 20002:3000
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=es-webcam-pcap"
-      - "traefik.port=20001"
+      - "traefik.backend=es-safehouse-ap-ssh"
+      - "traefik.port=3000"
       - "traefik.frontend.rule=Host:es-safehouse-ap-ssh.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
@@ -837,9 +837,51 @@ services:
       - 20003:3000
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=es-webcam-pcap"
-      - "traefik.port=20001"
+      - "traefik.backend=es-safehouse-ap-devices"
+      - "traefik.port=3000"
       - "traefik.frontend.rule=Host:es-safehouse-ap-devices.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-plc-access:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-plc-access
+    hostname: es-plc-access
+    restart: always
+    environment:
+      ES_URL: http://elasticsearch:9200
+      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_INDEX: plc-access
+    ports:
+      - 20004:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-plc-access"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-plc-access.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-plc-ssh:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-plc-ssh
+    hostname: es-plc-ssh
+    restart: always
+    environment:
+      ES_URL: http://elasticsearch:9200
+      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_INDEX: plc-ssh
+    ports:
+      - 20005:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-plc-ssh"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-plc-ssh.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
