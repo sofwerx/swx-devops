@@ -307,8 +307,8 @@ services:
     hostname: es-plc-access
     restart: always
     environment:
-      ES_URL: ${ES_DOOR_LOCK_URL}
-      ES_HTTP_AUTH: ${ES_DOOR_LOCK_HTTP_AUTH}
+      ES_URL: ${ES_PLC_ACCESS_URL}
+      ES_HTTP_AUTH: ${ES_PLC_ACCESS_HTTP_AUTH}
       ES_INDEX: plc-access
     ports:
       - 21008:3000
@@ -328,8 +328,8 @@ services:
     hostname: es-plc-ssh
     restart: always
     environment:
-      ES_URL: ${ES_DOOR_LOCK_URL}
-      ES_HTTP_AUTH: ${ES_DOOR_LOCK_HTTP_AUTH}
+      ES_URL: ${ES_PLC_SSH_URL}
+      ES_HTTP_AUTH: ${ES_PLC_SSH_HTTP_AUTH}
       ES_INDEX: plc-ssh
     ports:
       - 21009:3000
