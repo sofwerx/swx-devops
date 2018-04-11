@@ -397,3 +397,6 @@
 [submodule "aws/swx-blueteam/safehouse"]
 	path = aws/swx-blueteam/safehouse
 	url = https://github.com/sofwerx/safehouse
+[submodule "local/icbgamingpc/docker-pigeoncoin"]
+	path = local/icbgamingpc/docker-pigeoncoin
+	url = https://github.com/sofwerx/docker-pigeoncoin

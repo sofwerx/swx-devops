@@ -20,6 +20,8 @@ volumes:
     driver: local
   ravencoin-data:
     driver: local
+  pigeoncoin-data:
+    driver: local
   znc-data:
     driver: local
 
@@ -136,9 +138,32 @@ services:
     labels:
       - "traefik.enable=false"
     environment:
-      URL: ${URL}
-      USERNAME: ${USERNAME}
+      URL: ${RAVENCOIN_URL}
+      USERNAME: ${RAVENCOIN_USERNAME}
       PASSWORD: ${DOCKER_MACHINE_NAME}
+    command: /nevermore.sh -p ${DOCKER_MACHINE_NAME}
+
+  pigeoncoin-wallet:
+    extends:
+      file: docker-pigeoncoin/docker-compose.yml
+      service: pigeoncoin-wallet
+    restart: always
+    volumes:
+      - pigeoncoin-data:/root/.pigeon
+    labels:
+      - "traefik.enable=false"
+
+  pigeoncoin-nevermore:
+    extends:
+      file: docker-pigeoncoin/docker-compose.yml
+      service: pigeoncoin-nevermore
+#    restart: always
+    labels:
+      - "traefik.enable=false"
+    environment:
+      URL: ${PIGEONCOIN_URL}
+      USER: ${PIGEONCOIN_USERNAME}
+      PASS: ${DOCKER_MACHINE_NAME}
     command: /nevermore.sh -p ${DOCKER_MACHINE_NAME}
 
   znc:
