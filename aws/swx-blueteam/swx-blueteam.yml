@@ -898,3 +898,22 @@ services:
     labels:
       - "traefik.enable=false"
 
+  safehouse:
+    extends:
+      file: safehouse/docker-compose.yml
+      service: safehouse
+    container_name: safehouse
+    hostname: safehouse
+    restart: always
+    environment:
+      ES_URL: ${ES_SAFEHOUSE_URL}
+      ES_HTTP_AUTH: ${ES_SAFEHOUSE_HTTP_AUTH}
+      ES_INDEX: safehouse
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=safehouse"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:safehouse.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+

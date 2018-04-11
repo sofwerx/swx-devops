@@ -173,3 +173,128 @@ services:
     labels:
       - "traefik.enable=false"
 
+  es-minicam-motion:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-minicam-motion
+    hostname: es-minicam-motion
+    restart: always
+    environment:
+      ES_URL: ${ES_MINICAM_MOTION_URL}
+      ES_HTTP_AUTH: ${ES_MINICAM_MOTION_HTTP_AUTH}
+      ES_INDEX: minicam-motion
+    ports:
+      - 21002:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-minicam-motion"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-minicam-motion.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-alexa-trigger:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-alexa-trigger
+    hostname: es-alexa-trigger
+    restart: always
+    environment:
+      ES_URL: ${ES_ALEXA_TRIGGER_URL}
+      ES_HTTP_AUTH: ${ES_ALEXA_TRIGGER_HTTP_AUTH}
+      ES_INDEX: alexa-trigger
+    ports:
+      - 21003:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-alexa-trigger"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-alexa-trigger.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-google-home:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-google-home
+    hostname: es-google-home
+    restart: always
+    environment:
+      ES_URL: ${ES_GOOGLE_HOME_URL}
+      ES_HTTP_AUTH: ${ES_GOOGLE_HOME_HTTP_AUTH}
+      ES_INDEX: google-home
+    ports:
+      - 21004:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-google-home"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-google-home.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-plug:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-plug
+    hostname: es-plug
+    restart: always
+    environment:
+      ES_URL: ${ES_PLUG_URL}
+      ES_HTTP_AUTH: ${ES_PLUG_HTTP_AUTH}
+      ES_INDEX: plug
+    ports:
+      - 21005:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-plug"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-plug.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-alexa-music:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-alexa-music
+    hostname: es-alexa-music
+    restart: always
+    environment:
+      ES_URL: ${ES_ALEXA_MUSIC_URL}
+      ES_HTTP_AUTH: ${ES_ALEXA_MUSIC_HTTP_AUTH}
+      ES_INDEX: alexa-music
+    ports:
+      - 21006:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-alexa-music"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-alexa-music.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  es-door-lock:
+    extends:
+      file: es-json/docker-compose.yml
+      service: es-json
+    container_name: es-door-lock
+    hostname: es-door-lock
+    restart: always
+    environment:
+      ES_URL: ${ES_DOOR_LOCK_URL}
+      ES_HTTP_AUTH: ${ES_DOOR_LOCK_HTTP_AUTH}
+      ES_INDEX: door-lock
+    ports:
+      - 21007:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-door-lock"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:es-door-lock.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"

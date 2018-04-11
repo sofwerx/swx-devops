@@ -447,6 +447,22 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+#  terria:
+#    extends:
+#      file: docker-terria/docker-compose.yml
+#      service: terria
+#    restart: always
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=terria"
+#      - "traefik.port=3001"
+#      - "traefik.frontend.rule=Host:terria.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+
   3dcitydb-postgis:
     extends:
       file: docker-3dcitydb/docker-compose.yml
