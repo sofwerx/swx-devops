@@ -2,6 +2,9 @@
 set -e
 # Install dependencies for this script
 apt-get update
+which npm > /dev/null || (
+  apt-get install -y npm
+)
 which sudo > /dev/null || (
   apt-get install -y sudo
 )
