@@ -246,7 +246,8 @@ resource "aws_iam_policy" "iam_policy" {
          "s3:PutObjectAcl",
          "s3:GetObject",
          "s3:GetObjectAcl",
-         "s3:DeleteObject"
+         "s3:DeleteObject",
+        "iam:PassRole"
       ],
       "Resource": "${aws_s3_bucket.blueteam.arn}/*"
     }
