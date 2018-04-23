@@ -144,7 +144,7 @@ services:
       - "traefik.enable=false"
 
   sourcegraph:
-    image: sourcegraph/server:2.5.4
+    image: sourcegraph/server:2.7.0
     restart: always
     container_name: sourcegraph
     hostname: sourcegraph
@@ -268,7 +268,12 @@ services:
   #
   elasticsearch:
     privileged: true
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
+#    image: docker.elastic.co/elasticsearch/elasticsearch-platinum:${ELASTICSEARCH_VERSION}
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.elasticsearch
     container_name: elasticsearch
     hostname: elasticsearch
     ports: ['127.0.0.1:9200:9200']
@@ -738,6 +743,33 @@ services:
       - kibana
     networks:
       - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  curator:
+    build:
+      context: docker-elastic/
+      dockerfile: Dockerfile.curator
+    image: sofwerx/es-curator
+    hostname: curator
+    container_name: curator
+#    depends_on: ['elasticsearch']
+    networks:
+      - default
+    environment:
+      SCHEME: https
+      ES_USER: elastic
+      ES_PASS: ${ELASTIC_PASSWORD}
+      ES_HOST: elasticsearch.${DNS_DOMAIN}
+      ES_PORT: 443
+      ES_URL: https://elasticsearch.${DNS_DOMAIN}
+      ES_S3_REPOSITORY_BUCKET: sofwerx-blueteam
+      ES_S3_REPOSITORY_NAME: sofwerx_blueteam
+      AWS_REGION: ${AWS_REGION}
+    stdin_open: true
+    tty: true
+    command: /curator.sh
     logging: *default-logging
     labels:
       - "traefik.enable=false"

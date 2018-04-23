@@ -222,12 +222,34 @@ resource "aws_iam_policy" "iam_policy" {
 {
   "Version": "2012-10-17",
   "Statement": [
-     {
-       "Effect": "Allow",
-       "Action": [
-         "iam:ListInstanceProfiles"
-       ],
-       "Resource": "*"
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListInstanceProfiles"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect":"Allow",
+      "Action":[
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucketMultipartUploads",
+        "s3:ListBucketVersions"
+      ],
+      "Resource": "${aws_s3_bucket.blueteam.arn}"
+    },
+    {
+      "Effect":"Allow",
+      "Action":[
+         "s3:PutObject",
+         "s3:PutObjectAcl",
+         "s3:GetObject",
+         "s3:GetObjectAcl",
+         "s3:DeleteObject",
+        "iam:PassRole"
+      ],
+      "Resource": "${aws_s3_bucket.blueteam.arn}/*"
     }
   ]
 }
@@ -444,6 +466,77 @@ resource "aws_route53_record" "wildcard_project_name_ipv6" {
   type    = "AAAA"
   ttl     = "300"
   records = ["${join(",", flatten(aws_instance.instance.*.ipv6_addresses))}"]
+}
+
+resource "aws_s3_bucket" "blueteam" {
+
+  region   = "${var.aws_region}"
+  bucket = "sofwerx-blueteam"
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    prefix  = "elasticsearch/"
+    enabled = true
+
+    noncurrent_version_transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    noncurrent_version_transition {
+      days          = 60
+      storage_class = "GLACIER"
+    }
+
+    noncurrent_version_expiration {
+      days = 180
+    }
+  }
+
+  tags {
+    Name = "sofwerx-blueteam"
+    Project = "${var.Project}"
+    Lifecycle = "${var.Lifecycle}"
+  }
+}
+
+resource "aws_s3_bucket_policy" "elasticsearch" {
+  bucket = "${aws_s3_bucket.blueteam.id}"
+  policy =<<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "SOFWERXBLUETEAMELASTICSEARCHBUCKETPOLICY",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucketMultipartUploads",
+        "s3:ListBucketVersions"
+      ],
+      "Principal":{"AWS": "${aws_iam_role.iam_role.arn}"},
+      "Resource": ["${aws_s3_bucket.blueteam.arn}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts"
+      ],
+      "Principal":{"AWS": "${aws_iam_role.iam_role.arn}"},
+      "Resource": ["${aws_s3_bucket.blueteam.arn}/*"]
+    }
+  ]
+}
+POLICY
 }
 
 output "hostname_list" {
