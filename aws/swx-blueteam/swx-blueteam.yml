@@ -940,12 +940,66 @@ services:
     environment:
       ES_URL: ${ES_SAFEHOUSE_URL}
       ES_HTTP_AUTH: ${ES_SAFEHOUSE_HTTP_AUTH}
-      ES_INDEX: safehouse
     labels:
       - "traefik.enable=true"
       - "traefik.backend=safehouse"
-      - "traefik.port=3000"
+      - "traefik.port=4200"
       - "traefik.frontend.rule=Host:safehouse.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  safehouse-server:
+    extends:
+      file: safehouse/docker-compose.yml
+      service: safehouse-server
+    container_name: safehouse-server
+    hostname: safehouse-server
+    restart: always
+    environment:
+      ES_URL: ${ES_SAFEHOUSE_URL}
+      ES_HTTP_AUTH: ${ES_SAFEHOUSE_HTTP_AUTH}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=safehouse-server"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:safehouse-server.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  safehouse2:
+    extends:
+      file: safehouse/docker-compose.yml
+      service: safehouse
+    container_name: safehouse2
+    hostname: safehouse2
+    restart: always
+    environment:
+      ES_URL: ${ES_SAFEHOUSE_URL}
+      ES_HTTP_AUTH: ${ES_SAFEHOUSE_HTTP_AUTH}
+      GRAPHQL_URL: https://safehouse2-server.${DNS_DOMAIN}/graphql/
+    command: ./safehouse.sh --public-host safehouse2.${DNS_DOMAIN} --disable-host-check
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=safehouse2"
+      - "traefik.port=4200"
+      - "traefik.frontend.rule=Host:safehouse2.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  safehouse2-server:
+    extends:
+      file: safehouse/docker-compose.yml
+      service: safehouse-server
+    container_name: safehouse2-server
+    hostname: safehouse2-server
+    restart: always
+    environment:
+      ES_URL: ${ES_SAFEHOUSE_URL}
+      ES_HTTP_AUTH: ${ES_SAFEHOUSE_HTTP_AUTH}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=safehouse2-server"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:safehouse2-server.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
