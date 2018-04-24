@@ -1,0 +1,91 @@
+version: '2.1'
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  rethink-data:
+    driver: local
+
+services:
+
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    networks:
+      - default
+    restart: always
+    volumes:
+      - traefik-ssl:/ssl
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  rethinkdb:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: rethinkdb
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  adbd:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: adbd
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  stf:
+    extends:
+      file: docker-openstf/docker-compose.yml
+      service: stf-local
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+#  nginx:
+#    extends:
+#      file: docker-openstf/docker-compose.yml
+#      service: nginx
+#    build:
+#      context: docker-openstf/nginx/
+#      dockerfile: Dockerfile
+#    image: sofwerx/nginx
+#    networks:
+#      - default
+##    ports:
+##      - 80:80
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=openstf"
+#      - "traefik.port=80"
+#      - "traefik.frontend.rule=Host:stf.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+
