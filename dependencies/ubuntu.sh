@@ -4,6 +4,7 @@ set -e
 apt-get update
 which npm > /dev/null || (
   apt-get install -y npm
+  ln -s /usr/bin/nodejs /usr/local/bin/node
 )
 which sudo > /dev/null || (
   apt-get install -y sudo
@@ -23,6 +24,9 @@ which aws > /dev/null || (
 )
 which unzip > /dev/null || (
   sudo apt-get install -y unzip
+)
+which vi > /dev/null || (
+  sudo apt-get install -y vim
 )
 which terraform > /dev/null || (
   cd /tmp
