@@ -406,3 +406,9 @@
 [submodule "local/swx-demobox/docker-openstf"]
 	path = local/swx-demobox/docker-openstf
 	url = https://github.com/sofwerx/docker-openstf.git
+[submodule "aws/swx-blueteam/docker-dtube"]
+	path = aws/swx-blueteam/docker-dtube
+	url = https://github.com/sofwerx/docker-dtube
+[submodule "local/ibm-minsky/docker-dtube"]
+	path = local/ibm-minsky/docker-dtube
+	url = https://github.com/sofwerx/docker-dtube/
