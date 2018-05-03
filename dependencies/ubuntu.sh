@@ -129,6 +129,34 @@ Pin: release n=artful
 Pin-Priority: -10
 
 Package: gnupg2:i386
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: gnupg-agent:i386
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: gnupg2
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: dirmngr
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: python3-software-properties
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: software-properties-common
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: gnupg-agent
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: gnupg2:i386
 Pin: release n=xenial
 Pin-Priority: -10
 
