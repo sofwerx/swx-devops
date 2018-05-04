@@ -48,6 +48,8 @@ volumes:
     driver: local
   django-geopackage-server_data:
     driver: local
+  django-geopackage-server-media:
+    driver: local
 
 services:
 
@@ -261,6 +263,7 @@ services:
     extends:
       file: docker-neo4j/docker-compose.yml
       service: neo4j
+    user: root
     image: neo4j:3.3
     restart: always
     networks: 
@@ -271,6 +274,7 @@ services:
       - 7473:7473
     volumes:
       - traefik-ssl:/ssl
+      - neo4j-data:/var/lib/neo4j
     labels:
       - "traefik.enable=true"
       - "traefik.backend=neo4j"
@@ -532,3 +536,21 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+
+  milsymbol-server:
+    extends:
+      file: milsymbol-server/docker-compose.yml
+      service: milsymbol-server
+    image: milsymbol-server
+    container_name: milsymbol-server
+    hostname: milsymbol-server
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mylsymbol-server"
+      - "traefik.port=2525"
+      - "traefik.frontend.rule=Host:milsymbol-server.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"

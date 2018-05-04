@@ -412,3 +412,6 @@
 [submodule "local/ibm-minsky/docker-dtube"]
 	path = local/ibm-minsky/docker-dtube
 	url = https://github.com/sofwerx/docker-dtube/
+[submodule "aws/swx-geotools1/milsymbol-server"]
+	path = aws/swx-geotools1/milsymbol-server
+	url = git@github.com:sofwerx/milsymbol-server.git
