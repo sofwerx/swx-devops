@@ -39,7 +39,7 @@ if [ -n "$DOCKER_API_VERSION" ]; then
 fi
 
 # Set the bash prompt to show our $AWS_PROFILE
-export PS1='[$AWS_PROFILE:$SWX_ENVIRONMENT:$DOCKER_MACHINE_NAME] \h:\W \u\$ '
+export PS1='[$AWS_PROFILE:$SWX_ENVIRONMENT:$DOCKER_MACHINE_NAME] \h:\W\$ '
 
 # These variables become available for terraform to use
 export TF_VAR_aws_region=${AWS_REGION}

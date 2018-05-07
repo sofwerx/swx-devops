@@ -30,8 +30,8 @@ which vi > /dev/null || (
 )
 which terraform > /dev/null || (
   cd /tmp
-  wget https://releases.hashicorp.com/terraform/0.10.7/terraform_0.10.7_linux_amd64.zip
-  unzip terraform_0.10.7_linux_amd64.zip
+  wget https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip
+  unzip terraform_0.11.7_linux_amd64.zip
   sudo mv terraform /usr/local/bin/terraform
 )
 which trousseau > /dev/null || (
@@ -126,6 +126,34 @@ Pin-Priority: -10
 
 Package: gnupg-agent
 Pin: release n=artful
+Pin-Priority: -10
+
+Package: gnupg2:i386
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: gnupg-agent:i386
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: gnupg2
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: dirmngr
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: python3-software-properties
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: software-properties-common
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: gnupg-agent
+Pin: release n=bionic
 Pin-Priority: -10
 
 Package: gnupg2:i386
