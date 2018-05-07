@@ -1,6 +1,11 @@
-if(which gpg2){
+#!/bin/bash
+
+set -e
+
+which gpg2 > /dev/null ||
   brew unlink gnupg
-}
+
+
 brew install gnupg@2.0
 brew link --force gnupg@2.0
 
