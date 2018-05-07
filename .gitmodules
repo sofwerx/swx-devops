@@ -115,9 +115,6 @@
 [submodule "aws/swx-geotools1/docker-geonetwork"]
 	path = aws/swx-geotools1/docker-geonetwork
 	url = https://github.com/sofwerx/core-geonetwork.git
-[submodule "local/ibm-minsky/docker-volume-ipfs"]
-	path = local/ibm-minsky/docker-volume-ipfs
-	url = https://github.com/sofwerx/docker-volume-ipfs
 [submodule "aws/swx-blueteam/docker-elastic"]
 	path = aws/swx-blueteam/docker-elastic
 	url = https://github.com/sofwerx/docker-elastic
