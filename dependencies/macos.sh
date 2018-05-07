@@ -1,5 +1,4 @@
-if(whereis gnupg == NULL){
-  echo "this ran!"
+if(which gpg2){
   brew unlink gnupg
 }
 brew install gnupg@2.0
