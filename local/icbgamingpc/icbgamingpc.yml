@@ -30,6 +30,7 @@ services:
   tor:
     build: docker-tor-ssh/
     image: sofwerx/tor
+    restart: always
     container_name: tor
     logging: *default-logging
     volumes:
