@@ -237,7 +237,7 @@ resource "aws_iam_policy" "iam_policy" {
         "s3:ListBucketMultipartUploads",
         "s3:ListBucketVersions"
       ],
-      "Resource": "*"
+      "Resource": "${aws_s3_bucket.blueteam.arn}"
     },
     {
       "Effect":"Allow",
@@ -249,7 +249,7 @@ resource "aws_iam_policy" "iam_policy" {
          "s3:DeleteObject",
         "iam:PassRole"
       ],
-      "Resource": "*"
+      "Resource": "${aws_s3_bucket.blueteam.arn}"
     }
   ]
 }
