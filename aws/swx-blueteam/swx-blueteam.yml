@@ -32,6 +32,12 @@ volumes:
     driver: local
   bimserver-database:
     driver: local
+  ipfs-data:
+    driver: local
+  dcs-data:
+    driver: local
+  dcs-log:
+    driver: local
 
 services:
 
@@ -285,7 +291,7 @@ services:
       discovery.type: single-node
       cluster.name: ${ELASTIC_CLUSTER_NAME}
       bootstrap.memory_lock: "true"
-      ES_JAVA_OPTS: -Xms16g -Xmx16g
+      ES_JAVA_OPTS: -Xms12g -Xmx12g
       reindex.remote.whitelist: "*.*"
     ulimits:
       memlock:
@@ -996,6 +1002,9 @@ services:
     environment:
       ES_URL: ${ES_SAFEHOUSE_URL}
       ES_HTTP_AUTH: ${ES_SAFEHOUSE_HTTP_AUTH}
+    networks:
+      - default
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=safehouse2-server"
@@ -1003,3 +1012,118 @@ services:
       - "traefik.frontend.rule=Host:safehouse2-server.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  ipfs:
+    extends:
+      file: docker-dtube/docker-compose.yml
+      service: ipfs
+    container_name: ipfs
+    hostname: ipfs
+    restart: always
+    ports:
+      - 4001:4001             # public swarm address
+      - 127.0.0.1:5001:5001   # api service
+      - 127.0.0.1:8080:8080   # gateway service
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=ipfs"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.port=5001"
+      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN};Path:/;AddPrefix:/webui"
+      - "traefik.ipfs.port=8080"
+      - "traefik.ipfs.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/ipfs"
+      - "traefik.webui.port=5001"
+      - "traefik.webui.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/webui"
+
+#  test:
+#    image: ubuntu:xenial
+#    volumes:
+#      - test-data:/data
+
+#  dtube:
+#    extends:
+#      file: docker-dtube/docker-compose.yml
+#      service: dtube
+#    container_name: dtube
+#    hostname: dtube
+#    restart: always
+#    environment:
+#      IPFS_HOST: ipfs
+#    networks:
+#      - default
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=dtube"
+#      - "traefik.port=3000"
+#      - "traefik.frontend.rule=Host:dtube.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+
+#  dcs:
+#    extends:
+#      file: docker-dtube/docker-compose.yml
+#      service: dcs
+#    container_name: dcs
+#    hostname: dcs
+#    restart: always
+#    environment:
+#      IPFS_HOST: ipfs
+#      PORT: ${DCS_PORT}
+#    networks:
+#      - default
+#    logging: *default-logging
+#    command: npm start -p ${DCS_PORT}
+#    labels:
+#      - "traefik.enable=false"
+
+  elasticsearch-hq:
+    image: elastichq/elasticsearch-hq
+    container_name: elasticsearch-hq
+    hostname: elasticsearch-hq
+    environment:
+      SCHEME: http
+      USERNAME: ${ELASTIC_USER}
+      PASSWORD: ${ELASTIC_PASSWORD}
+      ES_HOST: elasticsearch
+      ES_PORT: 9200
+      PORT: 5000
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=elasticsearch-hq"
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=Host:elasticsearch-hq.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
+
+  cerebro:
+    build:
+      context: docker-elastic/
+      args:
+        CEREBRO_VERSION: ${CEREBRO_VERSION}
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.cerebro
+    image: sofwerx/cerebro:${CEREBRO_VERSION}
+    container_name: cerebro
+    hostname: cerebro
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=cerebro"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:cerebro.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
+
+

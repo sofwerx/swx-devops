@@ -788,8 +788,8 @@ services:
     hostname: es-webcam-pcap
     restart: always
     environment:
-      ES_URL: http://elasticsearch:9200
-      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_URL: ${ES_WEBCAM_PCAP_URL}
+      ES_HTTP_AUTH: ${ES_WEBCAM_PCAP_HTTP_AUTH}
       ES_INDEX: webcam-pcap
     ports:
       - 20001:3000
@@ -809,8 +809,8 @@ services:
     hostname: es-safehouse-ap-ssh
     restart: always
     environment:
-      ES_URL: http://elasticsearch:9200
-      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_URL: ${ES_SAFEHOUSE_AP_SSH_URL}
+      ES_HTTP_AUTH: ${ES_SAFEHOUSE_AP_SSH_HTTP_AUTH}
       ES_INDEX: safehouse-ap-ssh
     ports:
       - 20002:3000
@@ -830,8 +830,8 @@ services:
     hostname: es-safehouse-ap-devices
     restart: always
     environment:
-      ES_URL: http://elasticsearch:9200
-      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_URL: ${ES_SAFEHOUSE_AP_DEVICES_URL}
+      ES_HTTP_AUTH: ${ES_SAFEHOUSE_AP_DEVICES_HTTP_AUTH}
       ES_INDEX: safehouse-ap-devices
     ports:
       - 20003:3000
@@ -851,8 +851,8 @@ services:
     hostname: es-plc-access
     restart: always
     environment:
-      ES_URL: http://elasticsearch:9200
-      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
+      ES_URL: ${ES_PLC_ACCESS_URL}
+      ES_HTTP_AUTH: ${ES_PLC_ACCESS_HTTP_AUTH}
       ES_INDEX: plc-access
     ports:
       - 20004:3000
@@ -864,24 +864,24 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  es-plc-ssh:
+  es-plc-remote-access:
     extends:
       file: es-json/docker-compose.yml
       service: es-json
-    container_name: es-plc-ssh
-    hostname: es-plc-ssh
+    container_name: es-plc-remote-access
+    hostname: es-plc-remote-access
     restart: always
     environment:
-      ES_URL: http://elasticsearch:9200
-      ES_HTTP_AUTH: elastic:${ELASTIC_PASSWORD}
-      ES_INDEX: plc-ssh
+      ES_URL: ${ES_PLC_REMOTE_ACCESS_URL}
+      ES_HTTP_AUTH: ${ES_PLC_REMOTE_ACCESS_HTTP_AUTH}
+      ES_INDEX: plc-remote-access
     ports:
       - 20005:3000
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=es-plc-ssh"
+      - "traefik.backend=es-plc-remote-access"
       - "traefik.port=3000"
-      - "traefik.frontend.rule=Host:es-plc-ssh.${DNS_DOMAIN}"
+      - "traefik.frontend.rule=Host:es-plc-remote-access.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 

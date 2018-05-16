@@ -249,7 +249,7 @@ resource "aws_iam_policy" "iam_policy" {
          "s3:DeleteObject",
         "iam:PassRole"
       ],
-      "Resource": "${aws_s3_bucket.blueteam.arn}/*"
+      "Resource": "${aws_s3_bucket.blueteam.arn}"
     }
   ]
 }
@@ -468,6 +468,11 @@ resource "aws_route53_record" "wildcard_project_name_ipv6" {
   records = ["${join(",", flatten(aws_instance.instance.*.ipv6_addresses))}"]
 }
 
+resource "aws_s3_bucket" "blueteam_log" {
+  bucket = "sofwerx-blueteam-log"
+  acl    = "log-delivery-write"
+}
+
 resource "aws_s3_bucket" "blueteam" {
 
   region   = "${var.aws_region}"
@@ -483,18 +488,23 @@ resource "aws_s3_bucket" "blueteam" {
     enabled = true
 
     noncurrent_version_transition {
-      days          = 30
+      days          = 1825
       storage_class = "STANDARD_IA"
     }
 
     noncurrent_version_transition {
-      days          = 60
+      days          = 3650
       storage_class = "GLACIER"
     }
 
     noncurrent_version_expiration {
-      days = 180
+      days = 7300
     }
+  }
+
+  logging {
+    target_bucket = "${aws_s3_bucket.blueteam_log.id}"
+    target_prefix = "log/"
   }
 
   tags {
