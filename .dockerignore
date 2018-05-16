@@ -1,4 +1,6 @@
-local
-aws
-node_modules
-.git
+local/
+aws/
+node_modules/
+.git/
+cellar/
+tmp/
