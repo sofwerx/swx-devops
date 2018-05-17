@@ -2,3 +2,5 @@ secrets/
 node_modules/
 .vagrant*
 tmp/
+.bash_history
+.viminfo
