@@ -181,8 +181,7 @@ swx_ssh ()
     swx_secrets_decrypt secrets/dm/$ssh_host
     local config_json="${devops}/secrets/docker/machines/${ssh_host}/config.json"
     if [ ! -f "${config_json}" ]; then
-      mkdir -p $(dirname "${config_json}")
-      dmport --export "$ssh_host" | jq -r .machines[\""$ssh_host"\"][\""config.json"\"] | base64 -D > ${config_json}
+      swx_dm_export $ssh_host
     fi
     if [ -f "${config_json}" ]; then
       local ip_address="$(jq -r .Driver.IPAddress ${config_json})"
