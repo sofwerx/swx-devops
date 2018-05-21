@@ -555,3 +555,22 @@ services:
       - "traefik.frontend.rule=Host:milsymbol-server.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  glo:
+    extends:
+      file: glo/docker-compose.yml
+      service: glo
+    image: sofwerx/glo
+    container_name: glo
+    hostname: glo
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=glo"
+      - "traefik.port=4200"
+      - "traefik.frontend.rule=Host:glo.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
+
