@@ -49,6 +49,10 @@ volumes:
 #    driver: ipfs
   iri-data:
     driver: local
+  dcs-data:
+    driver: local
+  dcs-log:
+    driver: local
 
 services:
 
@@ -283,71 +287,40 @@ services:
       --password=/tmp/password
       "
 
-#  ipfs:
-#    privileged: true
-#    extends:
-#      file: docker-ipfs/docker-compose.yml
-#      service: ipfs
-#    image: sofwerx/ipfs:${ARCH}
-#    restart: always
-#    volumes:
-#      - ipfs-staging:/export
-#      - ipfs-data:/data/ipfs
-#    ports:
-#      - 4001:4001             # public swarm address
-#      - 127.0.0.1:8080:8080   # gateway service
-#      - 127.0.0.1:5001:5001   # api service
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.backend=ipfs"
-#      - "traefik.port=8080"
-#      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN}"
-#      - "traefik.frontend.passHostHeader=true"
-#      - "traefik.frontend.entryPoints=http,https"
-
-#  ipfs-cluster:
-#    extends:
-#      file: docker-ipfs-cluster/docker-compose.yml
-#      service: ipfs-cluster
-#    image: sofwerx/ipfs-cluster:${ARCH}
-#    container_name: ipfs-cluster
-#    hostname: ipfs-cluster
-#    volumes:
-#      - ipfs-cluster-data:/data/ipfs-cluster
-#    labels:
-#      - "traefik.enable=false"
-
-  docker-volume-ipfs:
+  ipfs:
+    container_name: ipfs
+    hostname: ipfs
     privileged: true
     restart: always
     build:
-      context: docker-volume-ipfs/
+      context: docker-ipfs/
       dockerfile: Dockerfile.${ARCH}
-    container_name: docker-volume-ipfs
-    hostname: docker-volume-ipfs
-    image: sofwerx/docker-volume-ipfs:${ARCH}
+    image: sofwerx/ipfs:${ARCH}
     environment:
       ARCH: ${ARCH}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ipfs-staging:/export
       - ipfs-data:/data/ipfs
+      - /:/chroot
     ports:
       - 4001:4001             # public swarm address
-      - 127.0.0.1:8080:8080   # gateway service
       - 127.0.0.1:5001:5001   # api service
+      - 127.0.0.1:8080:8080   # gateway service
     logging: *default-logging
+    networks:
+      - default
     labels:
       - "traefik.enable=true"
       - "traefik.backend=ipfs"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.port=5001"
+      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN};Path:/;AddPrefix:/webui"
       - "traefik.ipfs.port=8080"
-      - "traefik.ipfs.rule=Host:ipfs.${DNS_DOMAIN};AddPrefix:/ipfs"
-      - "traefik.ipfs.passHostHeader=true"
-      - "traefik.ipfs.entryPoints=http,https"
-      - "traefik.ipfswebui.port=5001"
-      - "traefik.ipfswebui.rule=Host:ipfs-webui.${DNS_DOMAIN};AddPrefix:/webui"
-      - "traefik.ipfswebui.passHostHeader=true"
-      - "traefik.ipfswebui.entryPoints=http,https"
+      - "traefik.ipfs.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/ipfs"
+      - "traefik.webui.port=5001"
+      - "traefik.webui.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/webui"
 
 #  test:
 #    image: ubuntu:xenial
@@ -409,4 +382,41 @@ services:
       PASSWORD: ${MONERO_PASSWORD}
       HOSTPORT: ${MONERO_HOSTPORT}
     tty: true
+
+  dtube:
+    extends:
+      file: docker-dtube/docker-compose.yml
+      service: dtube
+    container_name: dtube
+    hostname: dtube
+    restart: always
+    environment:
+      IPFS_HOST: ipfs
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=dtube"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:dtube.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  dcs:
+    extends:
+      file: docker-dtube/docker-compose.yml
+      service: dcs
+    container_name: dcs
+    hostname: dcs
+    restart: always
+    environment:
+      IPFS_HOST: ipfs
+    networks:
+      - default
+    logging: *default-logging
+    command: npm start
+    labels:
+      - "traefik.enable=false"
+
 
