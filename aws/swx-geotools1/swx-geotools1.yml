@@ -574,3 +574,21 @@ services:
       - "traefik.frontend.passHostHeader=false"
       - "traefik.frontend.entryPoints=http,https"
 
+  swx-glo:
+    extends:
+      file: swx-glo/docker-compose.yml
+      service: glo
+    image: sofwerx/swx-glo
+    container_name: swx-glo
+    hostname: swx-glo
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=swx-glo"
+      - "traefik.port=4200"
+      - "traefik.frontend.rule=Host:swx-glo.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
+
