@@ -1,4 +1,3 @@
-# The trousseau and terraform commands need buckets
 export TROUSSEAU_STORE="${TROUSSEAU_STORE:-${devops}/.trousseau}"
 
 # TROUSSEAU_PRIVATE_KEY
@@ -20,3 +19,16 @@ if which trousseau 2>&1 > /dev/null ; then
 else
   alias trousseau="echo Cannot find the trousseau command in your path"
 fi
+
+trousseau_find_store ()
+{
+  if [ "${PWD}" != "/" ]; then
+   if [ -f .trousseau ]; then
+      export TROUSSEAU_STORE="${PWD}/.trousseau"
+    else
+      pushd .. > /dev/null 2>&1 
+      trousseau_find_store
+    fi
+  fi
+  popd > /dev/null 2>&1
+}

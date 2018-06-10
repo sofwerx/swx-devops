@@ -8,9 +8,10 @@ fi
 devops="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 alias ch="cd ${devops}"
 
-for part in ${devops}/swx.d/* ; do
-  . "${part}"
+for swx_step in ${devops}/swx.d/* ; do
+  . "${swx_step}"
 done
+unset swx_step
 
 # Set the bash prompt to show our $AWS_PROFILE
 export PS1='[$AWS_PROFILE:$SWX_ENVIRONMENT:$DOCKER_MACHINE_NAME] \h:\W\$ '
