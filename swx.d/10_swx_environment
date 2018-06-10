@@ -1,0 +1,128 @@
+swx_environment_ls ()
+{
+  trousseau keys | grep -e ^environment: | cut -d: -f2 | sort | uniq
+}
+
+swx_environment_del ()
+{
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau del "environment:${SWX_ENVIRONMENT}:$1"
+    unset $1
+  else
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
+  fi
+}
+
+swx_environment_get ()
+{
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau get "environment:${SWX_ENVIRONMENT}:$1"
+  else
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
+  fi
+}
+
+swx_environment_set ()
+{
+  if echo "$1" | grep = > /dev/null ; then
+    echo 'Do not put a = sign in the variable name.'
+  else
+    if [ -n "${SWX_ENVIRONMENT}" ]; then
+      trousseau set "environment:${SWX_ENVIRONMENT}:$1" "$2"
+      export "$1=$2"
+      echo "$1=$2"
+    else
+      echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
+    fi
+  fi
+}
+
+swx_environment_show ()
+{
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://" | while read key ; do
+      echo "${key}=$(trousseau get environment:${SWX_ENVIRONMENT}:${key})"
+    done
+  else
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
+  fi
+}
+swx_environment_keys ()
+{
+  if [ -n "${SWX_ENVIRONMENT}" ]; then
+    trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"
+  else
+    echo 'No enviroment selected. Please use `swx environment switch` to switch to an environment first'
+  fi
+}
+
+swx_environment_create ()
+{
+  environment=$1
+
+  if trousseau keys | grep -e "^environment:${environment}:" > /dev/null ; then
+    echo "Environment variables already exist in trousseau for environment: $environment" 1>&2
+    return 1
+  else
+    export SWX_ENVIRONMENT="$environment"
+  fi
+}
+
+swx_environment_switch ()
+{
+  environment=$1
+
+  if trousseau keys | grep -e "^environment:${environment}:" > /dev/null ; then
+
+    # Preemptively undefine some variables that cause problems if defined in one environment and not another
+    unset COMPOSE_PROJECT_NAME COMPOSE_FILE COMPOSE_HTTP_TIMEOUT
+
+    # Default to having docker-compose timeout after 5 minutes if it cannot communicate to a docker-engine
+    export COMPOSE_HTTP_TIMEOUT=${COMPOSE_HTTP_TIMEOUT:-300}
+
+    # Undefine any variables from an already sourced environment
+    if [ -n $SWX_ENVIRONMENT ]; then
+      for variable in $(trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"); do
+        unset "$variable"
+      done
+    fi
+
+    # Define variables from the newly selected environment
+    export SWX_ENVIRONMENT=$environment
+    for variable in $(trousseau keys | grep -e "^environment:${SWX_ENVIRONMENT}:" | sed -e "s/^environment:${SWX_ENVIRONMENT}://"); do
+      export ${variable}="$(trousseau get environment:${SWX_ENVIRONMENT}:${variable})"
+    done
+  else
+    echo "No environment variables exist in trousseau for environment: $environment" 1>&2
+    return 1
+  fi
+}
+
+swx_environment ()
+{
+  case $1 in
+ls) shift; swx_environment_ls ;;
+create) shift; swx_environment_create $@ ;;
+switch) shift; swx_environment_switch $@ ;;
+del) shift; swx_environment_del $@ ;;
+get) shift; swx_environment_get $@ ;;
+set) shift; swx_environment_set $@ ;;
+show) shift; swx_environment_show $@ ;;
+keys) shift; swx_environment_keys $@ ;;
+*) cat <<EOU 1>&2
+Usage: swx dm environment {action}
+  ls     - List environments
+  create - Create a new environment
+  switch - Switch to an environment
+  del    - Delete an environment variable from the current environment
+  get    - Get an environment variable from the current environment
+  set    - Set an environment variable in the current environment
+  show   - Show the environment variables and values for the current environment
+  keys   - List the environment variables for the current environment
+EOU
+  return 1
+  ;;
+  esac
+}
+
+

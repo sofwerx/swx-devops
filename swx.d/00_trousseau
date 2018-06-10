@@ -1,0 +1,22 @@
+# The trousseau and terraform commands need buckets
+export TROUSSEAU_STORE="${TROUSSEAU_STORE:-${devops}/.trousseau}"
+
+# TROUSSEAU_PRIVATE_KEY
+if [ -z "${TROUSSEAU_PASSPHRASE}" ] &&
+   [ -z "${TROUSSEAU_KEYRING_SERVICE}" ] &&
+   [ -z "${GPG_AGENT_INFO}" ] ; then
+  echo 'To save yourself some passphrase prompting pain, you may want to:'
+  echo '    export TROUSSEAU_PASSPHRASE={your pgp passphrase}'
+  echo 'Alternatively, you may want to add a password to your keyring service for trousseau to use:'
+  echo '    export TROUSSEAU_KEYRING_SERVICE=trouseau'
+fi
+
+if [ -n "${GPG_AGENT_INFO}" -a -z "$TROUSSEAU_KEYRING_SERVICE" ]; then
+  export TROUSSEAU_KEYRING_SERVICE=trouseau
+fi
+
+if which trousseau 2>&1 > /dev/null ; then
+  alias trousseau="$(which trousseau) --gnupg-home $GNUPGHOME --store $TROUSSEAU_STORE"
+else
+  alias trousseau="echo Cannot find the trousseau command in your path"
+fi

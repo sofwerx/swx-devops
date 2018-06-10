@@ -1,0 +1,20 @@
+if [ -n "$DOCKER_API_VERSION" ]; then
+ unset DOCKER_API_VERSION
+fi
+
+# Allow a secrets based local store of docker-machines... for Ian. You _probably_ don't want this directory.
+if [ -d "${devops}/secrets/docker/machines" ]; then
+  export MACHINE_STORAGE_PATH="${devops}/secrets/docker"
+else
+  if [ -d ~/.docker/machine/machines ] ; then
+    export MACHINE_STORAGE_PATH=~/.docker/machine/machines
+  fi
+fi
+
+# Install dmport if it has not been yet
+if which npm > /dev/null; then
+  if [ ! -d "${devops}/node_modules/" ]; then
+    npm install
+  fi
+  export PATH=$PATH:"${devops}/node_modules/.bin"
+fi

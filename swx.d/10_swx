@@ -1,0 +1,61 @@
+_swx ()
+{
+  local cur
+  COMPREPLY=()
+  cur=${COMP_WORDS[COMP_CWORD]}
+  case "${COMP_WORDS[*]}" in
+    "swx dc"*) COMPREPLY=( $( compgen -W "build bundle config create down events exec help images kill logs pause port ps pull push restart rm run scale start stop top unpause up version" -- $cur ) ) ;;
+    "swx dm ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx dm import"*) COMPREPLY=( $( compgen -W "$(docker-machine ls -q)" -- $cur ) ) ;;
+    "swx dm export"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
+    "swx dm env"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
+    "swx dm"*) COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
+    "swx ssh"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
+    "swx gpg"*) COMPREPLY=( $( compgen -W "prepare remember forget reset" -- $cur ) ) ;;
+    "swx environment ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx environment create"*) COMPREPLY=( $( $cur ) ) ;;
+    "swx environment switch"*) COMPREPLY=( $( compgen -W "$(swx_environment_ls)" -- $cur ) ) ;;
+    "swx environment del"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
+    "swx environment get"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
+    "swx environment set"*) COMPREPLY=( $( compgen -W "$(swx_environment_keys)" -- $cur ) ) ;;
+    "swx environment show"*) COMPREPLY=( $cur ) ;;
+    "swx environment keys") COMPREPLY=( $cur ) ;;
+    "swx environment"*) COMPREPLY=( $( compgen -W "ls switch del get set show keys"  -- $cur ) ) ;;
+    "swx secrets addrecipients"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx secrets encrypt "*) COMPREPLY=( $( compgen -W "$(find secrets/ -type f | grep -v -e 'gnupg\|docker')" -- $cur ) ) ;;
+    "swx secrets decrypt "*) COMPREPLY=( $( compgen -W "$(trousseau keys | grep -e ^file:secrets/ | sed -e s/^file://)" -- $cur ) ) ;;
+    "swx secrets pull "*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
+    "swx secrets"*) COMPREPLY=( $( compgen -W "addrecipients decrypt encrypt pull" -- $cur ) ) ;;
+    "swx tf"*) COMPREPLY=( $( compgen -W "apply destroy fmt get graph import init output plan push refresh remote show taint untaint validate version state" -- $cur ) ) ;;
+    *) COMPREPLY=( $( compgen -W 'dc dm environment gpg secrets tf' -- $cur ) ) ;;
+  esac
+  return 0
+}
+complete -F _swx swx
+
+swx ()
+{
+  case $1 in
+ssh) shift; swx_ssh $@ ;;
+gpg) shift; swx_gpg $@ ;;
+dm) shift; swx_dm $@ ;;
+environment) shift; swx_environment $@ ;;
+secrets) shift; swx_secrets $@ ;;
+tf) shift; swx_tf $@ ;;
+*) cat <<EOU 1>&2
+Usage: swx {command}
+  dm          - Manage dm (docker-machines)
+  environment - Source project-lifecycle environment variables
+  gpg         - Interact with your gpg-agent
+  secrets     - Deal with secrets/ folder
+  ssh         - Attempt to ssh into a dm
+  tf          - Run Terraform for a project-lifecycle
+EOU
+  return 1
+  ;;
+  esac
+}
+alias swx="swx"
+complete -F _swx swx
+
+

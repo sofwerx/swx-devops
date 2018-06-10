@@ -1,0 +1,13 @@
+change_directory ()
+{
+  unalias cd 2>/dev/null 
+  \cd $@
+  alias cd='change_directory $@'
+  if [ -f .dm ]; then
+    swx dm env $(cat .dm)
+  fi
+  if [ -f .trousseau ]; then
+    export TROUSSEAU_STORE="${PWD}/.trousseau"
+  fi
+}
+
