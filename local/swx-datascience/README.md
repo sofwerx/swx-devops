@@ -21,20 +21,21 @@ This consists of:
 
 For the supermicro servers, with the ZFS volume driver:
 
-    docker-machine create -d generic --generic-ip-address 192.168.1.60 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-supermicro0
-    docker-machine create -d generic --generic-ip-address 192.168.1.62 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-supermicro2
-    docker-machine create -d generic --generic-ip-address 192.168.1.64 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-supermicro4
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 60022 --generic-engine-port 60376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-supermicro0
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 62022 --generic-engine-port 62376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-supermicro2
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 63022 --generic-engine-port 63376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-supermicro3
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 64022 --generic-engine-port 64376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-supermicro4
 
-For the tranquilpc "orange box" with the overlay2 volume driver:
+For the tranquilpc "orange box" with the ZFS volume driver:
 
-    docker-machine create -d generic --generic-ip-address 192.168.1.120 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-orange0
-    docker-machine create -d generic --generic-ip-address 192.168.1.121 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-orange1
-    docker-machine create -d generic --generic-ip-address 192.168.1.122 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-orange2
-    docker-machine create -d generic --generic-ip-address 192.168.1.123 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-orange3
-    docker-machine create -d generic --generic-ip-address 192.168.1.124 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-orange4
-    docker-machine create -d generic --generic-ip-address 192.168.1.125 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-orange5
-    docker-machine create -d generic --generic-ip-address 192.168.1.126 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-orange6
-    docker-machine create -d generic --generic-ip-address 192.168.1.127 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-orange7
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 50022 --generic-engine-port 50376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-orange0
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 51022 --generic-engine-port 51376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-orange1
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 52022 --generic-engine-port 52376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-orange2
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 53022 --generic-engine-port 53376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-orange3
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 54022 --generic-engine-port 54376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-orange4
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 55022 --generic-engine-port 55376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-orange5
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 56022 --generic-engine-port 56376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-orange6
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 57022 --generic-engine-port 57376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver zfs swx-u-ub-orange7
 
 If you run into any problems doing this, you may safely remove them and try again:
 
@@ -69,7 +70,7 @@ You may find that docker-machine can't find dockerd, and that's likely because d
 
 9. Setup environment variables for traefik:
 
-    swx environment create swx-supermicro0
+    swx environment create swx-datascience
     swx environment set DNS_DOMAIN datascience.opswerx.org
 
 10. Setup the dm2environment association between the dm host to the environment it is part of, to allow auto-switching to the environment when you cd to the directory:
@@ -90,7 +91,7 @@ You may find that docker-machine can't find dockerd, and that's likely because d
 
 11. Setup environment variable for `docker-compose` to know which `.yml` file to use for this environment, and the ARCH of this environment:
 
-    swx environment set COMPOSE_FILE swx-supermicro0.yml
+    swx environment set COMPOSE_FILE swx-datascience.yml
     swx environment set ARCH x86_64
 
 12. Add the `.trousseau` file to the git repo and commit and push it as a new change:
