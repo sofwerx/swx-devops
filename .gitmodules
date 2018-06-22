@@ -418,3 +418,6 @@
 [submodule "aws/swx-geotools1/swx-glo"]
 	path = aws/swx-geotools1/swx-glo
 	url = git@github.com:sofwerx/glo.git
+[submodule "local/swx-datascience/kubespray"]
+	path = local/swx-datascience/kubespray
+	url = https://github.com/sofwerx/kubespray
