@@ -421,3 +421,6 @@
 [submodule "local/swx-datascience/kubespray"]
 	path = local/swx-datascience/kubespray
 	url = https://github.com/sofwerx/kubespray
+[submodule "local/icbgamingpc/docker-makemkv"]
+	path = local/icbgamingpc/docker-makemkv
+	url = https://github.com/ianblenke/docker-makemkv
