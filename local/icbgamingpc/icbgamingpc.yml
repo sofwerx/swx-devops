@@ -24,6 +24,18 @@ volumes:
     driver: local
   znc-data:
     driver: local
+  plex-config:
+    driver: local
+  plex-transcode:
+    driver: local
+  plex-media:
+    driver: local
+  makemkv-config:
+    driver: local
+  makemkv-storage:
+    driver: local
+  makemkv-output:
+    driver: local
 
 services:
 
@@ -180,4 +192,48 @@ services:
       - 6697:6697
     labels:
       - "traefik.enable=false"
+
+  plex:
+    image: plexinc/pms-docker
+#    hostname: plex
+    container_name: plex
+    network_mode: host
+#    ports:
+#      - 32401:32400/tcp
+#      - 3005:3005/tcp
+#      - 8324:8324/tcp
+#      - 32469:32469/tcp
+#      - 1900:1900/udp
+#      - 32410:32410/udp
+#      - 32412:32412/udp
+#      - 32413:32413/udp
+#      - 32414:32414/udp
+    environment:
+      TZ: "EST5EDT"
+      PLEX_CLAIM: "${PLEX_CLAIM}"
+      ADVERTISE_IP: "http://${PUBLIC_IPV4}:32401/"
+    volumes:
+      - plex-config:/config
+      - plex-transcode:/transcode
+      - plex-media:/data
+      - /home/ianblenke/Videos:/videos
+
+  makemkv:
+    extends:
+      file: docker-makemkv/docker-compose.yml
+      service: makemkv
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    image: ianblenke/makemkv
+    container_name: makemkv
+    ports:
+      - 5800:5800
+    volumes:
+      - makemkv-config:/config
+      - makemkv-storage:/storage
+      - makemkv-output:/output
+    devices:
+      - /dev/sr0
+      - /dev/sg1
 
