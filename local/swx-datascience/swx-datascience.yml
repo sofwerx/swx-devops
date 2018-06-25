@@ -48,3 +48,344 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  motion43:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion43
+    hostname: motion43
+    restart: always
+    ports:
+      - 20043:20043
+      - 21043:21043
+    environment:
+      WEBCONTROL_PORT: 20043
+      STREAM_PORT: 21043
+      RTSP_URL: ${RTSP_URL_43}
+      RTSP_AUTH: ${RTSP_AUTH_43}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion43:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20043"
+      - "traefik.frontend.rule=Host:motion43.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion44:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion44
+    hostname: motion44
+    restart: always
+    ports:
+      - 20044:20044
+      - 21044:21044
+    environment:
+      WEBCONTROL_PORT: 20044
+      STREAM_PORT: 21044
+      RTSP_URL: ${RTSP_URL_44}
+      RTSP_AUTH: ${RTSP_AUTH_44}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion44:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20044"
+      - "traefik.frontend.rule=Host:motion44.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion45:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion45
+    hostname: motion45
+    restart: always
+    ports:
+      - 20045:20045
+      - 21045:21045
+    environment:
+      WEBCONTROL_PORT: 20045
+      STREAM_PORT: 21045
+      RTSP_URL: ${RTSP_URL_45}
+      RTSP_AUTH: ${RTSP_AUTH_45}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion45:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20045"
+      - "traefik.frontend.rule=Host:motion45.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion46:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion46
+    hostname: motion46
+    restart: always
+    ports:
+      - 20046:20046
+      - 21046:21046
+    environment:
+      WEBCONTROL_PORT: 20046
+      STREAM_PORT: 21046
+      RTSP_URL: ${RTSP_URL_46}
+      RTSP_AUTH: ${RTSP_AUTH_46}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion46:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20046"
+      - "traefik.frontend.rule=Host:motion46.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion47:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion47
+    hostname: motion47
+    restart: always
+    ports:
+      - 20047:20047
+      - 21047:21047
+    environment:
+      WEBCONTROL_PORT: 20047
+      STREAM_PORT: 21047
+      RTSP_URL: ${RTSP_URL_47}
+      RTSP_AUTH: ${RTSP_AUTH_47}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion47:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20047"
+      - "traefik.frontend.rule=Host:motion47.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion48:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion48
+    hostname: motion48
+    restart: always
+    ports:
+      - 20048:20048
+      - 21048:21048
+    environment:
+      WEBCONTROL_PORT: 20048
+      STREAM_PORT: 21048
+      RTSP_URL: ${RTSP_URL_48}
+      RTSP_AUTH: ${RTSP_AUTH_48}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion48:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20048"
+      - "traefik.frontend.rule=Host:motion48.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion49:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion49
+    hostname: motion49
+    restart: always
+    ports:
+      - 20049:20049
+      - 21049:21049
+    environment:
+      WEBCONTROL_PORT: 20049
+      STREAM_PORT: 21049
+      RTSP_URL: ${RTSP_URL_49}
+      RTSP_AUTH: ${RTSP_AUTH_49}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion49:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20049"
+      - "traefik.frontend.rule=Host:motion49.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion50:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion50
+    hostname: motion50
+    restart: always
+    ports:
+      - 20050:20050
+      - 21050:21050
+    environment:
+      WEBCONTROL_PORT: 20050
+      STREAM_PORT: 21050
+      RTSP_URL: ${RTSP_URL_50}
+      RTSP_AUTH: ${RTSP_AUTH_50}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion50:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20050"
+      - "traefik.frontend.rule=Host:motion50.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion51:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion51
+    hostname: motion51
+    restart: always
+    ports:
+      - 20051:20051
+      - 21051:21051
+    environment:
+      WEBCONTROL_PORT: 20051
+      STREAM_PORT: 21051
+      RTSP_URL: ${RTSP_URL_51}
+      RTSP_AUTH: ${RTSP_AUTH_51}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion51:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20051"
+      - "traefik.frontend.rule=Host:motion51.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion52:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion52
+    hostname: motion52
+    restart: always
+    ports:
+      - 20052:20052
+      - 21052:21052
+    environment:
+      WEBCONTROL_PORT: 20052
+      STREAM_PORT: 21052
+      RTSP_URL: ${RTSP_URL_52}
+      RTSP_AUTH: ${RTSP_AUTH_52}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion52:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20052"
+      - "traefik.frontend.rule=Host:motion52.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion53:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion53
+    hostname: motion53
+    restart: always
+    ports:
+      - 20053:20053
+      - 21053:21053
+    environment:
+      WEBCONTROL_PORT: 20053
+      STREAM_PORT: 21053
+      RTSP_URL: ${RTSP_URL_53}
+      RTSP_AUTH: ${RTSP_AUTH_53}
+#      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion53:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=20053"
+      - "traefik.frontend.rule=Host:motion53.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
