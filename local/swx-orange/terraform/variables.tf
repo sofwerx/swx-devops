@@ -10,7 +10,7 @@ variable Lifecycle {
 
 variable dns_zone {
   description = "DNS Zone"
-  default = "devwerx.org."
+  default = "opswerx.org."
 }
 
 variable aws_access_key_id {

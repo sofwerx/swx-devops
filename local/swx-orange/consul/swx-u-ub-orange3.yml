@@ -1,0 +1,50 @@
+version: "3.4"
+
+volumes:
+
+  consul-data:
+    driver: local
+  consul-config:
+    driver: local
+
+services:
+
+  consul:
+    container_name: consul
+    network_mode: host
+    image: consul
+    command: >-
+      agent
+        -server
+        -retry-join 192.168.1.120
+        -retry-join 192.168.1.121
+        -retry-join 192.168.1.122
+        -retry-join 192.168.1.124
+        -retry-join 192.168.1.125
+        -retry-join 192.168.1.126
+        -retry-join 192.168.1.127
+        -config-dir=/consul/config
+        -data-dir=/consul/data
+        -bootstrap-expect=5
+        -raft-protocol=3
+        -rejoin
+        -ui-dir=/ui
+        -log-level debug
+        -advertise='{{ GetInterfaceIP "enp6s0" }}'
+        -advertise-wan='{{ GetInterfaceIP "enp6s0" }}'
+        -client='{{ GetInterfaceIP "enp6s0" }} {{ GetInterfaceIP "docker0" }}'
+        -serf-wan-bind='{{ GetInterfaceIP "enp6s0" }}'
+        -serf-lan-bind='{{ GetInterfaceIP "enp6s0" }}'
+    volumes:
+      - consul-data:/consul/data
+      - consul-config:/consul/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=consul"
+      - "traefik.backend.loadbalancer.swarm=true"
+      - "traefik.backend.loadbalancer.method=wrr"
+      - "traefik.port=8500"
+      - "traefik.frontend.rule=Host:consul.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+

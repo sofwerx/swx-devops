@@ -1,0 +1,77 @@
+version: '3.1'
+
+networks: 
+
+  traefik:
+    driver: overlay
+
+  minio:
+    external:
+      name: minio_stack_minio
+
+volumes:
+
+  traefik-ssl:
+    driver: local
+
+services:
+
+  traefik:
+    build:
+      context: docker-traefik/
+      dockerfile: Dockerfile.${ARCH}
+      args:
+        ARCH: ${ARCH}
+    image: sofwerx/traefik
+    deploy:
+      mode: global
+      restart_policy:
+        delay: 10s
+        max_attempts: 10
+        window: 60s
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=traefik"
+        - "traefik.backend.loadbalancer.method=wrr"
+        - "traefik.port=7080"
+        - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - traefik
+      - minio
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      DOCKER_SWARMMODE: "true"
+      CONSUL_HOST: 172.17.0.1
+    command: >-
+      --loglevel DEBUG
+      --web
+      --web.address=":7080"
+      --docker
+      --docker.endpoint="unix:///var/run/docker.sock"
+      --docker.domain="${DNS_DOMAIN}"
+      --docker.swarmmode
+      --docker.watch
+      --exposedbydefault=false
+      --consul
+      --consul.endpoint="172.18.0.1:8500"
+      --consul.watch
+      --consul.prefix="traefik"
+      --entrypoints="Name:http Address::80"
+      --entrypoints="Name:https Address::443 TLS"
+    volumes:
+      - traefik-ssl:/ssl
+      - /var/run/docker.sock:/var/run/docker.sock
+
