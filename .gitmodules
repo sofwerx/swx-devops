@@ -427,3 +427,6 @@
 [submodule "local/swx-datascience/docker-traefik"]
 	path = local/swx-datascience/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/swx-datascience/docker-motion"]
+	path = local/swx-datascience/docker-motion
+	url = https://github.com/sofwerx/docker-motion
