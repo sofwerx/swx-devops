@@ -424,3 +424,6 @@
 [submodule "local/icbgamingpc/docker-makemkv"]
 	path = local/icbgamingpc/docker-makemkv
 	url = https://github.com/ianblenke/docker-makemkv
+[submodule "local/swx-datascience/docker-traefik"]
+	path = local/swx-datascience/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git

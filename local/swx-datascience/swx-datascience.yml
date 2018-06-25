@@ -1,0 +1,50 @@
+version: '2.1'
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+
+services:
+
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    volumes:
+      - traefik-ssl:/ssl
+    restart: always
+    ports:
+      - 80:20080
+      - 443:20443
+    networks:
+      - default
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "20080"
+      HTTPS_PORT: "20443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
