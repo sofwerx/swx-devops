@@ -71,3 +71,7 @@ If that fails, you may safely remove it and try it again:
 
     docker-compose up -d traefik
 
+# kubespray
+
+This kubernetes cluster is deployed and maintained using kubespray.
+
