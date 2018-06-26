@@ -1,0 +1,6 @@
+if [ -f "${devops}/secrets/kube/config" ] ; then
+  export KUBECONFIG="${devops}/secrets/kube/config"
+fi
+if [ -d "${devops}/secrets/helm" ] ; then
+  export HELM_HOME="${devops}/secrets/helm"
+fi
