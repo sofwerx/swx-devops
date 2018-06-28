@@ -15,7 +15,7 @@ data "aws_route53_zone" "selected" {
   private_zone = false
 }
 
-/* Define a orange.devwerx.org CNAME record */
+/* Define a orange.opswerx.org CNAME record */
 resource "aws_route53_record" "project-name-cname" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
   name    = "${var.Lifecycle}.${var.dns_zone}"
@@ -24,7 +24,7 @@ resource "aws_route53_record" "project-name-cname" {
   records = ["172.109.143.82"]
 }
 
-/* Define a *.orange.devwerx.org CNAME record */
+/* Define a *.orange.opswerx.org CNAME record */
 resource "aws_route53_record" "project-name-wildcard" {
   zone_id = "${data.aws_route53_zone.selected.zone_id}"
   name    = "*.${var.Lifecycle}.${var.dns_zone}"
