@@ -196,13 +196,14 @@ services:
       dockerfile: Dockerfile.metricbeat
     image: sofwerx/metricbeat:${ELASTICSEARCH_VERSION}
     container_name: metricbeat
-    hostname: metricbeat
+    network_mode: host
     restart: always
+    privileged: true
     environment:
-      ELASTIC_HOST: 172.17.0.1:9200
+      ELASTIC_HOST: 127.0.0.1:9200
       ELASTIC_USER: ${ELASTIC_USER}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      XPACK_MONITORING_ELASTICSEARCH_URL: http://172.17.0.1:9200
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://127.0.0.1:9200
       XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
       XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
       OUTPUT_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
@@ -218,7 +219,7 @@ services:
       - /:/hostfs:ro
     command: >-
       -e
-      -E 'output.elasticsearch.hosts=["172.17.0.1:9200"]'
+      -E 'output.elasticsearch.hosts=["127.0.0.1:9200"]'
       -E 'output.elasticsearch.username=${ELASTIC_USER}'
       -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
       -system.hostfs=/hostfs
@@ -259,7 +260,7 @@ services:
       dockerfile: Dockerfile.logstash
     image: sofwerx/logstash:${ELASTICSEARCH_VERSION}
     container_name: logstash
-    hostname: logstash
+    network_mode: host
     restart: always
     privileged: true
     user: root
@@ -268,14 +269,12 @@ services:
       - 514:514/tcp
       - 514:514/udp
     environment:
-      ELASTIC_HOST: 172.17.0.1:9200
+      ELASTIC_HOST: 127.0.0.1:9200
       ELASTIC_USER: ${ELASTIC_USER}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      XPACK_MONITORING_ELASTICSEARCH_URL: http://172.17.0.1:9200
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://127.0.0.1:9200
       XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
       XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
-    networks:
-      - default
     logging: *default-logging
     labels:
       - "traefik.enable=false"
