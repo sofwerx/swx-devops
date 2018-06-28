@@ -1,25 +1,304 @@
 version: "3.4"
 
-networks:
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
 
-  consul:
-    driver: overlay
-    driver_opts:
-      encrypted: "true"
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.29.20.0/28
+networks: 
+
+  default:
+    driver: bridge
+
+volumes:
+
+  traefik-ssl:
+    driver: local
+  elasticsearch-data:
+    driver: local
 
 services:
 
-  multiarch:
-    hostname: multiarch
-    container_name: multiarch
-    image: multiarch/qemu-user-static:register
-    command: --reset
+#  multiarch:
+#    hostname: multiarch
+#    container_name: multiarch
+#    image: multiarch/qemu-user-static:register
+#    command: --reset
+#    privileged: true
+
+  traefik:
+    container_name: traefik
+    hostname: traefik
+    build:
+      context: docker-traefik/
+      dockerfile: Dockerfile.${ARCH}
+      args:
+        ARCH: ${ARCH}
+    image: sofwerx/traefik:${ARCH}
+    restart: always
+    network_mode: host
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+    volumes:
+      - traefik-ssl:/ssl
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  # The environment variable "ELASTICSEARCH_VERSION" is used throughout this file to
+  # specify the version of the images to run. The default is set in the
+  # '.env' file in this folder. It can be overridden with any normal
+  # technique for setting environment variables, for example:
+  #
+  #   ELASTICSEARCH_VERSION=6.0.0-beta1 docker-compose up
+  #
+  # REF: https://docs.docker.com/compose/compose-file/#variable-substitution
+  #
+  # Also be sure to set the ELASTIC_VERSION variable. For released versions,
+  # ${ELASTICSEARCH_VERSION} and ${ELASTIC_VERSION} will be identical, but for pre-release
+  # versions, ${ELASTICSEARCH_VERSION} might contain an extra build identifier, like
+  # "6.0.0-beta1-3eab5b40", so a full invocation might look like:
+  #
+  #   ELASTIC_VERSION=6.0.0-beta1 ELASTICSEARCH_VERSION=6.0.0-beta1-3eab5b40 docker-compose up
+  #
+  elasticsearch:
     privileged: true
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
+    container_name: elasticsearch
+    network_mode: host
+    restart: always
+    environment:
+      bootstrap.memory_lock: "true"
+      cluster.name: ${ELASTIC_CLUSTER_NAME}
+      discovery.type: zen
+      discovery.zen.fd.ping_interval: 1s
+      discovery.zen.fd.ping_retries: 3
+      discovery.zen.ping.unicast.hosts: '192.168.1.120,192.168.1.121,192.168.1.122,192.168.1.123,192.168.1.124,192.168.1.125,192.168.1.126,192.168.1.127'
+      discovery.zen.ping_timeout: 3s
+      discovery.zen.minimum_master_nodes: 5
+      discovery.zen.publish_timeout: 30s
+      discovery.zen.no_master_block: write
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
+      ES_JAVA_OPTS: -Xms32g -Xmx32g
+      ELASTIC_SEARCH_HEAP_SIZE: 16g
+      GATEWAY_EXPECTED_MASTER_NODES: 5
+      GATEWAY_EXPECTED_DATA_NODES: 5
+      gateway.recover_after_time: 5m
+      gateway.recover_after_nodes: 5
+      gateway.recover_after_master_nodes: 5
+      gateway.recover_after_data_nodes: 5
+      http.host: 0.0.0.0
+#     index.number_of_shards: 5
+#     index.number_of_replicas: 2
+#     index.auto_expand_replicas: 0-2
+#     index.number_of_routing_shards: 30
+      network.publish_host: _enp6s0_
+      network.bind_host: 0.0.0.0
+      node.name: ${DOCKER_MACHINE_NAME}
+      NODE_MASTER: "true"
+      NODE_DATA: "true"
+      NODE_DIGEST: "true"
+      transport.host: _enp6s0_
+      transport.publish_host: _enp6s0_
+      transport.bind_host: 0.0.0.0
+      xpack.monitoring.collection.enabled: "true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=elasticsearch"
+      - "traefik.port=9200"
+      - "traefik.frontend.rule=Host:elasticsearch.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
+#    build:
+#      context: docker-elastic/
+#      args:
+#        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+#      dockerfile: Dockerfile.kibana
+#    image: sofwerx/kibana
+    container_name: kibana
+    network_mode: host
+    restart: always
+    environment:
+      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
+      ELASTICSEARCH_URL: http://127.0.0.1:9200
+      ELASTICSEARCH_USERNAME: kibana
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      SENTINEL_SETTINGS_AUTHENTICATION_ENABLED: 'true'
+      SENTINEL_SETTINGS_AUTHENTICATION_IMPERSONATE: 'true'
+      SENTINEL_SETTINGS_AUTHENTICATION_USERNAME: elastic
+      SENTINEL_SETTINGS_AUTHENTICATION_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://127.0.0.1:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: elastic
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    ports: ['5601:5601']
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=kibana"
+      - "traefik.port=5601"
+      - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
+
+  setup_kibana:
+    build:
+      context: docker-elastic/
+      dockerfile: Dockerfile.setup_kibana
+    image: sofwerx/setup_kibana:${ELASTICSEARCH_VERSION}
+    container_name: setup_kibana
+    environment: 
+      ES_URL: http://${ELASTIC_USER}:${ELASTIC_PASSWORD}@172.17.0.1:9200
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      INSTALL_BASIC_ELASTICSEARCH_LICENSE: "true"
     networks:
-      - consul
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  metricbeat:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.metricbeat
+    image: sofwerx/metricbeat:${ELASTICSEARCH_VERSION}
+    container_name: metricbeat
+    hostname: metricbeat
+    restart: always
+    environment:
+      ELASTIC_HOST: 172.17.0.1:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://172.17.0.1:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      OUTPUT_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      OUTPUT_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    # The commented sections below enable Metricbeat to monitor the Docker host,
+    # rather than the Metricbeat container. It's problematic with Docker for
+    # Windows, however, since "/proc", "/sys" etc. don't exist on Windows.
+    # The same likely applies to OSX (needs testing).
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+    command: >-
+      -e
+      -E 'output.elasticsearch.hosts=["172.17.0.1:9200"]'
+      -E 'output.elasticsearch.username=${ELASTIC_USER}'
+      -E 'output.elasticsearch.password=${ELASTIC_PASSWORD}'
+      -system.hostfs=/hostfs
+    pid: host
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  setup_metricbeat:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_metricbeat
+    image: sofwerx/metricbeat:${ELASTICSEARCH_VERSION}
+    container_name: setup_metricbeat
+    hostname: setup_metricbeat
+    environment: 
+      KIBANA_HOST: 172.17.0.1
+      ELASTIC_HOST: 172.17.0.1:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      OUTPUT_ELASTICSEARCH_HOSTS: "['http://172.17.0.1:9200']"
+      OUTPUT_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      OUTPUT_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://172.17.0.1:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  logstash:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.logstash
+    image: sofwerx/logstash:${ELASTICSEARCH_VERSION}
+    container_name: logstash
+    hostname: logstash
+    restart: always
+    privileged: true
+    user: root
+    ports:
+      - 9600:9600
+      - 514:514/tcp
+      - 514:514/udp
+    environment:
+      ELASTIC_HOST: 172.17.0.1:9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      XPACK_MONITORING_ELASTICSEARCH_URL: http://172.17.0.1:9200
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  # Run a short-lived container to set up Logstash.
+  setup_logstash:
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.setup_logstash
+    image: sofwerx/setup_logstash:${ELASTICSEARCH_VERSION}
+    container_name: setup_logstash
+    hostname: setup_logstash
+    environment: 
+      ELASTIC_HOST: 172.17.0.1
+      ELASTIC_PORT: 9200
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 
 
