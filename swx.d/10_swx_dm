@@ -53,7 +53,7 @@ swx_dm_export ()
     if [ ! -d "${devops}/secrets/docker/machines/$dm_host/" ]; then
       mkdir -p "${devops}/secrets/docker/machines/$dm_host/"
       for key in $( cat "${devops}/secrets/dm/$dm_host" | jq -r .machines[\""$dm_host"\"] | jq keys | jq -r .[]) ; do
-        cat "${devops}/secrets/dm/$dm_host" | jq -r .machines[\""$dm_host"\"][\""$key"\"] | base64 -D > "${devops}/secrets/docker/machines/${dm_host}/${key}"
+        cat "${devops}/secrets/dm/$dm_host" | jq -r .machines[\""$dm_host"\"][\""$key"\"] | base64 --decode > "${devops}/secrets/docker/machines/${dm_host}/${key}"
       done
       sed -i% -e "s%__MACHINE_PATH__%${devops}/secrets/docker/machines/${dm_host}/%" \
         -e "s%__MACHINE_CERT_PATH__%${devops}/secrets/docker/machines/${dm_host}/%" \
