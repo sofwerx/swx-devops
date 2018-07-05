@@ -430,3 +430,6 @@
 [submodule "local/swx-datascience/docker-motion"]
 	path = local/swx-datascience/docker-motion
 	url = https://github.com/sofwerx/docker-motion
+[submodule "local/swx-orange/docker-elastic"]
+	path = local/swx-orange/docker-elastic
+	url = https://github.com/sofwerx/docker-elastic
