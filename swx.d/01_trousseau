@@ -32,3 +32,4 @@ trousseau_find_store ()
   fi
   popd > /dev/null 2>&1
 }
+

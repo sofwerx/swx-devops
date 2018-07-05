@@ -42,3 +42,4 @@ swx_gpg_forget ()
   gpg-preset-passphrase --forget $KEYGRIP
 }
 
+
