@@ -70,7 +70,10 @@ swx_gpg_prepare ()
   if [ -z "$TROUSSEAU_MASTER_GPG_ID" ]; then
     export TROUSSEAU_MASTER_GPG_ID=$KEYGRIP
   fi
-
+  if [ -d /swx -a -f /swx/secrets/ssh/sofwerx ]; then
+    eval $(ssh-agent)
+    ssh-add /swx/secrets/ssh/sofwerx
+  fi
 }
 
 swx_gpg_prepare
