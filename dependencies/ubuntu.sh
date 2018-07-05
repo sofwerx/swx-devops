@@ -222,6 +222,9 @@ EOF
   sudo ln -nsf /usr/bin/gpg2 /usr/local/bin/gpg
   hash -r
 )
+which jq > /dev/null || (
+  sudo apt-get install -y jq
+)
 which docker > /dev/null || (
   sudo apt-get install -y \
     apt-transport-https \
