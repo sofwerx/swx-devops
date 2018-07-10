@@ -437,3 +437,6 @@
 [submodule "local/swx-vmhost/glo-services"]
 	path = local/swx-vmhost/glo-services
 	url = git@github.com:sofwerx/glo-services.git
+[submodule "aws/swx-geotools1/glo-demo"]
+	path = aws/swx-geotools1/glo-demo
+	url = git@github.com:sofwerx/glo-demo.git
