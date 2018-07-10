@@ -412,9 +412,6 @@
 [submodule "aws/swx-geotools1/milsymbol-server"]
 	path = aws/swx-geotools1/milsymbol-server
 	url = git@github.com:sofwerx/milsymbol-server.git
-[submodule "aws/swx-geotools1/glo"]
-	path = aws/swx-geotools1/glo
-	url = https://github.com/sofwerx/glo
 [submodule "aws/swx-geotools1/swx-glo"]
 	path = aws/swx-geotools1/swx-glo
 	url = git@github.com:sofwerx/glo.git
