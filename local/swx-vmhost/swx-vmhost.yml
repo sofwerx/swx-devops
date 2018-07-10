@@ -26,20 +26,20 @@ services:
       service: traefik
     restart: always
     ports:
-      - 20080:20080
-      - 20443:20443
+      - 80:80
+      - 443:443
     networks:
       - default
     environment:
       REST_PORT: "7080"
-      HTTP_PORT: "20080"
-      HTTPS_PORT: "20443"
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       SUBDOMAINS: ${SUBDOMAINS}
-#      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-#      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-#      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
     logging: *default-logging
     labels:
       - "traefik.enable=true"
@@ -66,30 +66,30 @@ services:
     labels:
       - "traefik.enable=false"
 
-  xmr-stak:
-    container_name: xmr-stak
-    hostname: xmr-stak
-    build: xmr-stak/
-    image: sofwerx/xmr-stak:${ARCH}
-    restart: always
-    environment:
-      NVIDIA_VISIBLE_DEVICES: ""
-    command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
-    tty: true
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
+#  xmr-stak:
+#    container_name: xmr-stak
+#    hostname: xmr-stak
+#    build: xmr-stak/
+#    image: sofwerx/xmr-stak:${ARCH}
+#    restart: always
+#    environment:
+#      NVIDIA_VISIBLE_DEVICES: ""
+#    command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
+#    tty: true
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
 
-  ravencoin-wallet:
-    extends:
-      file: docker-ravencoin/docker-compose.yml
-      service: ravencoin-wallet
-    restart: always
-    volumes:
-      - ravencoin-data:/root/.raven
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
+#  ravencoin-wallet:
+#    extends:
+#      file: docker-ravencoin/docker-compose.yml
+#      service: ravencoin-wallet
+#    restart: always
+#    volumes:
+#      - ravencoin-data:/root/.raven
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
 
 #  ravencoin-gpu-ccminer:
 #    extends:
@@ -104,16 +104,16 @@ services:
 #    labels:
 #      - "traefik.enable=false"
 
-  ravencoin-nevermore:
-    extends:
-      file: docker-ravencoin/docker-compose.yml
-      service: ravencoin-nevermore
-    restart: always
-    logging: *default-logging
-    environment:
-      URL: ${URL}
-      USERNAME: ${USERNAME}
-      PASSWORD: ${DOCKER_MACHINE_NAME}
-    labels:
-      - "traefik.enable=false"
+#  ravencoin-nevermore:
+#    extends:
+#      file: docker-ravencoin/docker-compose.yml
+#      service: ravencoin-nevermore
+#    restart: always
+#    logging: *default-logging
+#    environment:
+#      URL: ${URL}
+#      USERNAME: ${USERNAME}
+#      PASSWORD: ${DOCKER_MACHINE_NAME}
+#    labels:
+#      - "traefik.enable=false"
 
