@@ -95,7 +95,7 @@ services:
       discovery.zen.publish_timeout: 30s
       discovery.zen.no_master_block: write
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
+#      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
       ES_JAVA_OPTS: -Xms32g -Xmx32g
       ELASTIC_SEARCH_HEAP_SIZE: 16g
       GATEWAY_EXPECTED_MASTER_NODES: 5
@@ -150,7 +150,7 @@ services:
     network_mode: host
     restart: always
     environment:
-      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
+#      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
       ELASTICSEARCH_URL: http://127.0.0.1:9200
       ELASTICSEARCH_USERNAME: kibana
       ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
@@ -300,4 +300,23 @@ services:
     labels:
       - "traefik.enable=false"
 
+  veritone:
+    build: es-json/
+    image: sofwerx/es-json
+    container_name: veritone
+    hostname: veritone
+    restart: always
+    environment:
+      ES_URL: ${ES_VERITONE_URL}
+      ES_HTTP_AUTH: ${ES_VERITONE_HTTP_AUTH}
+      ES_INDEX: veritone
+    ports:
+      - 21000:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=es-veritone"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:veritone.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
