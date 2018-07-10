@@ -433,3 +433,7 @@
 [submodule "local/swx-orange/docker-elastic"]
 	path = local/swx-orange/docker-elastic
 	url = https://github.com/sofwerx/docker-elastic
+[submodule "local/swx-vmhost/glo"]
+	path = local/swx-vmhost/glo
+	url = git@github.com:sofwerx/glo.git
+	branch = Globe
