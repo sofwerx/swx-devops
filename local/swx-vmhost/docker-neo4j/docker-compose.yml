@@ -1,0 +1,34 @@
+version: "2.1"
+
+networks: 
+  default:
+    driver: bridge
+
+volumes:
+  neo4j:
+    driver: local
+
+services:
+  neo4j:
+    image: neo4j:3.3
+    restart: always
+    container_name: neo4j
+    hostname: neo4j
+    networks: 
+      - default
+    ports:
+      - 7687:7687
+      - 7474:7474
+      - 7473:7473
+
+# this was frustrating...
+#  neo4j-js:
+#    build: .
+#    image: neo4j-js
+#    restart: always
+#    container_name: neo4j-js
+#    networks: 
+#      - default
+#    ports:
+#      - 4200:4200
+#      - 49153:49153

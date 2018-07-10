@@ -12,13 +12,49 @@ networks:
     driver: bridge
 
 volumes:
-
   traefik-ssl:
     driver: local
-  ravencoin-data:
+  neo4j-data:
     driver: local
 
 services:
+
+  glo:
+    extends:
+      file: glo/docker-compose.yml
+      service: glo
+    image: sofwerx/glo
+    container_name: glo
+    hostname: glo
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=glo"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:glo.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
+
+
+#  glo-demo:
+#    extends:
+#      file: glo-demo/docker-compose.yml
+#      service: glo-demo
+#    image: sofwerx/glo-demo
+#    container_name: glo-demo
+#    hostname: glo-demo
+#    restart: always
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=glo-demo"
+#      - "traefik.port=4200"
+#      - "traefik.frontend.rule=Host:glo-demo.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=false"
+#      - "traefik.frontend.entryPoints=http,https"
 
   traefik:
     extends:
@@ -37,9 +73,6 @@ services:
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       SUBDOMAINS: ${SUBDOMAINS}
-#      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-#      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-#      AWS_REGION: ${AWS_REGION}
     logging: *default-logging
     labels:
       - "traefik.enable=true"
@@ -49,71 +82,26 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  ethminer:
-    build: docker-ethminer/
-    image: sofwerx/ethminer:${ARCH}
-    container_name: ethminer
-    hostname: ethminer
-    restart: always
-    environment:
-      GPU_FORCE_64BIT_PTR: 0
-      GPU_MAX_HEAP_SIZE: 100
-      GPU_USE_SYNC_OBJECTS: 1
-      GPU_MAX_ALLOC_PERCENT: 100
-      GPU_SINGLE_ALLOC_PERCENT: 100
-    command: /ethminer/build/ethminer/ethminer --cuda-parallel-hash 8 --farm-recheck 200 -U -S us1.ethermine.org:4444 -FS us2.ethermine.org:4444 -O 2c0859b9312d9bf93e1b4cae8d47d59030a75a9f.${DOCKER_MACHINE_NAME}
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
-
-  xmr-stak:
-    container_name: xmr-stak
-    hostname: xmr-stak
-    build: xmr-stak/
-    image: sofwerx/xmr-stak:${ARCH}
-    restart: always
-    environment:
-      NVIDIA_VISIBLE_DEVICES: ""
-    command: nice -n +20 xmr-stak --currency monero -o pool.minexmr.com:7777 -u 46UBBUKUst1LPLKsQCfu6p1HkXAPPAD1vbEPCpKfgE7Ma7NJYzLGbhcTYP7o1mRygU8cFKrzyghUxFFLpBQ3ERXKC83zkVY.${DOCKER_MACHINE_NAME} -p x
-    tty: true
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
-
-  ravencoin-wallet:
+  neo4j:
     extends:
-      file: docker-ravencoin/docker-compose.yml
-      service: ravencoin-wallet
+      file: docker-neo4j/docker-compose.yml
+      service: neo4j
+    image: neo4j:latest
     restart: always
+    networks: 
+      - default
+    ports:
+      - 7687:7687
+      - 7474:7474
+      - 7473:7473
     volumes:
-      - ravencoin-data:/root/.raven
-    logging: *default-logging
+      - traefik-ssl:/ssl
+      - neo4j-data:/var/lib/neo4j
     labels:
-      - "traefik.enable=false"
-
-#  ravencoin-gpu-ccminer:
-#    extends:
-#      file: docker-ravencoin/docker-compose.yml
-#      service: ravencoin-gpu-ccminer
-#    restart: always
-#    logging: *default-logging
-#    environment:
-#      URL: ${URL}
-#      USERNAME: ${USERNAME}
-#      PASSWORD: ${DOCKER_MACHINE_NAME}
-#    labels:
-#      - "traefik.enable=false"
-
-  ravencoin-nevermore:
-    extends:
-      file: docker-ravencoin/docker-compose.yml
-      service: ravencoin-nevermore
-    restart: always
-    logging: *default-logging
-    environment:
-      URL: ${URL}
-      USERNAME: ${USERNAME}
-      PASSWORD: ${DOCKER_MACHINE_NAME}
-    labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.backend=neo4j"
+      - "traefik.port=7474"
+      - "traefik.frontend.rule=Host:neo4j.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
