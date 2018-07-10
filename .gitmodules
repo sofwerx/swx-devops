@@ -437,3 +437,6 @@
 	path = local/swx-vmhost/glo
 	url = git@github.com:sofwerx/glo.git
 	branch = Globe
+[submodule "local/swx-vmhost/glo-services"]
+	path = local/swx-vmhost/glo-services
+	url = git@github.com:sofwerx/glo-services.git
