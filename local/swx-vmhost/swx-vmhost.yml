@@ -62,17 +62,20 @@ services:
       service: traefik
     restart: always
     ports:
-      - 20080:20080
-      - 20443:20443
+      - 80:80
+      - 443:443
     networks:
       - default
     environment:
       REST_PORT: "7080"
-      HTTP_PORT: "20080"
-      HTTPS_PORT: "20443"
+      HTTP_PORT: "80"
+      HTTPS_PORT: "443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       SUBDOMAINS: ${SUBDOMAINS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
     logging: *default-logging
     labels:
       - "traefik.enable=true"
@@ -104,4 +107,3 @@ services:
       - "traefik.frontend.rule=Host:neo4j.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
-
