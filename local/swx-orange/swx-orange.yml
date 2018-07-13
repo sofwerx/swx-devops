@@ -18,6 +18,8 @@ volumes:
     driver: local
   elasticsearch-data:
     driver: local
+  gdelt-data:
+    driver: local
 
 services:
 
@@ -151,14 +153,14 @@ services:
     restart: always
     environment:
 #      ELASTICSEARCH_LICENSE: ${ELASTICSEARCH_LICENSE}
-      ELASTICSEARCH_URL: http://127.0.0.1:9200
+      ELASTICSEARCH_URL: ${ELASTIC_URL}
       ELASTICSEARCH_USERNAME: kibana
       ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
       SENTINEL_SETTINGS_AUTHENTICATION_ENABLED: 'true'
       SENTINEL_SETTINGS_AUTHENTICATION_IMPERSONATE: 'true'
       SENTINEL_SETTINGS_AUTHENTICATION_USERNAME: elastic
       SENTINEL_SETTINGS_AUTHENTICATION_PASSWORD: ${ELASTIC_PASSWORD}
-      XPACK_MONITORING_ELASTICSEARCH_URL: http://127.0.0.1:9200
+      XPACK_MONITORING_ELASTICSEARCH_URL: ${ELASTIC_URL}
       XPACK_MONITORING_ELASTICSEARCH_USERNAME: elastic
       XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     ports: ['5601:5601']
@@ -269,10 +271,10 @@ services:
       - 514:514/tcp
       - 514:514/udp
     environment:
-      ELASTIC_HOST: 127.0.0.1:9200
+      ELASTIC_HOST: ${ELASTIC_HOST}
       ELASTIC_USER: ${ELASTIC_USER}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      XPACK_MONITORING_ELASTICSEARCH_URL: http://127.0.0.1:9200
+      XPACK_MONITORING_ELASTICSEARCH_URL: ${ELASTIC_URL}
       XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
       XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
     logging: *default-logging
@@ -319,4 +321,125 @@ services:
       - "traefik.frontend.rule=Host:veritone.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  gdelt_create_index:
+    build: es-gdelt/
+    image: sofwerx/es-gdelt
+    container_name: gdelt_create_index
+    hostname: gdelt_create_index
+    command: python gdelt_create_index.py
+    environment:
+      ES_HOST_URL: ${ELASTIC_URL}
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_GDELT_INDEX: /gdelt
+      ES_DELETE_INDEX: Y
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  gdelt_realtime_downloader:
+    build:
+      context: es-gdelt/
+      dockerfile: Dockerfile
+    image: sofwerx/es-gdelt
+    container_name: gdelt_realtime_downloader
+    hostname: gdelt_realtime_downloader
+    volumes:
+      - gdelt-data:/es-gdelt/data
+    restart: always
+    environment:
+      GDELT_HISTORIC_FILE_PATH: ${GDELT_HISTORIC_FILE_PATH}
+      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+      SLACK_NOTIFICATIONS_ENABLED: ${SLACK_NOTIFICATIONS_ENABLED}
+      SLACK_NOTIFICATIONS_URL: ${SLACK_NOTIFICATIONS_URL}
+    command: ./realtime_download.sh
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  gdelt_historic_downloader:
+    build:
+      context: es-gdelt/
+      dockerfile: Dockerfile
+    image: sofwerx/es-gdelt
+    container_name: gdelt_historic_downloader
+    hostname: gdelt_historic_downloader
+    volumes:
+      - gdelt-data:/es-gdelt/data
+    environment:
+      GDELT_HISTORIC_FILE_PATH: ${GDELT_HISTORIC_FILE_PATH}
+      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+      SLACK_NOTIFICATIONS_ENABLED: ${SLACK_NOTIFICATIONS_ENABLED}
+      SLACK_NOTIFICATIONS_URL: ${SLACK_NOTIFICATIONS_URL}
+    command: ./historic_download.sh
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  gdelt_realtime_logstash:
+    build:
+      context: es-gdelt/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.realtime_logstash
+    image: sofwerx/gdelt_realtime_logstash:${ELASTICSEARCH_VERSION}
+    container_name: gdelt_realtime_logstash
+    hostname: gdelt_realtime_logstash
+    restart: always
+    volumes:
+      - gdelt-data:/es-gdelt/data
+    environment:
+      XPACK_MONITORING_ELASTICSEARCH_URL: ${ELASTIC_URL}
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      GDELT_REALTIME_FILE_PATH: ${GDELT_REALTIME_FILE_PATH}
+      GDELT_REALTIME_GKG_FILE_PATH: ${GDELT_REALTIME_GKG_FILE_PATH}
+      GDELT_REALTIME_MENTIONS_FILE_PATH: ${GDELT_REALTIME_MENTIONS_FILE_PATH}
+      ES_HOST: ${ELASTIC_HOST}
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_GDELT_INDEX: gdelt
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  gdelt_historic_logstash:
+    build:
+      context: es-gdelt/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.historic_logstash
+    image: sofwerx/gdelt_historic_logstash:${ELASTICSEARCH_VERSION}
+    container_name: gdelt_historic_logstash
+    hostname: gdelt_historic_logstash
+    restart: always
+    volumes:
+      - gdelt-data:/es-gdelt/data
+    environment:
+      XPACK_MONITORING_ELASTICSEARCH_URL: ${ELASTIC_URL}
+      XPACK_MONITORING_ELASTICSEARCH_USERNAME: ${ELASTIC_USER}
+      XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      GDELT_HISTORIC_FILE_PATH: ${GDELT_HISTORIC_FILE_PATH}
+      ES_HOST: ${ELASTIC_HOST}
+      ES_USER: ${ELASTIC_USER}
+      ES_PASSWORD: ${ELASTIC_PASSWORD}
+      ES_GDELT_INDEX: gdelt
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 

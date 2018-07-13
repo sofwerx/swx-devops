@@ -437,3 +437,12 @@
 [submodule "local/swx-vmhost/glo-demo"]
 	path = local/swx-vmhost/glo-demo
 	url = git@github.com:sofwerx/glo-demo.git
+[submodule "local/swx-supermicro3/docker-traefik"]
+	path = local/swx-supermicro3/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/swx-supermicro3/docker-motion"]
+	path = local/swx-supermicro3/docker-motion
+	url = https://github.com/sofwerx/docker-motion
+[submodule "local/swx-orange/es-gdelt"]
+	path = local/swx-orange/es-gdelt
+	url = https://github.com/sofwerx/es-gdelt
