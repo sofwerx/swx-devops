@@ -33,7 +33,7 @@ variable vpc_subnet_network_bits {
 
 variable vpc_subnet_count {
   description = "Number of subnets to create"
-  default = 1
+  default = 2
 }
 
 variable "aws_availability_zones" {
@@ -124,7 +124,7 @@ variable ebs_root_volume_size {
 
 variable tor_da_count {
     description = "Number of DA nodes"
-    default = "1"
+    default = "2"
 }
 
 variable tor_relay_count {
