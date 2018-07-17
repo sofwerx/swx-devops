@@ -446,3 +446,6 @@
 [submodule "local/swx-orange/es-gdelt"]
 	path = local/swx-orange/es-gdelt
 	url = https://github.com/sofwerx/es-gdelt
+[submodule "aws/tor-vpin"]
+	path = aws/tor-vpin
+	url = https://github.com/sofwerx/tor-vpin
