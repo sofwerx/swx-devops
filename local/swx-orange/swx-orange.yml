@@ -20,6 +20,8 @@ volumes:
     driver: local
   gdelt-data:
     driver: local
+  skedler-data:
+    driver: local
 
 services:
 
@@ -141,13 +143,13 @@ services:
       - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
-#    build:
-#      context: docker-elastic/
-#      args:
-#        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
-#      dockerfile: Dockerfile.kibana
-#    image: sofwerx/kibana
+#    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_VERSION}
+    build:
+      context: docker-elastic/
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+      dockerfile: Dockerfile.kibana
+    image: sofwerx/kibana
     container_name: kibana
     network_mode: host
     restart: always
@@ -309,8 +311,8 @@ services:
     hostname: veritone
     restart: always
     environment:
-      ES_URL: ${ES_VERITONE_URL}
-      ES_HTTP_AUTH: ${ES_VERITONE_HTTP_AUTH}
+      ES_URL: ${ELASTIC_URL}
+      ES_HTTP_AUTH: ${ELASTIC_USER}:${ELASTIC_PASSWORD}
       ES_INDEX: veritone
     ports:
       - 21000:3000
@@ -442,4 +444,32 @@ services:
     logging: *default-logging
     labels:
       - "traefik.enable=false"
+
+  skedler:
+    build:
+      context: docker-elastic/
+      dockerfile: Dockerfile.skedler
+    image: sofwerx/skedler:${ELASTICSEARCH_VERSION}
+    container_name: skedler
+    hostname: skedler
+    restart: always
+    volumes:
+      - skedler-data:/data
+    environment:
+      ELASTIC_URL: ${ELASTIC_URL}
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      KIBANA_URL: ${KIBANA_URL}
+    networks:
+      - default
+    logging: *default-logging
+    command: sleep 86400
+    privileged: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=skedler"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:skedler.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
