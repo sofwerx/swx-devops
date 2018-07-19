@@ -434,3 +434,6 @@
 [submodule "local/swx-vmhost/glo-demo"]
 	path = local/swx-vmhost/glo-demo
 	url = git@github.com:sofwerx/glo-demo.git
+[submodule "local/swx-vmhost/docker-cesium"]
+	path = local/swx-vmhost/docker-cesium
+	url = git@github.com:sofwerx/docker-cesium.git
