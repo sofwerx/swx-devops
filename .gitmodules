@@ -431,9 +431,24 @@
 [submodule "aws/swx-geotools1/glo-demo"]
 	path = aws/swx-geotools1/glo-demo
 	url = git@github.com:sofwerx/glo-demo.git
+[submodule "local/swx-orange/es-json"]
+	path = local/swx-orange/es-json
+	url = https://github.com/sofwerx/es-json
 [submodule "local/swx-vmhost/glo-demo"]
 	path = local/swx-vmhost/glo-demo
 	url = git@github.com:sofwerx/glo-demo.git
 [submodule "local/swx-vmhost/docker-cesium"]
 	path = local/swx-vmhost/docker-cesium
 	url = git@github.com:sofwerx/docker-cesium.git
+[submodule "local/swx-supermicro3/docker-traefik"]
+	path = local/swx-supermicro3/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/swx-supermicro3/docker-motion"]
+	path = local/swx-supermicro3/docker-motion
+	url = https://github.com/sofwerx/docker-motion
+[submodule "local/swx-orange/es-gdelt"]
+	path = local/swx-orange/es-gdelt
+	url = https://github.com/sofwerx/es-gdelt
+[submodule "aws/tor-vpin"]
+	path = aws/tor-vpin
+	url = https://github.com/sofwerx/tor-vpin
