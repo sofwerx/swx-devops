@@ -38,23 +38,23 @@ services:
       - "traefik.frontend.entryPoints=http,https"
 
 
-#  glo-demo:
-#    extends:
-#      file: glo-demo/docker-compose.yml
-#      service: glo-demo
-#    image: sofwerx/glo-demo
-#    container_name: glo-demo
-#    hostname: glo-demo
-#    restart: always
-#    networks:
-#      - default
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.backend=glo-demo"
-#      - "traefik.port=4200"
-#      - "traefik.frontend.rule=Host:glo-demo.${DNS_DOMAIN}"
-#      - "traefik.frontend.passHostHeader=false"
-#      - "traefik.frontend.entryPoints=http,https"
+  glo-demo:
+    extends:
+      file: glo-demo/docker-compose.yml
+      service: glo-demo
+    image: sofwerx/glo-demo
+    container_name: glo-demo
+    hostname: glo-demo
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=glo-demo"
+      - "traefik.port=4200"
+      - "traefik.frontend.rule=Host:glo-demo.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
 
   traefik:
     extends:
@@ -107,3 +107,23 @@ services:
       - "traefik.frontend.rule=Host:neo4j.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  cesium:
+    extends:
+      file: docker-cesium/docker-compose.yml
+      service: cesium
+    image: sofwerx/cesium
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    volumes:
+      - traefik-ssl:/ssl
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=cesium"
+      - "traefik.port=8088"
+      - "traefik.frontend.rule=Host:cesium.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
