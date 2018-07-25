@@ -2,6 +2,11 @@ change_directory ()
 {
   unalias cd 2>/dev/null 
   \cd $@
+  trousseau_find_store
+  for swx_step in ${devops}/swx.d/* ; do
+    . "${swx_step}"
+  done
+  unset swx_step
   alias cd='change_directory $@'
   if [ -f .dm ]; then
     if [ -s .dm ]; then
@@ -10,5 +15,4 @@ change_directory ()
       unset DOCKER_MACHINE_NAME
     fi
   fi
-  trousseau_find_store
 }
