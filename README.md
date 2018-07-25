@@ -157,9 +157,9 @@ If your `gpg` does not prompt you for the number of bits, you're probably using 
 
 After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
 
-    gpg --export --armor > gpg/yourname@sofwerx.org
-    git add gpg/yourname@sofwerx.org
-    git commit -m 'Adding gpg/yourname@sofwerx.org public key'
+    #gpg --export --armor > gpg/yourname@sofwerx.org
+    #git add gpg/yourname@sofwerx.org
+    #git commit -m 'Adding gpg/yourname@sofwerx.org public key'
 
 Our convention in this repository is that the filename must be your email address, to make trousseau management easier.
 
