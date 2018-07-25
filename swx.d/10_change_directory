@@ -4,7 +4,11 @@ change_directory ()
   \cd $@
   alias cd='change_directory $@'
   if [ -f .dm ]; then
-    swx dm env $(cat .dm)
+    if [ -s .dm ]; then
+      swx dm env $(cat .dm)
+    else
+      unset DOCKER_MACHINE_NAME
+    fi
   fi
   #trousseau_find_store
 }
