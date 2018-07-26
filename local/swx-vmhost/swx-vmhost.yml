@@ -16,6 +16,12 @@ volumes:
     driver: local
   neo4j-data:
     driver: local
+  kanboard_data:
+    driver: local
+  kanboard_plugins:
+    driver: local
+  kanboard_ssl:
+    driver: local
 
 services:
 
@@ -56,23 +62,23 @@ services:
       - "traefik.frontend.entryPoints=http,https"
 
 
-  glo-demo:
-    extends:
-      file: glo-demo/docker-compose.yml
-      service: glo-demo
-    image: sofwerx/glo-demo
-    container_name: glo-demo
-    hostname: glo-demo
-    restart: always
-    networks:
-      - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=glo-demo"
-      - "traefik.port=4200"
-      - "traefik.frontend.rule=Host:glo-demo.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=false"
-      - "traefik.frontend.entryPoints=http,https"
+#  glo-demo:
+#   extends:
+#      file: glo-demo/docker-compose.yml
+#      service: glo-demo
+#    image: sofwerx/glo-demo
+#    container_name: glo-demo
+#    hostname: glo-demo
+#    restart: always
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=glo-demo"
+#      - "traefik.port=4200"
+#      - "traefik.frontend.rule=Host:glo-demo.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=false"
+#      - "traefik.frontend.entryPoints=http,https"
 
   traefik:
     extends:
@@ -142,6 +148,24 @@ services:
       - "traefik.backend=cesium"
       - "traefik.port=8088"
       - "traefik.frontend.rule=Host:cesium.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  kanboard:
+    image: kanboard/kanboard:latest
+    volumes:
+     - kanboard_data:/var/www/app/data
+     - kanboard_plugins:/var/www/app/plugins
+     - kanboard_ssl:/etc/nginx/ssl
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=kanboard"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:kanboard.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 

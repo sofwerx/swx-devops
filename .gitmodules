@@ -452,3 +452,6 @@
 [submodule "aws/tor-vpin"]
 	path = aws/tor-vpin
 	url = https://github.com/sofwerx/tor-vpin
+[submodule "local/swx-vmhost/kanboard"]
+	path = local/swx-vmhost/kanboard
+	url = https://github.com/kanboard/kanboard.git
