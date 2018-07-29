@@ -153,6 +153,8 @@ services:
 
   kanboard:
     image: kanboard/kanboard:latest
+    container_name: kanboard
+    hostname: kanboard
     volumes:
      - kanboard_data:/var/www/app/data
      - kanboard_plugins:/var/www/app/plugins
