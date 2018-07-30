@@ -455,3 +455,6 @@
 [submodule "local/swx-vmhost/kanboard"]
 	path = local/swx-vmhost/kanboard
 	url = https://github.com/kanboard/kanboard.git
+[submodule "local/swx-vmhost/underground"]
+	path = local/swx-vmhost/underground
+	url = https://github.com/sofwerx/underground
