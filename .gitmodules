@@ -83,7 +83,7 @@
 	path = local/ibm-minsky/synthetic-target-area-of-interest
 	url = https://github.com/sofwerx/synthetic-target-area-of-interest
 [submodule "aws/huntclub-moodle/docker-traefik"]
-	path = aws/huntclub-moodle/docker-traefik
+	path = cellar/huntclub-moodle/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
 [submodule "aws/swx-geotools1/docker-mage-server"]
 	path = aws/swx-geotools1/docker-mage-server
