@@ -44,10 +44,10 @@
 	path = cellar/osgeo/docker-openstf
 	url = https://github.com/sofwerx/docker-openstf
 [submodule "aws/swx-geotools1/docker-guacamole"]
-	path = aws/swx-geotools1/docker-guacamole
+	path = cellar/swx-geotools1/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole.git
 [submodule "aws/swx-geotools1/docker-traefik"]
-	path = aws/swx-geotools1/docker-traefik
+	path = cellar/swx-geotools1/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "aws/jumpbox-kali/docker-guacamole"]
 	path = aws/jumpbox-kali/docker-guacamole
@@ -86,16 +86,16 @@
 	path = cellar/huntclub-moodle/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
 [submodule "aws/swx-geotools1/docker-mage-server"]
-	path = aws/swx-geotools1/docker-mage-server
+	path = cellar/swx-geotools1/docker-mage-server
 	url = https://github.com/sofwerx/docker-mage-server
 [submodule "aws/swx-geotools1/docker-opensphere"]
-	path = aws/swx-geotools1/docker-opensphere
+	path = cellar/swx-geotools1/docker-opensphere
 	url = https://github.com/sofwerx/docker-opensphere
 [submodule "aws/swx-geotools1/docker-geoserver"]
-	path = aws/swx-geotools1/docker-geoserver
+	path = cellar/swx-geotools1/docker-geoserver
 	url = https://github.com/sofwerx/docker-geoserver.git
 [submodule "aws/swx-geotools1/docker-postgis"]
-	path = aws/swx-geotools1/docker-postgis
+	path = cellar/swx-geotools1/docker-postgis
 	url = https://github.com/sofwerx/docker-postgis.git
 [submodule "local/orange/fuel-nat/docker-nat"]
 	path = local/orange/fuel-nat/docker-nat
@@ -110,10 +110,10 @@
 	path = aws/swx-blueteam/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "aws/swx-geotools1/docker-geonode"]
-	path = aws/swx-geotools1/docker-geonode
+	path = cellar/swx-geotools1/docker-geonode
 	url = https://github.com/sofwerx/geonode.git
 [submodule "aws/swx-geotools1/docker-geonetwork"]
-	path = aws/swx-geotools1/docker-geonetwork
+	path = cellar/swx-geotools1/docker-geonetwork
 	url = https://github.com/sofwerx/core-geonetwork.git
 [submodule "aws/swx-blueteam/docker-elastic"]
 	path = aws/swx-blueteam/docker-elastic
@@ -356,7 +356,7 @@
 	path = aws/swx-blueteam/es-tshark
 	url = https://github.com/sofwerx/es-tshark
 [submodule "aws/swx-geotools1/docker-cesium"]
-	path = aws/swx-geotools1/docker-cesium
+	path = cellar/swx-geotools1/docker-cesium
 	url = https://github.com/sofwerx/docker-cesium
 [submodule "local/swx-supermicro0/docker-traefik"]
 	path = local/swx-supermicro0/docker-traefik
@@ -371,13 +371,13 @@
 	path = local/swx-bluerange0/es-json
 	url = https://github.com/sofwerx/es-json
 [submodule "aws/swx-geotools1/teamengine-docker"]
-	path = aws/swx-geotools1/teamengine-docker
+	path = cellar/swx-geotools1/teamengine-docker
 	url = https://github.com/sofwerx/teamengine-docker.git
 [submodule "aws/swx-geotools1/teamengine"]
 	path = aws/swx-geotools1/teamengine
 	url = https://github.com/opengeospatial/teamengine.git
 [submodule "aws/swx-geotools1/DjangoGeoPackageServer"]
-	path = aws/swx-geotools1/DjangoGeoPackageServer
+	path = cellar/swx-geotools1/DjangoGeoPackageServer
 	url = https://github.com/sofwerx/DjangoGeoPackageServer
 [submodule "local/swx-bluerange1/es-json"]
 	path = local/swx-bluerange1/es-json
@@ -404,7 +404,7 @@
 	path = aws/swx-geotools1/milsymbol-server
 	url = git@github.com:sofwerx/milsymbol-server.git
 [submodule "aws/swx-geotools1/swx-glo"]
-	path = aws/swx-geotools1/swx-glo
+	path = cellar/swx-geotools1/swx-glo
 	url = git@github.com:sofwerx/glo.git
 [submodule "local/swx-datascience/kubespray"]
 	path = local/swx-datascience/kubespray
@@ -429,7 +429,7 @@
 	path = local/swx-vmhost/glo-services
 	url = git@github.com:sofwerx/glo-services.git
 [submodule "aws/swx-geotools1/glo-demo"]
-	path = aws/swx-geotools1/glo-demo
+	path = cellar/swx-geotools1/glo-demo
 	url = git@github.com:sofwerx/glo-demo.git
 [submodule "local/swx-orange/es-json"]
 	path = local/swx-orange/es-json
