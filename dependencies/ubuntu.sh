@@ -42,7 +42,7 @@ which trousseau > /dev/null || (
 #if [ "$(gpg2 --version | head -1 | cut -d' ' -f3- | cut -d. -f1-2)" != "2.0" ]; then
 which gpg2 > /dev/null || (
   sudo chmod ugo+rwx /etc/apt/preferences.d /etc/apt/sources.list.d
-  grep -e ^deb /etc/apt/sources.list | sed -e 's/xenial/trusty/g' -e 's/zesty/trusty/g' -e 's/artful/trusty/g' -e 's/bionic/trusty/g' > /etc/apt/sources.list.d/trusty.list
+  grep -e ^deb /etc/apt/sources.list | grep -v proprietary| sed -e 's/xenial/trusty/g' -e 's/zesty/trusty/g' -e 's/artful/trusty/g' -e 's/bionic/trusty/g' > /etc/apt/sources.list.d/trusty.list
   cat <<EOF > /etc/apt/preferences.d/gnupg
 Package: gnupg2:i386
 Pin: release n=yakkety
