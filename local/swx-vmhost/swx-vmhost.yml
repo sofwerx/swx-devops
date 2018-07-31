@@ -35,6 +35,8 @@ services:
     restart: always
     networks:
       - default
+    environment:
+      REACT_APP_MAPBOX_ACCESS_TOKEN: ${REACT_APP_MAPBOX_ACCESS_TOKEN}
     labels:
       - "traefik.enable=true"
       - "traefik.backend=glo"
