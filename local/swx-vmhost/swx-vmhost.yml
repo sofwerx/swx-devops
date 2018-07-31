@@ -153,6 +153,8 @@ services:
 
   kanboard:
     image: kanboard/kanboard:latest
+    container_name: kanboard
+    hostname: kanboard
     volumes:
      - kanboard_data:/var/www/app/data
      - kanboard_plugins:/var/www/app/plugins
@@ -168,4 +170,23 @@ services:
       - "traefik.frontend.rule=Host:kanboard.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  underground:
+    extends:
+      file: underground/docker-compose.yml
+      service: underground
+    image: sofwerx/underground
+    container_name: underground
+    hostname: underground
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=underground"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:underground.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
+
 
