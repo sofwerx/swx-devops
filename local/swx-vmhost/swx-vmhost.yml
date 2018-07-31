@@ -36,20 +36,8 @@ services:
     extends:
       file: glo-services/docker-compose.yml
       service: glo-services
-    image: sofwerx/glo-services
-    container_name: glo-services
-    hostname: glo-services
-    restart: always
     networks:
       - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=glo-services"
-      - "traefik.port=3000"
-      - "traefik.frontend.rule=Host:glo.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=false"
-      - "traefik.frontend.entryPoints=http,https"
-
 
 #  glo-demo:
 #   extends:
