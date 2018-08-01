@@ -50,25 +50,25 @@
 	path = cellar/swx-geotools1/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "aws/jumpbox-kali/docker-guacamole"]
-	path = aws/jumpbox-kali/docker-guacamole
+	path = cellar/jumpbox-kali/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "aws/jumpbox-kali/docker-traefik"]
-	path = aws/jumpbox-kali/docker-traefik
+	path = cellar/jumpbox-kali/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
 [submodule "aws/swx-xmpp/docker-traefik"]
 	path = cellar/swx-xmpp/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
 [submodule "aws/marklogic-datahub/docker-traefik"]
-	path = aws/marklogic-datahub/docker-traefik
+	path = cellar/marklogic-datahub/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
 [submodule "aws/marklogic-datahub/docker-guacamole"]
-	path = aws/marklogic-datahub/docker-guacamole
+	path = cellar/marklogic-datahub/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "aws/marklogic-datahub/docker-nifi"]
-	path = aws/marklogic-datahub/docker-nifi
+	path = cellar/marklogic-datahub/docker-nifi
 	url = https://github.com/sofwerx/docker-nifi
 [submodule "aws/marklogic-datahub/docker-marklogic"]
-	path = aws/marklogic-datahub/docker-marklogic
+	path = cellar/marklogic-datahub/docker-marklogic
 	url = https://github.com/sofwerx/docker-marklogic.git
 [submodule "local/ibm-minsky/docker-traefik"]
 	path = local/ibm-minsky/docker-traefik
