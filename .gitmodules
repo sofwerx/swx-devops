@@ -50,10 +50,10 @@
 	path = cellar/swx-geotools1/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "aws/jumpbox-kali/docker-guacamole"]
-	path = aws/jumpbox-kali/docker-guacamole
+	path = cellar/jumpbox-kali/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "aws/jumpbox-kali/docker-traefik"]
-	path = aws/jumpbox-kali/docker-traefik
+	path = cellar/jumpbox-kali/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
 [submodule "aws/swx-xmpp/docker-traefik"]
 	path = cellar/swx-xmpp/docker-traefik
