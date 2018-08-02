@@ -402,10 +402,10 @@
 	url = https://github.com/sofwerx/docker-dtube/
 [submodule "aws/swx-geotools1/milsymbol-server"]
 	path = aws/swx-geotools1/milsymbol-server
-	url = git@github.com:sofwerx/milsymbol-server.git
+	url = https://github.com/sofwerx/milsymbol-server.git
 [submodule "aws/swx-geotools1/swx-glo"]
 	path = cellar/swx-geotools1/swx-glo
-	url = git@github.com:sofwerx/glo.git
+	url = https://github.com/sofwerx/glo.git
 [submodule "local/swx-datascience/kubespray"]
 	path = local/swx-datascience/kubespray
 	url = https://github.com/sofwerx/kubespray
@@ -423,23 +423,23 @@
 	url = https://github.com/sofwerx/docker-elastic
 [submodule "local/swx-vmhost/glo"]
 	path = local/swx-vmhost/glo
-	url = git@github.com:sofwerx/glo.git
+	url = https://github.com/sofwerx/glo.git
 	branch = Globe
 [submodule "local/swx-vmhost/glo-services"]
 	path = local/swx-vmhost/glo-services
-	url = git@github.com:sofwerx/glo-services.git
+	url = https://github.com/sofwerx/glo-services.git
 [submodule "aws/swx-geotools1/glo-demo"]
 	path = cellar/swx-geotools1/glo-demo
-	url = git@github.com:sofwerx/glo-demo.git
+	url = https://github.com/sofwerx/glo-demo.git
 [submodule "local/swx-orange/es-json"]
 	path = local/swx-orange/es-json
 	url = https://github.com/sofwerx/es-json
 [submodule "local/swx-vmhost/glo-demo"]
 	path = local/swx-vmhost/glo-demo
-	url = git@github.com:sofwerx/glo-demo.git
+	url = https://github.com/sofwerx/glo-demo.git
 [submodule "local/swx-vmhost/docker-cesium"]
 	path = local/swx-vmhost/docker-cesium
-	url = git@github.com:sofwerx/docker-cesium.git
+	url = https://github.com/sofwerx/docker-cesium.git
 [submodule "local/swx-supermicro3/docker-traefik"]
 	path = local/swx-supermicro3/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
