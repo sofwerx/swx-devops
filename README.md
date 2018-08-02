@@ -54,13 +54,13 @@ Archived resources:
 - [cellar/swx-gpu](cellar/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
 - [cellar/swx-dev](cellar/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
 - [cellar/rcloud-dev](cellar/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
-- [cellar/huntclub-moodle](cellar/huntclub-moodle) - Moodle deploy for Hunt Club
-- [cellar/jumpbox-kali](cellar/jumpbox-kali) - Kali guacamole jump box
-- [cellar/marklogic-datahub](cellar/marklogic-datahub) - Apache Nifi + Marklogic
-- [cellar/nerdherd-vpn](cellar/nerdherd-vpn) - Nerdherd VPN box
-- [cellar/swx-geotools1](cellar/swx-geotools1) - GIS Tools box
-- [cellar/swx-redteam](cellar/swx-redteam) - Red Team box
-- [cellar/swx-xmpp](cellar/swx-xmpp) - XMPP Server for ATAK
+- [cellar/huntclub-moodle](cellar/huntclub-moodle) - Moodle deploy for Hunt Club (Destroyed)
+- [cellar/jumpbox-kali](cellar/jumpbox-kali) - Kali guacamole jump box (Destroyed)
+- [cellar/marklogic-datahub](cellar/marklogic-datahub) - Apache Nifi + Marklogic (Destroyed)
+- [cellar/nerdherd-vpn](cellar/nerdherd-vpn) - Nerdherd VPN box (Destroyed)
+- [cellar/swx-geotools1](cellar/swx-geotools1) - GIS Tools box (Destroyed)
+- [cellar/swx-redteam](cellar/swx-redteam) - Red Team box (Destroyed)
+- [cellar/swx-xmpp](cellar/swx-xmpp) - XMPP Server for ATAK (Destroyed)
 
 # Secrets
 
