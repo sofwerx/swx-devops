@@ -458,3 +458,6 @@
 [submodule "local/swx-vmhost/underground"]
 	path = local/swx-vmhost/underground
 	url = https://github.com/sofwerx/underground
+[submodule "local/swx-vmhost/pocket-node"]
+	path = local/swx-vmhost/pocket-node
+	url = https://github.com/sofwerx/pocket-node
