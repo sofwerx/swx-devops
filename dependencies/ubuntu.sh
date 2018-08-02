@@ -211,7 +211,80 @@ Pin-Priority: 900
 Package: gnupg-agent
 Pin: release n=trusty
 Pin-Priority: 900
+
+Package: libgrilo-0.3-0
+Pin: release n=trusty
+Pin-Priority: 900
+
+Package: libgrilo-0.3-0
+Pin: release n=xenial
+Pin-Priority: -10
+
+Package: libgrilo-0.3-0
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: libgrilo-0.3-0
+Pin: release n=artful
+Pin-Priority: -10
+
+Package: libgrilo-0.3-0
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: libgrilo-0.3-0
+Pin: release n=zesty
+Pin-Priority: -10
+
+Package: libtotem-plparser18
+Pin: release n=trusty
+Pin-Priority: 900
+
+Package: libtotem-plparser18
+Pin: release n=xenial
+Pin-Priority: -10
+
+Package: libtotem-plparser18
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: libtotem-plparser18
+Pin: release n=artful
+Pin-Priority: -10
+
+Package: libtotem-plparser18
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: libtotem-plparser18
+Pin: release n=zesty
+Pin-Priority: -10
+
+Package: gnome-control-script
+Pin: release n=trusty
+Pin-Priority: 900
+
+Package: gnome-control-center
+Pin: release n=xenial
+Pin-Priority: -10
+
+Package: gnome-control-center
+Pin: release n=yakkety
+Pin-Priority: -10
+
+Package: gnome-control-center
+Pin: release n=artful
+Pin-Priority: -10
+
+Package: gnome-control-center
+Pin: release n=bionic
+Pin-Priority: -10
+
+Package: gnome-control-center
+Pin: release n=zesty
+Pin-Priority: -10
 EOF
+
   sudo apt-get update
   sudo apt-get install -y gnupg2 gnupg-agent
   if [ ! -f /usr/bin/gpg1 ] ;  then

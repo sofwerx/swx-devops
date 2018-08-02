@@ -1013,31 +1013,31 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  ipfs:
-    extends:
-      file: docker-dtube/docker-compose.yml
-      service: ipfs
-    container_name: ipfs
-    hostname: ipfs
-    restart: always
-    ports:
-      - 4001:4001             # public swarm address
-      - 127.0.0.1:5001:5001   # api service
-      - 127.0.0.1:8080:8080   # gateway service
-    networks:
-      - default
-    logging: *default-logging
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=ipfs"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
-      - "traefik.port=5001"
-      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN};Path:/;AddPrefix:/webui"
-      - "traefik.ipfs.port=8080"
-      - "traefik.ipfs.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/ipfs"
-      - "traefik.webui.port=5001"
-      - "traefik.webui.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/webui"
+#  ipfs:
+#    extends:
+#      file: docker-dtube/docker-compose.yml
+#      service: ipfs
+#    container_name: ipfs
+#    hostname: ipfs
+#    restart: always
+#    ports:
+#      - 4001:4001             # public swarm address
+#      - 127.0.0.1:5001:5001   # api service
+#      - 127.0.0.1:8080:8080   # gateway service
+#    networks:
+#      - default
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=ipfs"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+#      - "traefik.port=5001"
+#      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN};Path:/;AddPrefix:/webui"
+#      - "traefik.ipfs.port=8080"
+#      - "traefik.ipfs.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/ipfs"
+#      - "traefik.webui.port=5001"
+#      - "traefik.webui.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/webui"
 
 #  test:
 #    image: ubuntu:xenial

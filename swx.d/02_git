@@ -2,7 +2,11 @@ if [ -d /swx ] ; then
   if [ ! -f /swx/secrets/git ] ; then
     mkdir -p /swx/secrets/git
     touch /swx/secrets/git/.gitconfig
-    ln -s /swx/secrets/git/.gitconfig ~/.gitconfig
+    if [ ! -h ~/.gitconfig ]; then
+      if [ -f /swx/secrets/git/.gitconfig ]; then
+        ln -nsf /swx/secrets/git/.gitconfig ~/.gitconfig
+      fi
+    fi
     git config --global push.default simple
   fi
 fi
