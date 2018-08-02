@@ -340,3 +340,6 @@ pinentry-program /usr/bin/pinentry-curses
 enable-ssh-support
 EOF
 fi
+which screen > /dev/null || (
+  sudo apt-get install -y screen
+)

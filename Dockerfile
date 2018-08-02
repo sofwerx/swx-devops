@@ -12,4 +12,4 @@ WORKDIR /swx
 
 VOLUME /swx
 
-CMD ./shell.bash
+CMD screen -a -A -fn -h 10000 -s swx-devops ./shell.bash
