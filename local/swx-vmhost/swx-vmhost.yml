@@ -29,38 +29,15 @@ services:
     extends:
       file: glo/docker-compose.yml
       service: glo
-    image: sofwerx/glo
-    container_name: glo
-    hostname: glo
-    restart: always
     networks:
       - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=glo"
-      - "traefik.port=3000"
-      - "traefik.frontend.rule=Host:glo.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=false"
-      - "traefik.frontend.entryPoints=http,https"
 
   glo-services:
     extends:
       file: glo-services/docker-compose.yml
       service: glo-services
-    image: sofwerx/glo-services
-    container_name: glo-services
-    hostname: glo-services
-    restart: always
     networks:
       - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=glo-services"
-      - "traefik.port=3000"
-      - "traefik.frontend.rule=Host:glo.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=false"
-      - "traefik.frontend.entryPoints=http,https"
-
 
 #  glo-demo:
 #   extends:
@@ -153,6 +130,8 @@ services:
 
   kanboard:
     image: kanboard/kanboard:latest
+    container_name: kanboard
+    hostname: kanboard
     volumes:
      - kanboard_data:/var/www/app/data
      - kanboard_plugins:/var/www/app/plugins
@@ -167,5 +146,37 @@ services:
       - "traefik.port=80"
       - "traefik.frontend.rule=Host:kanboard.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  underground:
+    extends:
+      file: underground/docker-compose.yml
+      service: underground
+    image: sofwerx/underground
+    container_name: underground
+    hostname: underground
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=underground"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:underground.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
+
+  pocket-node:
+    extends:
+      file: pocket-node/docker-compose.yml
+      service: pocket-node
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=pocket-node"
+      - "traefik.port=${POCKET_NODE_SERVER_PORT}"
+      - "traefik.frontend.rule=Host:pocket-node.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
       - "traefik.frontend.entryPoints=http,https"
 

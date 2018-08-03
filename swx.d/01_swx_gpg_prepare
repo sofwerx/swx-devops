@@ -70,9 +70,9 @@ swx_gpg_prepare ()
   if [ -z "$TROUSSEAU_MASTER_GPG_ID" ]; then
     export TROUSSEAU_MASTER_GPG_ID=$KEYGRIP
   fi
-  if [ -d /swx -a -f /swx/secrets/ssh/sofwerx ]; then
-    eval $(ssh-agent)
-    ssh-add /swx/secrets/ssh/sofwerx
+  if [ -d /swx -a -d /swx/secrets/ssh ]; then
+    \ssh-add -l > /dev/null 2>&1 || eval $(ssh-agent)
+    ssh-add $(ls -1 /swx/secrets/ssh/*.pub  | sed -e 's/.pub$//') > /dev/null 2>&1
   fi
 }
 
@@ -81,6 +81,6 @@ swx_gpg_prepare
 # This fixes my ssh-add hang problem when using gpg-agent instead of sshagent
 if echo "$SSH_AUTH_SOCK" | grep gpg > /dev/null ; then
   unalias ssh-add 2>/dev/null 
-  alias ssh-add="echo UPDATESTARTUPTTY | gpg-connect-agent ; ssh-add"
+  alias ssh-add="echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null 2>&1 ; ssh-add"
 fi
 

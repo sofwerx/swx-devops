@@ -364,9 +364,11 @@ output "ec2_ipv4" {
   value = "${join(",", aws_instance.instance.*.public_ip)}"
 }
 
+/*
 output "ec2_ipv6" {
   value = "${join(",", aws_instance.instance.*.ipv6_addresses)}"
 }
+*/
 
 output "fqdns" {
   value = "${join(",", aws_route53_record.instance.*.fqdn)}"

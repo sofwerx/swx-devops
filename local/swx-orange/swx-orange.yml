@@ -22,6 +22,8 @@ volumes:
     driver: local
   skedler-data:
     driver: local
+  portainer-data:
+    driver: local
 
 services:
 
@@ -447,31 +449,20 @@ services:
     labels:
       - "traefik.enable=false"
 
-  skedler:
-    build:
-      context: docker-elastic/
-      dockerfile: Dockerfile.skedler
-    image: sofwerx/skedler:${ELASTICSEARCH_VERSION}
-    container_name: skedler
-    hostname: skedler
-    restart: always
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    hostname: portainer
     volumes:
-      - skedler-data:/data
-    environment:
-      ELASTIC_URL: ${ELASTIC_URL}
-      ELASTIC_USER: ${ELASTIC_USER}
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      KIBANA_URL: ${KIBANA_URL}
-    networks:
-      - default
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock 
     logging: *default-logging
-    command: sleep 86400
-    privileged: true
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=skedler"
-      - "traefik.port=3000"
-      - "traefik.frontend.rule=Host:skedler.${DNS_DOMAIN}"
+      - "traefik.backend=portainer"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:portainer.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+#      - "traefik.frontend.auth.basic=admin:${ELASTIC_PASSWORD_APR1}"
 
