@@ -5,6 +5,12 @@ fi
 # Allow a secrets based local store of docker-machines... for Ian. You _probably_ don't want this directory.
 if [ -d "${devops}/secrets/docker/machines" ]; then
   export MACHINE_STORAGE_PATH="${devops}/secrets/docker"
+  if [ ! -h "${devops}/.docker" ] ; then
+    if [ -d "${devops}/.docker" ]; then
+      mv "${devops}/.docker" "${devops}/secrets/.docker.mergeme.$$"
+    fi
+    ln -nsf "${devops}/secrets/docker/machines" "${devops}/.docker"
+  fi
 else
   if [ -d ~/.docker/machine/machines ] ; then
     export MACHINE_STORAGE_PATH=~/.docker/machine/machines
