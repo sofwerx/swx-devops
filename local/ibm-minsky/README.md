@@ -15,9 +15,8 @@ This docker-compose will spin up a traefik SSL reverse proxy that will allocate 
 
 This is configured to run tensorflow using GPU, and the 500ms periodicity for triangulate reflects this.
 
-## NOTE:
+## dm creation
 
-Whenever the [softwerx/synthetic-target-area-of-interest](synthetic-target-area-of-interest/) repository is updated, it will re-deploy automagically to this docker-engine.
-
-As such, if you push any merged changes to master there, you do not need to run `docker-compose` manually in that subdirectory to deploy them.
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 9022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 9376 swx-u-ub-minsky
+    swx dm import swx-u-ub-minsky
 

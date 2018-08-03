@@ -39,34 +39,34 @@ volumes:
     driver: local
   ethereum-rinkeby-keystore:
     driver: local 
-  ipfs-staging:
-    driver: local
-  ipfs-data:
-    driver: local
-  ipfs-cluster-data:
-    driver: local 
+#  ipfs-staging:
+#    driver: local
+#  ipfs-data:
+#    driver: local
+#  ipfs-cluster-data:
+#    driver: local 
 #  test-data:
 #    driver: ipfs
-  iri-data:
-    driver: local
-  dcs-data:
-    driver: local
-  dcs-log:
-    driver: local
+#  iri-data:
+#    driver: local
+#  dcs-data:
+#    driver: local
+#  dcs-log:
+#    driver: local
 
 services:
 
-  converge:
-    extends:
-      file: converge/docker-compose.yml
-      service: converge
-    network_mode: host
-    privileged: true
-    volumes:
-      - /:/chroot
-    logging: *default-logging
-    labels:
-      - "traefik.enable=false"
+#  converge:
+#    extends:
+#      file: converge/docker-compose.yml
+#      service: converge
+#    network_mode: host
+#    privileged: true
+#    volumes:
+#      - /:/chroot
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=false"
 
   traefik:
     container_name: traefik
@@ -79,8 +79,8 @@ services:
     image: sofwerx/traefik:${ARCH}
     restart: always
     ports:
-      - 80:80
-      - 443:443
+      - 9080:9080
+      - 9443:9443
     environment:
       HTTP_PORT: "80"
       HTTPS_PORT: "443"
@@ -287,71 +287,71 @@ services:
       --password=/tmp/password
       "
 
-  ipfs:
-    container_name: ipfs
-    hostname: ipfs
-    privileged: true
-    restart: always
-    build:
-      context: docker-ipfs/
-      dockerfile: Dockerfile.${ARCH}
-    image: sofwerx/ipfs:${ARCH}
-    environment:
-      ARCH: ${ARCH}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ipfs-staging:/export
-      - ipfs-data:/data/ipfs
-      - /:/chroot
-    ports:
-      - 4001:4001             # public swarm address
-      - 127.0.0.1:5001:5001   # api service
-      - 127.0.0.1:8080:8080   # gateway service
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=ipfs"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
-      - "traefik.port=5001"
-      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN};Path:/;AddPrefix:/webui"
-      - "traefik.ipfs.port=8080"
-      - "traefik.ipfs.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/ipfs"
-      - "traefik.webui.port=5001"
-      - "traefik.webui.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/webui"
+#  ipfs:
+#    container_name: ipfs
+#    hostname: ipfs
+#    privileged: true
+#    restart: always
+#    build:
+#      context: docker-ipfs/
+#      dockerfile: Dockerfile.${ARCH}
+#    image: sofwerx/ipfs:${ARCH}
+#    environment:
+#      ARCH: ${ARCH}
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - ipfs-staging:/export
+#      - ipfs-data:/data/ipfs
+#      - /:/chroot
+#    ports:
+#      - 4001:4001             # public swarm address
+#      - 127.0.0.1:5001:5001   # api service
+#      - 127.0.0.1:8080:8080   # gateway service
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=ipfs"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+#      - "traefik.port=5001"
+#      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN};Path:/;AddPrefix:/webui"
+#      - "traefik.ipfs.port=8080"
+#      - "traefik.ipfs.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/ipfs"
+#      - "traefik.webui.port=5001"
+#      - "traefik.webui.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/webui"
 
 #  test:
 #    image: ubuntu:xenial
 #    volumes:
 #      - test-data:/data
 
-  # IOTA coin
-  iri:
-    extends:
-      file: iri/docker-compose.yml
-      service: iri
-    image: sofwerx/iri:${ARCH}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=iri"
-      - "traefik.port=14265"
-      - "traefik.frontend.rule=Host:iota.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
-    logging: *default-logging
-    command: ["/run.sh", "-XX:+DisableAttachMechanism", "-Xmx768g", "-Xms256g", "-Dlogback.configurationFile=/iri/conf/logback.xml", "-Djava.net.preferIPv4Stack=true", "-jar", "iri.jar", "-p", "14265", "-u", "14777", "-t", "15777", "--remote", "--remote-limit-api", "\"addNeighbors, removeNeighbors, getNeighbors\"", "-n", "tcp://176.9.3.149:14265 tcp://5.9.118.112:14265 tcp://5.9.137.199:14265 tcp://5.9.149.169:14265 tcp://88.198.230.98:14265 tcp://cryptoiota.win:14265 tcp://eugene.iota.community:14265 tcp://eugene.iota.comunity:14265 tcp://eugene.iotasupport.com:14999 tcp://eugeneoldisoft.iotasupport.com:14265 tcp://iotanode.farm:14265 tcp://mainnet.necropaz.com:14500 tcp://node.deviceproof.org:14265 tcp://node.lukaseder.de:14265 tcp://node01.iotatoken.nl:14265 tcp://node02.iotatoken.nl:14265 tcp://node03.iotatoken.nl:15265 tcp://node04.iotatoken.nl:14265 tcp://node05.iotatoken.nl:16265 tcp://node06.iotatoken.nl:14265 tcp://wallets.iotamexico.com:80 udp://176.9.3.149:14777 udp://5.9.118.112:14777 udp://5.9.137.199:14777 udp://5.9.149.169:14777 udp://88.198.230.98:14777 udp://cryptoiota.win:14777 udp://eugene.iota.community:14777 udp://eugene.iota.comunity:14777 udp://eugeneoldisoft.iotasupport.com:14777 udp://iotanode.farm:14777 udp://node.deviceproof.org:14777 udp://node.lukaseder.de:14777 udp://node01.iotatoken.nl:14777 udp://node02.iotatoken.nl:14777 udp://node04.iotatoken.nl:14777 udp://node06.iotatoken.nl:14777 udp://94.156.128.15:14600 udp://185.181.8.149:14600", "$$@"]
-
-  nelson:
-    build:
-      context: nelson.cli/
-      dockerfile: Dockerfile.${ARCH}
-    image: sofwerx/nelson:${ARCH}
-    network_mode: host
-    container_name: nelson
-    hostname: nelson
-    command: -r 127.0.0.1 -i 14265 -u 14777 -t 15777 --neighbors "mainnet.deviota.com/16600 mainnet2.deviota.com/16600 mainnet3.deviota.com/16600 iotairi.tt-tec.net/16600"
+#  # IOTA coin
+#  iri:
+#    extends:
+#      file: iri/docker-compose.yml
+#      service: iri
+#    image: sofwerx/iri:${ARCH}
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=iri"
+#      - "traefik.port=14265"
+#      - "traefik.frontend.rule=Host:iota.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+#    logging: *default-logging
+#    command: ["/run.sh", "-XX:+DisableAttachMechanism", "-Xmx768g", "-Xms256g", "-Dlogback.configurationFile=/iri/conf/logback.xml", "-Djava.net.preferIPv4Stack=true", "-jar", "iri.jar", "-p", "14265", "-u", "14777", "-t", "15777", "--remote", "--remote-limit-api", "\"addNeighbors, removeNeighbors, getNeighbors\"", "-n", "tcp://176.9.3.149:14265 tcp://5.9.118.112:14265 tcp://5.9.137.199:14265 tcp://5.9.149.169:14265 tcp://88.198.230.98:14265 tcp://cryptoiota.win:14265 tcp://eugene.iota.community:14265 tcp://eugene.iota.comunity:14265 tcp://eugene.iotasupport.com:14999 tcp://eugeneoldisoft.iotasupport.com:14265 tcp://iotanode.farm:14265 tcp://mainnet.necropaz.com:14500 tcp://node.deviceproof.org:14265 tcp://node.lukaseder.de:14265 tcp://node01.iotatoken.nl:14265 tcp://node02.iotatoken.nl:14265 tcp://node03.iotatoken.nl:15265 tcp://node04.iotatoken.nl:14265 tcp://node05.iotatoken.nl:16265 tcp://node06.iotatoken.nl:14265 tcp://wallets.iotamexico.com:80 udp://176.9.3.149:14777 udp://5.9.118.112:14777 udp://5.9.137.199:14777 udp://5.9.149.169:14777 udp://88.198.230.98:14777 udp://cryptoiota.win:14777 udp://eugene.iota.community:14777 udp://eugene.iota.comunity:14777 udp://eugeneoldisoft.iotasupport.com:14777 udp://iotanode.farm:14777 udp://node.deviceproof.org:14777 udp://node.lukaseder.de:14777 udp://node01.iotatoken.nl:14777 udp://node02.iotatoken.nl:14777 udp://node04.iotatoken.nl:14777 udp://node06.iotatoken.nl:14777 udp://94.156.128.15:14600 udp://185.181.8.149:14600", "$$@"]
+#
+#  nelson:
+#    build:
+#      context: nelson.cli/
+#      dockerfile: Dockerfile.${ARCH}
+#    image: sofwerx/nelson:${ARCH}
+#    network_mode: host
+#    container_name: nelson
+#    hostname: nelson
+#    command: -r 127.0.0.1 -i 14265 -u 14777 -t 15777 --neighbors "mainnet.deviota.com/16600 mainnet2.deviota.com/16600 mainnet3.deviota.com/16600 iotairi.tt-tec.net/16600"
 
 #  # IOTA Spam Fund
 #  isf:
@@ -372,51 +372,50 @@ services:
 #      EMAIL: ${ISF_EMAIL}
 #      PASSWORD: ${ISF_PASSWORD}
 
-  xmrminer:
-    extends:
-      file: docker-xmr-miner/docker-compose.yml
-      service: xmrminer
-    logging: *default-logging
-    environment:
-      USERNAME: ${MONERO_USERNAME}
-      PASSWORD: ${MONERO_PASSWORD}
-      HOSTPORT: ${MONERO_HOSTPORT}
-    tty: true
+#  xmrminer:
+#    extends:
+#      file: docker-xmr-miner/docker-compose.yml
+#      service: xmrminer
+#    logging: *default-logging
+#    environment:
+#      USERNAME: ${MONERO_USERNAME}
+#      PASSWORD: ${MONERO_PASSWORD}
+#      HOSTPORT: ${MONERO_HOSTPORT}
+#    tty: true
 
-  dtube:
-    extends:
-      file: docker-dtube/docker-compose.yml
-      service: dtube
-    container_name: dtube
-    hostname: dtube
-    restart: always
-    environment:
-      IPFS_HOST: ipfs
-    networks:
-      - default
-    logging: *default-logging
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=dtube"
-      - "traefik.port=3000"
-      - "traefik.frontend.rule=Host:dtube.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
-
-  dcs:
-    extends:
-      file: docker-dtube/docker-compose.yml
-      service: dcs
-    container_name: dcs
-    hostname: dcs
-    restart: always
-    environment:
-      IPFS_HOST: ipfs
-    networks:
-      - default
-    logging: *default-logging
-    command: npm start
-    labels:
-      - "traefik.enable=false"
-
+#  dtube:
+#    extends:
+#      file: docker-dtube/docker-compose.yml
+#      service: dtube
+#    container_name: dtube
+#    hostname: dtube
+#    restart: always
+#    environment:
+#      IPFS_HOST: ipfs
+#    networks:
+#      - default
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=dtube"
+#      - "traefik.port=3000"
+#      - "traefik.frontend.rule=Host:dtube.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+#
+#  dcs:
+#    extends:
+#      file: docker-dtube/docker-compose.yml
+#      service: dcs
+#    container_name: dcs
+#    hostname: dcs
+#    restart: always
+#    environment:
+#      IPFS_HOST: ipfs
+#    networks:
+#      - default
+#    logging: *default-logging
+#    command: npm start
+#    labels:
+#      - "traefik.enable=false"
 
