@@ -17,6 +17,6 @@ This is configured to run tensorflow using GPU, and the 500ms periodicity for tr
 
 ## dm creation
 
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 9022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 9376 swx-u-ub-minsky
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 9022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 9376 --engine-storage-driver overlay2 swx-u-ub-minsky
     swx dm import swx-u-ub-minsky
 
