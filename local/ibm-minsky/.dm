@@ -1,1 +1,1 @@
-swx-u-ibm-minsky0
+swx-u-ub-minsky
