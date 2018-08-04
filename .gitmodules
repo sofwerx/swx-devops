@@ -107,7 +107,7 @@
 	path = cellar/swx-redteam/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "aws/swx-blueteam/docker-traefik"]
-	path = aws/swx-blueteam/docker-traefik
+	path = cellar/swx-blueteam/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "aws/swx-geotools1/docker-geonode"]
 	path = cellar/swx-geotools1/docker-geonode
@@ -116,7 +116,7 @@
 	path = cellar/swx-geotools1/docker-geonetwork
 	url = https://github.com/sofwerx/core-geonetwork.git
 [submodule "aws/swx-blueteam/docker-elastic"]
-	path = aws/swx-blueteam/docker-elastic
+	path = cellar/swx-blueteam/docker-elastic
 	url = https://github.com/sofwerx/docker-elastic
 [submodule "local/ibm-minsky/iri"]
 	path = local/ibm-minsky/iri
@@ -134,13 +134,13 @@
 	path = local/icbgamingpc/isf-jclient
 	url = https://github.com/sofwerx/isf-jclient.git
 [submodule "aws/swx-blueteam/isf-jclient"]
-	path = aws/swx-blueteam/isf-jclient
+	path = cellar/swx-blueteam/isf-jclient
 	url = https://github.com/sofwerx/isf-jclient
 [submodule "local/ibm-minsky/isf-jclient"]
 	path = local/ibm-minsky/isf-jclient
 	url = https://github.com/sofwerx/isf-jclient
 [submodule "aws/swx-blueteam/RecordRTC"]
-	path = aws/swx-blueteam/RecordRTC
+	path = cellar/swx-blueteam/RecordRTC
 	url = https://github.com/sofwerx/RecordRTC
 [submodule "local/swx-pandora/docker-pandorafms"]
 	path = local/swx-pandora/docker-pandorafms
@@ -194,10 +194,10 @@
 	path = local/swx-bluerange2/es-gdelt
 	url = https://github.com/sofwerx/es-gdelt
 [submodule "aws/swx-blueteam/es-gdelt"]
-	path = aws/swx-blueteam/es-gdelt
+	path = cellar/swx-blueteam/es-gdelt
 	url = https://github.com/sofwerx/es-gdelt
 [submodule "aws/swx-blueteam/xmr-stak"]
-	path = aws/swx-blueteam/xmr-stak
+	path = cellar/swx-blueteam/xmr-stak
 	url = https://github.com/sofwerx/xmr-stak
 [submodule "local/swx-bluerange0/es-gdelt"]
 	path = local/swx-bluerange0/es-gdelt
@@ -314,7 +314,7 @@
 	path = local/ibm-minsky/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
 [submodule "aws/swx-blueteam/es-sync"]
-	path = aws/swx-blueteam/es-sync
+	path = cellar/swx-blueteam/es-sync
 	url = https://github.com/sofwerx/es-sync
 [submodule "local/swx-bluerange1/docker-domoticz"]
 	path = local/swx-bluerange1/docker-domoticz
@@ -329,7 +329,7 @@
 	path = local/swx-tak/docker-tak
 	url = https://github.com/sofwerx/docker-tak
 [submodule "aws/swx-blueteam/docker-bimserver"]
-	path = aws/swx-blueteam/docker-bimserver
+	path = cellar/swx-blueteam/docker-bimserver
 	url = https://github.com/sofwerx/docker-bimserver
 [submodule "local/swx-range3/docker-gpsd"]
 	path = local/swx-range3/docker-gpsd
@@ -353,7 +353,7 @@
 	path = local/swx-bluerange1/docker-motion
 	url = https://github.com/sofwerx/docker-motion
 [submodule "aws/swx-blueteam/es-tshark"]
-	path = aws/swx-blueteam/es-tshark
+	path = cellar/swx-blueteam/es-tshark
 	url = https://github.com/sofwerx/es-tshark
 [submodule "aws/swx-geotools1/docker-cesium"]
 	path = cellar/swx-geotools1/docker-cesium
@@ -383,7 +383,7 @@
 	path = local/swx-bluerange1/es-json
 	url = https://github.com/sofwerx/es-json
 [submodule "aws/swx-blueteam/safehouse"]
-	path = aws/swx-blueteam/safehouse
+	path = cellar/swx-blueteam/safehouse
 	url = https://github.com/sofwerx/safehouse
 [submodule "local/icbgamingpc/docker-pigeoncoin"]
 	path = local/icbgamingpc/docker-pigeoncoin
@@ -395,7 +395,7 @@
 	path = local/swx-demobox/docker-openstf
 	url = https://github.com/sofwerx/docker-openstf.git
 [submodule "aws/swx-blueteam/docker-dtube"]
-	path = aws/swx-blueteam/docker-dtube
+	path = cellar/swx-blueteam/docker-dtube
 	url = https://github.com/sofwerx/docker-dtube
 [submodule "local/ibm-minsky/docker-dtube"]
 	path = local/ibm-minsky/docker-dtube
