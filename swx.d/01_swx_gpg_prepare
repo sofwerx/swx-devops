@@ -71,8 +71,10 @@ swx_gpg_prepare ()
     export TROUSSEAU_MASTER_GPG_ID=$KEYGRIP
   fi
   if [ -d /swx -a -d /swx/secrets/ssh ]; then
-    \ssh-add -l > /dev/null 2>&1 || eval $(ssh-agent)
-    ssh-add $(ls -1 /swx/secrets/ssh/*.pub  | sed -e 's/.pub$//') > /dev/null 2>&1
+    if ! ssh-add $(ls -1 /swx/secrets/ssh/*.pub  | sed -e 's/.pub$//') > /dev/null 2>&1 ; then
+      \ssh-add -l > /dev/null 2>&1 || eval $(ssh-agent)
+      \ssh-add $(ls -1 /swx/secrets/ssh/*.pub  | sed -e 's/.pub$//') > /dev/null 2>&1
+    fi
   fi
 }
 
