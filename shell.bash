@@ -7,6 +7,8 @@ if [ -n "${DOCKER_SH}" ]; then
     useradd -u ${UID} -g ${GID} -d ${devops} -s /bin/bash ${USER}
   fi
   chown ${UID}:${GID} $(tty)
+  rm -f /dev/tty
+  ln -s $(tty) /dev/tty
   exec su ${USER} --login -c "exec bash --rcfile ${devops}/.bashrc -i $@"
 fi
 echo "*** Type swx followed by the tab key for swx-devops commands ***"
