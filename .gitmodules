@@ -461,3 +461,6 @@
 [submodule "local/swx-vmhost/pocket-node"]
 	path = local/swx-vmhost/pocket-node
 	url = https://github.com/sofwerx/pocket-node
+[submodule "local/swx-vmhost/TORGI"]
+	path = local/swx-vmhost/TORGI
+	url = https://github.com/sofwerx/TORGI
