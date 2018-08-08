@@ -9,7 +9,7 @@ if [ -d "${devops}/secrets/docker/machines" ]; then
     if [ -d "${devops}/.docker" ]; then
       mv "${devops}/.docker" "${devops}/secrets/.docker.mergeme.$$"
     fi
-    ln -nsf "${devops}/secrets/docker/machines" "${devops}/.docker"
+    ln -nsf "secrets/docker/machines" "${devops}/.docker"
   fi
 else
   if [ -d ~/.docker/machine/machines ] ; then
