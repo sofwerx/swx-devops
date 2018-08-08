@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 docker build -t swx-devops .
 # This only works if the docker-engine can volume mount this directory as shared
 MY_GROUP="$(id -g -n)"
