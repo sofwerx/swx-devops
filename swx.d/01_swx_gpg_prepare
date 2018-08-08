@@ -73,7 +73,7 @@ swx_gpg_prepare ()
   if [ -d /swx -a -d /swx/secrets/ssh ]; then
     \ssh-add -l > /dev/null 2>&1 || eval $(ssh-agent)
     for sshpubkey in ${devops}/secrets/ssh/*.pub ; do
-      if ssh-add -l | grep $(ssh-keygen -l -f $sshpubkey | awk '{print $2}') ; then
+      if ssh-add -l | grep $(ssh-keygen -l -f $sshpubkey | awk '{print $2}') > /dev/null 2>&1 ; then
         true
       else
         \ssh-add $file
