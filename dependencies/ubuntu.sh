@@ -317,7 +317,7 @@ which docker > /dev/null || (
   fi
 )
 which docker-compose > /dev/null || (
-  sudo curl -Lo /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m`
+  sudo curl -Lo /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.22.0/docker-compose-`uname -s`-`uname -m`
   sudo chmod ugo+rx /usr/local/bin/docker-compose
 )
 which docker-machine > /dev/null || (
