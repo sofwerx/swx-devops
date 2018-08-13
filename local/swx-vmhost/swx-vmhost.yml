@@ -22,6 +22,12 @@ volumes:
     driver: local
   kanboard_ssl:
     driver: local
+  mongo-atlas2:
+    driver: local
+  atlas2-app:
+    driver: local
+  atlas2-node_modules:
+    driver: local
 
 services:
 
@@ -179,4 +185,42 @@ services:
       - "traefik.frontend.rule=Host:pocket-node.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=false"
       - "traefik.frontend.entryPoints=http,https"
+
+  mongo-atlas2:
+    image: mongo:3.0
+    container_name: mongo-atlas2
+    hostname: mongo-atlas2
+    restart: always
+    networks:
+      - default
+    volumes:
+      - mongo-atlas2:/data/db:Z
+    labels:
+      - "traefik.enable=false"
+
+  atlas2:
+    build: atlas2/
+    image: sofwerx/atlas2
+        command: npm start
+    container_name: atlas2
+    hostname: atlas2
+    restart: always
+    networks:
+      - default
+    volumes:
+      - atlas2-app:/usr/app/:Z
+      - atlas2-node_modules:/usr/app/node_modules
+    environment:
+      MONGO_URL_ATLAS2: "mongodb://mongo:27017/atlas2"
+      MONGO_URL_TEST_DUPLICATION: "mongodb://mongo:27017/test-duplication"
+      MONGO_URL_TEST_USAGE: "mongodb://mongo:27017/test-usage"
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=atlas2"
+      - "traefik.port=6001"
+      - "traefik.frontend.rule=Host:atlas2.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
