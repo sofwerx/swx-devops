@@ -464,3 +464,6 @@
 [submodule "local/swx-vmhost/TORGI"]
 	path = local/swx-vmhost/TORGI
 	url = https://github.com/sofwerx/TORGI
+[submodule "local/swx-vmhost/atlas2"]
+	path = local/swx-vmhost/atlas2
+	url = https://github.com/sofwerx/atlas2
