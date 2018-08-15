@@ -9,7 +9,7 @@ ROOTPATH=""
 
 # Are we running under the Windows Subsystem for Linux (WSL)?
 ## https://github.com/Microsoft/WSL/issues/2578
-if which powershell.exe > /dev/null 2>&1 && [ -d /mnt/c ]; then
+if which powershell.exe > /dev/null 2>&1 && [ -d /mnt/[a-z] ]; then
   RUN_ID="/tmp/$(date +%s)"
 
   # Mark our filesystem with a temporary file having an unique name.
