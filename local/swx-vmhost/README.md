@@ -19,15 +19,11 @@ This is a system76 silverback in the NerdHerd room, with two nVidia GPU cards.
 		c. Copy labels from section above
 		d. Replace copied name with kanboard
 		e. Replace port with 80 in labels
-	4. Set SUBDOMAIN Variable
-		a. #swx enviornment show
-		b. Add kanboard.vmhost.devwerx.org to the existing enviornment
-		c. #swx environment set SUBDOMAINS '"traefik.vmhost.devwerx.org","glo-services.vmhost.devwerx.org","glo.vmhost.devwerx.org","glo-demo.vmhost.devwerx.org","neo4j.vmhost.devwerx.org","kanboard.vmhost.devwerx.org"'
-	5. Recreate traefik container
+	4. Recreate traefik container
 		a. #docker-compose up -d traefik
-	6. Start kanboard container
+	5. Start kanboard container
 		a. #docker-compose up -d kanboard
-	7. Update github
+	6. Update github
 		a. #git status
 		b. #git add "file" 
 		c. #git commit -m "text with what you did"

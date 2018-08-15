@@ -73,9 +73,9 @@ services:
       HTTPS_PORT: "443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
-      SUBDOMAINS: ${SUBDOMAINS}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_HOSTED_ZONE_ID: ${AWS_HOSTED_ZONE_ID}
       AWS_REGION: ${AWS_REGION}
     logging: *default-logging
     labels:
