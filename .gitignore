@@ -6,3 +6,5 @@ tmp/
 .viminfo
 .gitconfig
 .docker
+.lesshst
+.terraform.d/
