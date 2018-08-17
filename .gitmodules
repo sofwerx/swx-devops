@@ -464,3 +464,6 @@
 [submodule "local/swx-vmhost/TORGI"]
 	path = local/swx-vmhost/TORGI
 	url = https://github.com/sofwerx/TORGI
+[submodule "local/swx-vmhost/tor-vpin-pizerow"]
+	path = local/swx-vmhost/tor-vpin-pizerow
+	url = https://github.com/sofwerx/tor-vpin-pizerow.git
