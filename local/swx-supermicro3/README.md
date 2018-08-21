@@ -1,11 +1,12 @@
 # swx-supermicro3
 
-This is the swx-u-ub-supermicro3 server hosted alongside the datascience kubernetes cluster.
+This is the swx-u-ub-supermicro3 server 
 
 This consists of:
 
 A dual-12core hyperthreaded 32G supermicro chassis with 4 internal 1.86G drives hardware RAID10 running Ubuntu 18.04
-  This is wired to a SAS 45 drive JBOD array, with a ZFS pool carved out of those drives.
+
+This is wired to a SAS 45 drive JBOD array, with 9 of those drives as a ZFS pool.
 
 ## Notes on how this host was added to swx-devops
 

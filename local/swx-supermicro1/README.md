@@ -14,7 +14,7 @@ This is NOT attached to our JBOD array.
 
 6. Run docker-machine with the generic driver:
 
-    docker-machine create -d generic --generic-ip-address 192.168.1.61 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro1
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 61022 --generic-engine-port 61376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro1
 
 If that fails, you may safely remove it and try it again:
 
@@ -59,7 +59,7 @@ If that fails, you may safely remove it and try it again:
 
 14. Add traefik service
 
-- Copy the `traefik:` service from another environment's `.yml` file into the `swx-pandora.yml` file (it is very generic).
+- Copy the `traefik:` service from another environment's `.yml` file into the `swx-supermicro1.yml` file (it is very generic).
 - Add the `docker-traefik` submodule:
 
     git submodule add https://github.com/sofwerx/docker-traefik.git

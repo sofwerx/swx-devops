@@ -2,7 +2,7 @@
 
 This is the dual-12core hyperthreaded 32G supermicro chassis with 4 internal 1.86G drives hardware RAID10 running Ubuntu 18.04
 
-This is attached to our JBOD array.
+This is wired to a SAS 45 drive JBOD array, with 12 of those drives as a ZFS pool.
 
 ## Notes on how this host was added to swx-devops
 
@@ -14,7 +14,7 @@ This is attached to our JBOD array.
 
 6. Run docker-machine with the generic driver:
 
-    docker-machine create -d generic --generic-ip-address 192.168.1.62 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro2
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 62022 --generic-engine-port 62376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro2
 
 If that fails, you may safely remove it and try it again:
 
@@ -59,7 +59,7 @@ If that fails, you may safely remove it and try it again:
 
 14. Add traefik service
 
-- Copy the `traefik:` service from another environment's `.yml` file into the `swx-pandora.yml` file (it is very generic).
+- Copy the `traefik:` service from another environment's `.yml` file into the `swx-supermicro2.yml` file (it is very generic).
 - Add the `docker-traefik` submodule:
 
     git submodule add https://github.com/sofwerx/docker-traefik.git
