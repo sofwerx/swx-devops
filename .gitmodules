@@ -461,3 +461,6 @@
 [submodule "local/swx-supermicro1/docker-traefik"]
 	path = local/swx-supermicro1/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
+[submodule "local/swx-supermicro2/docker-traefik"]
+	path = local/swx-supermicro2/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
