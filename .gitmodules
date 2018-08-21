@@ -406,18 +406,9 @@
 [submodule "aws/swx-geotools1/swx-glo"]
 	path = cellar/swx-geotools1/swx-glo
 	url = https://github.com/sofwerx/glo.git
-[submodule "local/swx-datascience/kubespray"]
-	path = local/swx-datascience/kubespray
-	url = https://github.com/sofwerx/kubespray
 [submodule "local/icbgamingpc/docker-makemkv"]
 	path = local/icbgamingpc/docker-makemkv
 	url = https://github.com/ianblenke/docker-makemkv
-[submodule "local/swx-datascience/docker-traefik"]
-	path = local/swx-datascience/docker-traefik
-	url = https://github.com/sofwerx/docker-traefik.git
-[submodule "local/swx-datascience/docker-motion"]
-	path = local/swx-datascience/docker-motion
-	url = https://github.com/sofwerx/docker-motion
 [submodule "local/swx-orange/docker-elastic"]
 	path = local/swx-orange/docker-elastic
 	url = https://github.com/sofwerx/docker-elastic
