@@ -98,6 +98,47 @@ swx_environment_switch ()
   fi
 }
 
+swx_environment_migrate ()
+{
+  if [ -f "${PWD}/.trousseau" ]; then
+    echo 'There already is a .trousseau file in this directory, cannot migrate environment here'
+  else
+    if [ ! -d gpg ] ; then
+      mkdir -p gpg/
+      cp -a ${devops}/gpg/* gpg/
+    fi
+
+    oldvars="$(swx environment show)"
+    export OLD_TROUSSEAU_STORE=$TROUSSEAU_STORE
+    export NEW_TROUSSEAU_STORE=${PWD}/.trousseau
+
+    # Create the new child trousseau environment
+    \trousseau --gnupg-home $GNUPGHOME --store $NEW_TROUSSEAU_STORE create $(ls -1 gpg/)
+    for keyval in $oldvars ; do
+      key="$(echo $keyval | cut -d= -f1)"
+      val="$(echo $keyval | cut -d= -f2-)"
+      \trousseau --gnupg-home $GNUPGHOME --store $NEW_TROUSSEAU_STORE set "environment:${SWX_ENVIRONMENT}:$key" "$val"
+    done
+
+    # Copy over the dm if one is referenced
+    if [ -f .dm ] ; then
+      DMHOST="$(cat .dm)"
+      \trousseau --gnupg-home $GNUPGHOME --store $NEW_TROUSSEAU_STORE set file:secrets/dm/${DMHOST} "$(\trousseau --gnupg-home $GNUPGHOME --store $OLD_TROUSSEAU_STORE get file:secrets/dm/${DMHOST})"
+      # Delete the dm from the old parent trousseau environment
+      \trousseau --gnupg-home $GNUPGHOME --store $OLD_TROUSSEAU_STORE del file:secrets/dm/${DMHOST}
+    fi
+
+    # Now prune out keys from the old parent trousseau environment
+    newvars="$(swx environment show)"
+    for keyval in $newvars ; do
+      key="$(echo $keyval | cut -d= -f1)"
+      \trousseau --gnupg-home $GNUPGHOME --store $OLD_TROUSSEAU_STORE del "environment:${SWX_ENVIRONMENT}:$key"
+    done
+  
+    change_directory .
+  fi
+}
+
 swx_environment ()
 {
   case $1 in
@@ -109,16 +150,18 @@ get) shift; swx_environment_get $@ ;;
 set) shift; swx_environment_set $@ ;;
 show) shift; swx_environment_show $@ ;;
 keys) shift; swx_environment_keys $@ ;;
+migrate) shift; swx_environment_migrate $@ ;;
 *) cat <<EOU 1>&2
 Usage: swx dm environment {action}
-  ls     - List environments
-  create - Create a new environment
-  switch - Switch to an environment
-  del    - Delete an environment variable from the current environment
-  get    - Get an environment variable from the current environment
-  set    - Set an environment variable in the current environment
-  show   - Show the environment variables and values for the current environment
-  keys   - List the environment variables for the current environment
+  ls      - List environments
+  create  - Create a new environment
+  switch  - Switch to an environment
+  del     - Delete an environment variable from the current environment
+  get     - Get an environment variable from the current environment
+  set     - Set an environment variable in the current environment
+  show    - Show the environment variables and values for the current environment
+  keys    - List the environment variables for the current environment
+  migrate - Migrate an environment into a .trousseau in the current working directory
 EOU
   return 1
   ;;
