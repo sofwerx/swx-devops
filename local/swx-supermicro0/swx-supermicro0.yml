@@ -25,8 +25,8 @@ services:
       - traefik-ssl:/ssl
     restart: always
     ports:
-      - 20080:20080
-      - 20443:20443
+      - 60080:60080
+      - 60443:60443
     networks:
       - default
     environment:
