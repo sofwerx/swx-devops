@@ -14,7 +14,7 @@ This is attached to our JBOD array.
 
 6. Run docker-machine with the generic driver:
 
-    docker-machine create -d generic --generic-ip-address 192.168.1.107 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro0
+    docker-machine create -d generic --generic-ip-address 192.168.1.60 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro0
 
 If that fails, you may safely remove it and try it again:
 
