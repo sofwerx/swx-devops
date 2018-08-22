@@ -1,13 +1,20 @@
 #!/bin/bash
 set -e
-# Install dependencies for this script
 apt-get update
-which npm > /dev/null || (
-  apt-get install -y npm
-  ln -s /usr/bin/nodejs /usr/local/bin/node
-)
+# Install dependencies for this script
 which sudo > /dev/null || (
   apt-get install -y sudo
+)
+which curl > /dev/null || (
+  sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl
+)
+which npm > /dev/null || (
+  curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+  ln -s /usr/bin/nodejs /usr/local/bin/node
 )
 which wget > /dev/null || (
   apt-get install -y wget
@@ -300,9 +307,6 @@ which jq > /dev/null || (
 )
 which docker > /dev/null || (
   sudo apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
     software-properties-common  
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   sudo add-apt-repository \
