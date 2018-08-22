@@ -8,3 +8,4 @@ tmp/
 .docker
 .lesshst
 .terraform.d/
+.npm
