@@ -467,3 +467,6 @@
 [submodule "local/swx-vmhost/tor-vpin-pizerow"]
 	path = local/swx-vmhost/tor-vpin-pizerow
 	url = https://github.com/sofwerx/tor-vpin-pizerow.git
+[submodule "local/swx-vmhost/teamengine-docker"]
+	path = local/swx-vmhost/teamengine-docker
+	url = git@github.com:sofwerx/teamengine-docker.git
