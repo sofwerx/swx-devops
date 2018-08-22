@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/sofwerx/swx-devops#readme",
   "dependencies": {
-    "@mumbacloud/dmport": "0.0.16"
+    "@mumbacloud/dmport": "git://github.com/sofwerx/dmport.git"
   }
 }

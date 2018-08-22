@@ -5,7 +5,7 @@ variable Project {
 
 variable Lifecycle {
   description = "Lifecycle (dev, qa, prod)"
-  default = "datascience"
+  default = "supermicro2"
 }
 
 variable dns_zone {

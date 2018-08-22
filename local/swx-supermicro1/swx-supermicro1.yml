@@ -31,8 +31,8 @@ services:
       - default
     environment:
       REST_PORT: "7080"
-      HTTP_PORT: "60080"
-      HTTPS_PORT: "60443"
+      HTTP_PORT: "61080"
+      HTTPS_PORT: "61443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}

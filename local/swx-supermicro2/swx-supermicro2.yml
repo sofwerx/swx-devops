@@ -25,14 +25,14 @@ services:
       - traefik-ssl:/ssl
     restart: always
     ports:
-      - 60080:60080
-      - 60443:60443
+      - 62080:62080
+      - 62443:62443
     networks:
       - default
     environment:
       REST_PORT: "7080"
-      HTTP_PORT: "60080"
-      HTTPS_PORT: "60443"
+      HTTP_PORT: "62080"
+      HTTPS_PORT: "62443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}

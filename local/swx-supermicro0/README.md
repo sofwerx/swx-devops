@@ -2,7 +2,7 @@
 
 This is the dual-12core hyperthreaded 32G supermicro chassis with 4 internal 1.86G drives hardware RAID10 running Ubuntu 18.04
 
-This is attached to our JBOD array.
+This is wired to a SAS 45 drive JBOD array, with 12 of those drives as a ZFS pool.
 
 ## Notes on how this host was added to swx-devops
 
@@ -14,7 +14,7 @@ This is attached to our JBOD array.
 
 6. Run docker-machine with the generic driver:
 
-    docker-machine create -d generic --generic-ip-address 192.168.1.107 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro0
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 60022 --generic-engine-port 60376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro0
 
 If that fails, you may safely remove it and try it again:
 
@@ -49,7 +49,7 @@ If that fails, you may safely remove it and try it again:
     git commit -m 'Updating secrets'
     git push
 
-13. Add CNAME records in Route53 to point `*.supermicro0.devwerx.org` over to `sofwerxdata.araknisdns.com`
+13. Add CNAME records in Route53 to point `*.supermicro0.devwerx.org` over to public IP
 - Clone the `terraform/` directory from another project
 - Edit the `Makefile`, `README.md`, and `tf.sh` to reflect this new environment
 - Gut the `variables.tf` and `vpc.tf` to reflect only what is required for the AWS Route53 record resources
@@ -59,7 +59,7 @@ If that fails, you may safely remove it and try it again:
 
 14. Add traefik service
 
-- Copy the `traefik:` service from another environment's `.yml` file into the `swx-pandora.yml` file (it is very generic).
+- Copy the `traefik:` service from another environment's `.yml` file into the `swx-supermicro0.yml` file (it is very generic).
 - Add the `docker-traefik` submodule:
 
     git submodule add https://github.com/sofwerx/docker-traefik.git
@@ -70,8 +70,4 @@ If that fails, you may safely remove it and try it again:
 - Deploy traefik with `docker-compose`:
 
     docker-compose up -d traefik
-
-# kubespray
-
-This kubernetes cluster is deployed and maintained using kubespray.
 

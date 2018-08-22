@@ -1,53 +1,46 @@
-# swx-supermicro3
+# swx-supermicro1
 
-This is the swx-u-ub-supermicro3 server 
+This is the dual-12core hyperthreaded 32G supermicro chassis with 4 internal 1.86G drives hardware RAID10 running Ubuntu 18.04
 
-This consists of:
-
-A dual-12core hyperthreaded 32G supermicro chassis with 4 internal 1.86G drives hardware RAID10 running Ubuntu 18.04
-
-This is wired to a SAS 45 drive JBOD array, with 9 of those drives as a ZFS pool.
+This is NOT attached to our JBOD array.
 
 ## Notes on how this host was added to swx-devops
 
 1. Copied README.md here from another project. Edited it to reflect this new environment.
 
-2. Setup ssh key trust on host for swxadmin user.
+2. Setup ssh key trust on host for swx-admin user.
 
 3. Setup /etc/sudoers with NOPASSWD: for the %admin group
 
 6. Run docker-machine with the generic driver:
 
-For the supermicro servers, with the ZFS volume driver:
+    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 61022 --generic-engine-port 61376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro1
 
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 63022 --generic-engine-port 63376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro3
+If that fails, you may safely remove it and try it again:
 
-If you run into any problems doing this, you may safely remove this and try again:
+    docker-machine rm -y swx-u-ub-supermicro1
 
-    docker-machine rm -y swx-u-ub-supermicro3
+7. Add that docker-machine host as a dm:
 
-We are running docker's `/var/lib/docker` persistence from `/dev/sda3` carved out of the 4 drive hardware RAID array.
+    swx dm import swx-u-ub-supermicro1
 
-7. This docker-machine host as a dm:
+8. Create a `.dm` file for the dm host to auto-switch when you cd to the directory:
 
-    swx dm import swx-u-ub-supermicro3
-
-8. Create a `.dm` file for the default dm host to auto-switch when you cd to the directory:
-
-    echo "swx-u-ub-supermicro3" > .dm
+    echo "swx-u-ub-supermicro1" > .dm
 
 9. Setup environment variables for traefik:
 
-    swx environment create swx-supermicro3
-    swx environment set DNS_DOMAIN supermicro3.opswerx.org
+    swx environment create swx-supermicro1
+    swx environment set DNS_DOMAIN supermicro1.opswerx.org
 
 10. Setup the dm2environment association between the dm host to the environment it is part of, to allow auto-switching to the environment when you cd to the directory:
 
-    trousseau set dm2environment:swx-u-ub-supermicro3 swx-supermicro3
+    trousseau set dm2environment:swx-u-ub-supermicro1 swx-supermicro1
 
 11. Setup environment variable for `docker-compose` to know which `.yml` file to use for this environment, and the ARCH of this environment:
 
-    swx environment set COMPOSE_FILE swx-supermicro3.yml
+    swx environment set COMPOSE_PROJECT_NAME swxsupermicro1
+    swx environment set COMPOSE_FILE swx-supermicro1.yml
     swx environment set ARCH x86_64
 
 12. Add the `.trousseau` file to the git repo and commit and push it as a new change:
@@ -56,7 +49,7 @@ We are running docker's `/var/lib/docker` persistence from `/dev/sda3` carved ou
     git commit -m 'Updating secrets'
     git push
 
-13. Add DNS records in Route53 to point `*.supermicro3.devwerx.org` to the cluster public IP
+13. Add CNAME records in Route53 to point `*.supermicro1.devwerx.org` over to the static public IP
 - Clone the `terraform/` directory from another project
 - Edit the `Makefile`, `README.md`, and `tf.sh` to reflect this new environment
 - Gut the `variables.tf` and `vpc.tf` to reflect only what is required for the AWS Route53 record resources
@@ -66,7 +59,7 @@ We are running docker's `/var/lib/docker` persistence from `/dev/sda3` carved ou
 
 14. Add traefik service
 
-- Copy the `traefik:` service from another environment's `.yml` file into the `swx-pandora.yml` file (it is very generic).
+- Copy the `traefik:` service from another environment's `.yml` file into the `swx-supermicro1.yml` file (it is very generic).
 - Add the `docker-traefik` submodule:
 
     git submodule add https://github.com/sofwerx/docker-traefik.git

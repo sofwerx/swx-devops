@@ -1,6 +1,6 @@
-# swx-datascience terraform
+# swx-supermicro2 terraform
 
-This is for AWS Route53 DNS resources for swx-datascience environment.
+This is for AWS Route53 DNS resources for swx-supermicro2 environment.
 
 # Note:
 
@@ -18,5 +18,5 @@ or the `tf.sh` script:
 
 or run this:
 
-    terraform init --backend-config="key=swx/datascience/terraform.tfstate"
+    terraform init --backend-config="key=swx/supermicro2/terraform.tfstate"
 
