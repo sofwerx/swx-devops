@@ -180,3 +180,20 @@ services:
       - "traefik.frontend.passHostHeader=false"
       - "traefik.frontend.entryPoints=http,https"
 
+  opensphere:
+    extends:
+      file: docker-opensphere/docker-compose.yml
+      service: opensphere
+    image: sofwerx/opensphere
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=opensphere"
+      - "traefik.port=8282"
+      - "traefik.frontend.rule=Host:opensphere.${DNS_DOMAIN}"
+#      - "traefik.frontend.rule=Host:opensphere.${DNS_DOMAIN};AddPrefix:/opensphere/dist/opensphere"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
