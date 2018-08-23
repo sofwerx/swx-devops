@@ -470,3 +470,6 @@
 [submodule "local/swx-vmhost/docker-opensphere"]
 	path = local/swx-vmhost/docker-opensphere
 	url = https://github.com/sofwerx/docker-opensphere
+[submodule "local/swx-orange/es-tshark"]
+	path = local/swx-orange/es-tshark
+	url = https://github.com/sofwerx/es-tshark
