@@ -473,3 +473,6 @@
 [submodule "local/swx-orange/es-tshark"]
 	path = local/swx-orange/es-tshark
 	url = https://github.com/sofwerx/es-tshark
+[submodule "local/swx-vmhost/edges"]
+	path = local/swx-vmhost/edges
+	url = https://github.com/sofwerx/edges
