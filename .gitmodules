@@ -470,3 +470,6 @@
 [submodule "local/swx-vmhost/docker-opensphere"]
 	path = local/swx-vmhost/docker-opensphere
 	url = https://github.com/sofwerx/docker-opensphere
+[submodule "local/swx-vmhost/edges"]
+	path = local/swx-vmhost/edges
+	url = https://github.com/sofwerx/edges
