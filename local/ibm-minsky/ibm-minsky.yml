@@ -53,6 +53,10 @@ volumes:
 #    driver: local
 #  dcs-log:
 #    driver: local
+  jupyterhub-postgres-data:
+    driver: local
+  jupyterhub-data:
+    driver: local
 
 services:
 
@@ -418,4 +422,73 @@ services:
 #    command: npm start
 #    labels:
 #      - "traefik.enable=false"
+
+  jupyterhub-postgres:
+    image: postgres:9.5
+    container_name: jupyterhub-postgres
+    hostname: jupyterhub-postgres
+    restart: always
+    networks:
+      - default
+    environment:
+      POSTGRES_DB: jupyterhub
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - "jupyterhub-postgres-data:/var/lib/postgresql/data"
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  jupyterhub:
+    build:
+      context: docker-jupyterhub/
+      dockerfile: Dockerfile.${ARCH}
+    restart: always
+    image: jupyterhub
+    container_name: jupyterhub
+    networks:
+      - default
+    volumes:
+      # Bind Docker socket on the host so we can connect to the daemon from
+      # within the container
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      # Bind Docker volume on host for JupyterHub database and cookie secrets
+      - "jupyterhub-data:/data"
+      - traefik-ssl:/ssl
+    environment:
+      # All containers will join this network
+      DOCKER_NETWORK_NAME: ${COMPOSE_PROJECT_NAME}_default
+      # JupyterHub will spawn this Notebook image for users
+      DOCKER_NOTEBOOK_IMAGE: sofwerx/jupyter-notebook:${ARCH}
+      # Notebook directory inside user image
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work
+      # Using this run command (optional)
+      DOCKER_SPAWN_CMD: start-singleuser.sh
+      # Postgres db info
+      POSTGRES_DB: jupyterhub
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: jupyterhub-postgres
+      GITHUB_CLIENT_ID: ${JUPYTERHUB_GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${JUPYTERHUB_GITHUB_CLIENT_SECRET}
+      GITHUB_USERLIST: ${JUPYTERHUB_GITHUB_USERLIST}
+      OAUTH_CALLBACK_URL: ${JUPYTERHUB_OAUTH_CALLBACK_URL}
+    logging: *default-logging
+    labels:
+      traefik.backend: "jupyterhub"
+      traefik.port: "443"
+      traefik.protocol: "https"
+      traefik.frontend.rule: "Host:jupyterhub.${DNS_DOMAIN}"
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.entryPoints: "https"
+
+  jupyter-notebook:
+    build:
+      context: docker-jupyterhub/jupyter-notebook/
+      dockerfile: Dockerfile.${ARCH}
+      args:
+        ARCH: ${ARCH}
+    image: sofwerx/jupyter-notebook:${ARCH}
+    container_name: jupyter-notebook
+    hostname: jupyter-notebook
 
