@@ -1,0 +1,62 @@
+FROM ubuntu:18.04
+
+# install nodejs, utf8 locale, set CDN because default httpredir is unreliable
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get -y update && \
+    apt-get -y upgrade && \
+    apt-get -y install wget git bzip2 curl gnupg jq coreutils && \
+    apt-get purge && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN apt-get install -y nodejs npm
+RUN npm install -g configurable-http-proxy
+
+ENV LANG=C.UTF-8 \
+    MINICONDA_VERSION=4.5.4 \
+    CONDA_DIR=/opt/conda \
+    PATH=$PATH:/opt/conda/bin
+RUN cd /tmp && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-ppc64le.sh && \
+    echo "05c1e073f262105179cf57920dfc4d43 *Miniconda3-${MINICONDA_VERSION}-Linux-ppc64le.sh" | md5sum -c - && \
+    /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-ppc64le.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-${MINICONDA_VERSION}-Linux-ppc64le.sh && \
+    $CONDA_DIR/bin/conda config --system --prepend channels conda-forge && \
+    $CONDA_DIR/bin/conda config --system --set auto_update_conda false && \
+    $CONDA_DIR/bin/conda config --system --set show_channel_urls true && \
+    $CONDA_DIR/bin/conda install --quiet --yes conda="${MINICONDA_VERSION%.*}.*" && \
+    $CONDA_DIR/bin/conda install --yes -c conda-forge \
+      python=3.6 sqlalchemy tornado jinja2 traitlets requests pip pycurl && \
+    pip install --upgrade pip && \
+    $CONDA_DIR/bin/conda update --all --quiet --yes && \
+    $CONDA_DIR/bin/conda clean -tipsy
+
+ADD jupyterhub/ /src/jupyterhub
+WORKDIR /src/jupyterhub
+
+RUN pip install . && \
+    rm -rf $PWD ~/.cache ~/.npm
+
+RUN mkdir -p /srv/jupyterhub/
+WORKDIR /srv/jupyterhub/
+EXPOSE 8000
+
+LABEL org.jupyter.service="jupyterhub"
+
+# Install dockerspawner, oauth, postgres
+RUN $CONDA_DIR/bin/conda install -yq psycopg2=2.7 && \
+    $CONDA_DIR/bin/conda clean -tipsy && \
+    $CONDA_DIR/bin/pip install --no-cache-dir \
+        oauthenticator==0.7.* \
+        dockerspawner==0.9.*
+
+ADD jupyterhub_config.py .
+ADD run.sh /run.sh
+
+CMD /run.sh
+
+#RUN chmod 700 /srv/jupyterhub/secrets && \
+#    chmod 600 /srv/jupyterhub/secrets/*
+
+#COPY ./userlist /srv/jupyterhub/userlist

@@ -476,3 +476,6 @@
 [submodule "local/swx-vmhost/edges"]
 	path = local/swx-vmhost/edges
 	url = https://github.com/sofwerx/edges
+[submodule "local/ibm-minsky/docker-jupyterhub/jupyterhub"]
+	path = local/ibm-minsky/docker-jupyterhub/jupyterhub
+	url = https://github.com/sofwerx/jupyterhub
