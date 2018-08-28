@@ -479,3 +479,6 @@
 [submodule "local/ibm-minsky/docker-jupyterhub/jupyterhub"]
 	path = local/ibm-minsky/docker-jupyterhub/jupyterhub
 	url = https://github.com/sofwerx/jupyterhub
+[submodule "local/swx-supermicro4/docker-traefik"]
+	path = local/swx-supermicro4/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
