@@ -22,40 +22,30 @@ volumes:
     driver: local
   kanboard_ssl:
     driver: local
+  minio:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.63,rw,soft,intr,nosuid,tcp
+      device: ":/data/minio"
+  osm-postgis-data:
+    driver: local
+  osm-import_done:
+    driver: local
+  osm-import_queue:
+    driver: local
+  osm-cache:
+    driver: local
+  osm-settings:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.63,rw,soft,intr,nosuid,tcp
+      device: ":/data/minio/jupyterhub/osm"
+  qgis-logs:
+    driver: local
 
 services:
-
-  glo:
-    extends:
-      file: glo/docker-compose.yml
-      service: glo
-    networks:
-      - default
-
-  glo-services:
-    extends:
-      file: glo-services/docker-compose.yml
-      service: glo-services
-    networks:
-      - default
-
-  glo-demo:
-    extends:
-      file: glo-demo/docker-compose.yml
-      service: glo-demo
-    image: sofwerx/glo-demo
-    container_name: glo-demo
-    hostname: glo-demo
-    restart: always
-    networks:
-      - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=glo-demo"
-      - "traefik.port=4200"
-      - "traefik.frontend.rule=Host:glo-demo.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=false"
-      - "traefik.frontend.entryPoints=http,https"
 
   traefik:
     extends:
@@ -86,6 +76,55 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  glo:
+    extends:
+      file: glo/docker-compose.yml
+      service: glo
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=glo"
+      - "traefik.port=4200"
+      - "traefik.frontend.rule=Host:glo.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
+
+  glo-services:
+    extends:
+      file: glo-services/docker-compose.yml
+      service: glo-services
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=glo-services"
+      - "traefik.port=4200"
+      - "traefik.frontend.rule=Host:glo-services.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
+
+  glo-demo:
+    extends:
+      file: glo-demo/docker-compose.yml
+      service: glo-demo
+    image: sofwerx/glo-demo
+    container_name: glo-demo
+    hostname: glo-demo
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=glo-demo"
+      - "traefik.port=4200"
+      - "traefik.frontend.rule=Host:glo-demo.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=false"
+      - "traefik.frontend.entryPoints=http,https"
+
   neo4j:
     extends:
       file: docker-neo4j/docker-compose.yml
@@ -98,6 +137,7 @@ services:
       - 7687:7687
       - 7474:7474
       - 7473:7473
+    logging: *default-logging
     volumes:
       - traefik-ssl:/ssl
       - neo4j-data:/var/lib/neo4j
@@ -158,6 +198,7 @@ services:
     restart: always
     networks:
       - default
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=underground"
@@ -170,6 +211,7 @@ services:
     extends:
       file: pocket-node/docker-compose.yml
       service: pocket-node
+    logging: *default-logging
     networks:
       - default
     labels:
@@ -186,6 +228,7 @@ services:
       service: opensphere
     image: sofwerx/opensphere
     restart: always
+    logging: *default-logging
     networks:
       - default
     labels:
@@ -194,6 +237,134 @@ services:
       - "traefik.port=8282"
       - "traefik.frontend.rule=Host:opensphere.${DNS_DOMAIN}"
 #      - "traefik.frontend.rule=Host:opensphere.${DNS_DOMAIN};AddPrefix:/opensphere/dist/opensphere"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  osm-postgis:
+    # About the postgresql version, it should match in the dockerfile of docker-imposm3
+    image: kartoza/postgis:9.6-2.4
+    hostname: osm-postgis
+    container_name: osm-postgis
+    environment:
+      - POSTGRES_USER=${OSM_POSTGRES_USER}
+      - POSTGRES_PASS=${OSM_POSTGRES_PASS}
+      - POSTGRES_DBNAME=${OSM_POSTGRES_DBNAME}
+      # Uncomment to expose the postgis database on the network
+      # - ALLOW_IP_RANGE= 0.0.0.0/0
+    logging: *default-logging
+    volumes:
+      - 'osm-postgis-data:/var/lib/postgresql'
+    # Uncomment to use the postgis database from outside the docker network
+    # ports:
+    #  - "35432:5432"
+    healthcheck:
+        test: "exit 0"
+    labels:
+      - "traefik.enable=false"
+
+  osm-import:
+    build: docker-osm/docker-imposm3
+    image: sofwerx/docker-osm:imposm-latest
+    container_name: osm-import
+    hostname: osm-import
+    logging: *default-logging
+    volumes:
+      # These are sharable to other containers
+      - osm-import_done:/home/import_done
+      - osm-import_queue:/home/import_queue
+      - osm-cache:/home/cache
+      - osm-settings:/home/settings
+    depends_on:
+        osm-postgis:
+          condition: service_healthy
+    environment:
+      - POSTGRES_USER=${OSM_POSTGRES_USER}
+      - POSTGRES_PASS=${OSM_POSTGRES_PASS}
+      - POSTGRES_DBNAME=${OSM_POSTGRES_DBNAME}
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=osm-postgis
+      # seconds between 2 executions of the script
+      # if 0, then no update will be done, only the first initial import from the PBF
+      - TIME=120
+      # folder for settings (with *.json and *.sql)
+      - SETTINGS=settings
+      # folder for caching
+      - CACHE=cache
+      # folder for diff which has been imported
+      - IMPORT_DONE=import_done
+      # folder for diff which hasn't been imported yet
+      - IMPORT_QUEUE=import_queue
+      # it can be 3857
+      - SRID=4326
+      # see http://imposm.org/docs/imposm3/latest/tutorial.html#optimize
+      - OPTIMIZE=false
+      # see http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
+      - DBSCHEMA_PRODUCTION=public
+      # http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
+      - DBSCHEMA_IMPORT=import
+      # http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
+      - DBSCHEMA_BACKUP=backup
+      # Install some styles if you are using the default mapping. It can be 'yes' or 'no'
+      - QGIS_STYLE=yes
+      # Use clip in the database
+      - CLIP=no
+    labels:
+      - "traefik.enable=false"
+
+  osm-update:
+    build: docker-osm/docker-osmupdate
+    image: sofwerx/docker-osm:osmupdate-latest
+    container_name: osm-update
+    hostname: osm-update
+    volumes:
+      # These are sharable to other containers
+      - osm-import_done:/home/import_done
+      - osm-import_queue:/home/import_queue
+      - osm-cache:/home/cache
+      - osm-settings:/home/settings
+    depends_on:
+      osm-postgis:
+        condition: service_healthy
+    environment:
+      # These are all currently the defaults but listed here for your
+      # convenience if you want to change them
+      # the maximum time range to assemble a cumulated changefile.
+      - MAX_DAYS=100
+      # osmupdate uses a combination of minutely, hourly and daily changefiles. This value can be minute, hour, day or sporadic.
+      - DIFF=sporadic
+      # argument to determine the maximum number of parallely processed changefiles.
+      - MAX_MERGE=7
+      # define level for gzip compression. values between 1 (low compression but fast) and 9 (high compression but slow)
+      - COMPRESSION_LEVEL=1
+      # change the URL to use a custom URL to fetch regional file updates.
+      - BASE_URL=http://planet.openstreetmap.org/replication/
+      # folder for diff which hasn't been imported yet
+      - IMPORT_QUEUE=import_queue
+      # folder for diff which has been imported
+      - IMPORT_DONE=import_done
+      # seconds between 2 executions of the script
+      # if 0, then no update will be done, only the first initial import from the PBF
+      - TIME=120
+    labels:
+      - "traefik.enable=false"
+
+  qgis:
+    build: docker-osm/qgis/
+    image: sofwerx/qgis-server:3.0
+    hostname: qgis
+    container_name: qgis
+    logging: *default-logging
+    volumes:
+      - qgis-logs:/var/log/apache2
+      - osm-settings:/web/settings
+    links:
+      - osm-postgis:db
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=qgis"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:qgis.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
