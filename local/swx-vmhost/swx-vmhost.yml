@@ -44,6 +44,8 @@ volumes:
       device: ":/data/minio/jupyterhub/osm"
   qgis-logs:
     driver: local
+  geoserver-data:
+    driver: local
 
 services:
 
@@ -365,6 +367,29 @@ services:
       - "traefik.backend=qgis"
       - "traefik.port=80"
       - "traefik.frontend.rule=Host:qgis.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  geoserver:
+    build: docker-geoserver/
+    image: sofwerx/geoserver
+    hostname: geoserver
+    container_name: geoserver
+    restart: always
+    environment:
+      ADMIN_PASSWD: ${GEOSERVER_ADMIN_PASSWORD}
+    networks:
+      - default
+    links:
+      - osm-postgis:postgis
+    volumes:
+      - geoserver-data:/opt/geoserver/data_dir
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=geoserver"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:geoserver.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 

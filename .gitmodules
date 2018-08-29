@@ -485,3 +485,6 @@
 [submodule "local/swx-vmhost/docker-osm"]
 	path = local/swx-vmhost/docker-osm
 	url = https://github.com/sofwerx/docker-osm
+[submodule "local/swx-vmhost/docker-geoserver"]
+	path = local/swx-vmhost/docker-geoserver
+	url = https://github.com/sofwerx/docker-geoserver.git
