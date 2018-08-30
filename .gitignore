@@ -9,3 +9,4 @@ tmp/
 .lesshst
 .terraform.d/
 .npm
+kube_config_cluster.yml
