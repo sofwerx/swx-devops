@@ -33,17 +33,16 @@ services:
       - traefik-ssl:/ssl
     restart: always
     ports:
-      - 80:20080
-      - 443:20443
+      - 80:63080
+      - 443:63443
     networks:
       - default
     environment:
       REST_PORT: "7080"
-      HTTP_PORT: "20080"
-      HTTPS_PORT: "20443"
+      HTTP_PORT: "63080"
+      HTTPS_PORT: "63443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
-      SUBDOMAINS: ${SUBDOMAINS}
       MINIO_URL: ${MINIO_URL}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
@@ -111,7 +110,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion43"
       - "traefik.port=20043"
       - "traefik.frontend.rule=Host:motion43.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -147,7 +146,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion44"
       - "traefik.port=20044"
       - "traefik.frontend.rule=Host:motion44.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -183,7 +182,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion45"
       - "traefik.port=20045"
       - "traefik.frontend.rule=Host:motion45.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -219,7 +218,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion46"
       - "traefik.port=20046"
       - "traefik.frontend.rule=Host:motion46.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -255,7 +254,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion47"
       - "traefik.port=20047"
       - "traefik.frontend.rule=Host:motion47.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -291,7 +290,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion48"
       - "traefik.port=20048"
       - "traefik.frontend.rule=Host:motion48.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -327,7 +326,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion49"
       - "traefik.port=20049"
       - "traefik.frontend.rule=Host:motion49.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -363,7 +362,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion50"
       - "traefik.port=20050"
       - "traefik.frontend.rule=Host:motion50.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -399,7 +398,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion51"
       - "traefik.port=20051"
       - "traefik.frontend.rule=Host:motion51.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -435,7 +434,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion52"
       - "traefik.port=20052"
       - "traefik.frontend.rule=Host:motion52.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
@@ -471,7 +470,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=traefik"
+      - "traefik.backend=motion53"
       - "traefik.port=20053"
       - "traefik.frontend.rule=Host:motion53.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
