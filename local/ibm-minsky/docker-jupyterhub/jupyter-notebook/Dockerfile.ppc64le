@@ -445,6 +445,10 @@ RUN bash -c 'source activate py2 ; \
 RUN apt-get install -y octave
 RUN pip install octave_kernel
 
+# Install Scilab kernel
+RUN apt-get install -y scilab
+RUN pip install scilab_kernel
+
 ADD test_cuda_docker.ipynb .
 
 RUN chown -R $NB_USER:users /home/$NB_USER
