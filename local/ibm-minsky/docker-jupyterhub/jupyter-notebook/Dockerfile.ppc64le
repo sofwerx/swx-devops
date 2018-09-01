@@ -441,9 +441,13 @@ RUN bash -c 'source activate py2 ; \
     python2 -m pip install ipykernel && \
     python2 -m ipykernel install --user'
 
+# Install Octave kernel (MATLAB like syntax)
+RUN apt-get install -y octave
+RUN pip install octave_kernel
+
 ADD test_cuda_docker.ipynb .
 
-#RUN chown -R $NB_USER:users /home/$NB_USER
+RUN chown -R $NB_USER:users /home/$NB_USER
 
 ## Install VNC
 #RUN apt-get install -y --no-install-recommends xterm xfonts-base x11-xserver-utils supervisor openbox wget bzip2 ca-certificates websockify xinit novnc xfce4
