@@ -68,6 +68,7 @@ services:
     networks:
       - default
     command: server /export
+    restart: always
     environment:
       MINIO_URL: ${MINIO_URL}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
