@@ -38,6 +38,8 @@ services:
       - traefik-ssl:/ssl
     restart: always
     ports:
+      - 80:60080
+      - 443:60443
       - 60080:60080
       - 60443:60443
     networks:
@@ -77,7 +79,7 @@ services:
       JIRA_DATABASE_URL: postgresql://${JIRA_DB_USER}@jira-postgres/${JIRA_DB_NAME}
       JIRA_DB_PASSWORD: ${JIRA_DB_PASSWORD}
       SETENV_JVM_MINIMUM_MEMORY: 256m
-      SETENV_JVM_MAXIMUM_MEMORY: 1g
+      SETENV_JVM_MAXIMUM_MEMORY: 4g
       #JIRA_PROXY_NAME:
       #JIRA_PROXY_PORT:
       #JIRA_PROXY_SCHEME:
