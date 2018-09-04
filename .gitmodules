@@ -488,3 +488,6 @@
 [submodule "local/swx-vmhost/docker-geoserver"]
 	path = local/swx-vmhost/docker-geoserver
 	url = https://github.com/sofwerx/docker-geoserver.git
+[submodule "local/swx-supermicro4/docker-aletheios-cicd"]
+	path = local/swx-supermicro4/docker-aletheios-cicd
+	url = https://github.com/sofwerx/docker-aletheios-cicd
