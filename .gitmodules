@@ -491,3 +491,9 @@
 [submodule "local/swx-supermicro4/docker-aletheios-cicd"]
 	path = local/swx-supermicro4/docker-aletheios-cicd
 	url = https://github.com/sofwerx/docker-aletheios-cicd
+[submodule "local/swx-supermicro0/docker-jira-postgres"]
+	path = local/swx-supermicro0/docker-jira-postgres
+	url = https://github.com/sofwerx/docker-jira-postgres
+[submodule "local/swx-supermicro0/docker-jira"]
+	path = local/swx-supermicro0/docker-jira
+	url = https://github.com/sofwerx/docker-jira
