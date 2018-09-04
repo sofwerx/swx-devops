@@ -384,6 +384,7 @@ services:
       - osm-postgis:postgis
     volumes:
       - geoserver-data:/opt/geoserver/data_dir
+      - minio:/opt/geoserver/minio
     logging: *default-logging
     labels:
       - "traefik.enable=true"
