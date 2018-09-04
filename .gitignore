@@ -5,8 +5,10 @@ tmp/
 .bash_history
 .viminfo
 .gitconfig
+.git-credentials
 .docker
 .lesshst
 .terraform.d/
 .npm
+.vim
 kube_config_cluster.yml
