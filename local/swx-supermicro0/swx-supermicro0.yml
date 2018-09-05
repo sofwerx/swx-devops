@@ -28,6 +28,13 @@ volumes:
       o: bind
       device: /data/jira-postgres
 
+  gitlab-runner-config:
+    driver: local
+  gitlab-runner-data:
+    driver: local
+  gitlab-runner-cache:
+    driver: local
+
 services:
 
   traefik:
@@ -157,3 +164,27 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  gitlab-runner:
+    container_name: gitlab-runner
+    hostname: gitlab-runner
+    build: docker-gitlab-runner/
+    image: 'sofwerx/gitlab-runner:latest'
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitlab-runner-config:/etc/gitlab-runner
+      - gitlab-runner-data:/home/gitlab-runner
+      - gitlab-runner-cache:/cache
+    environment:
+      #CI_DEBUG_TRACE: "true"
+      CI_SERVER_URL: "https://gitlab.${DNS_DOMAIN}:60443"
+      DOCKER_IMAGE: ruby:2.1
+      DOCKER_VOLUME_DRIVER: overlay2
+      REGISTER_LOCKED: "false"
+      REGISTER_NON_INTERACTIVE: "true"
+      REGISTER_RUN_UNTAGGED: "true"
+      REGISTRATION_TOKEN: ${GITLAB_RUNNER_TOKEN}
+      RUNNER_CACHE_DIR: /cache
+      RUNNER_ENV: "DOCKER_DRIVER=overlay2"
+      RUNNER_EXECUTOR: docker
+      RUNNER_NAME: gitlab-runner
