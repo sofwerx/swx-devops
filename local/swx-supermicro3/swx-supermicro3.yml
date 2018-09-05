@@ -477,3 +477,147 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  motion57:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion57
+    hostname: motion57
+    restart: always
+    ports:
+      - 20057:20057
+      - 21057:21057
+    environment:
+      WEBCONTROL_PORT: 20057
+      STREAM_PORT: 21057
+      RTSP_URL: ${RTSP_URL_57}
+      RTSP_AUTH: ${RTSP_AUTH_57}
+      RTSP_LABEL: ${RTSP_LABEL_57}
+      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      SECURE_MINIO_URL: ${SECURE_MINIO_URL}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion57:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=motion57"
+      - "traefik.port=20057"
+      - "traefik.frontend.rule=Host:motion57.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion58:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion58
+    hostname: motion58
+    restart: always
+    ports:
+      - 20058:20058
+      - 21058:21058
+    environment:
+      WEBCONTROL_PORT: 20058
+      STREAM_PORT: 21058
+      RTSP_URL: ${RTSP_URL_58}
+      RTSP_AUTH: ${RTSP_AUTH_58}
+      RTSP_LABEL: ${RTSP_LABEL_58}
+      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      SECURE_MINIO_URL: ${SECURE_MINIO_URL}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion58:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=motion58"
+      - "traefik.port=20058"
+      - "traefik.frontend.rule=Host:motion58.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion59:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion59
+    hostname: motion59
+    restart: always
+    ports:
+      - 20059:20059
+      - 21059:21059
+    environment:
+      WEBCONTROL_PORT: 20059
+      STREAM_PORT: 21059
+      RTSP_URL: ${RTSP_URL_59}
+      RTSP_AUTH: ${RTSP_AUTH_59}
+      RTSP_LABEL: ${RTSP_LABEL_59}
+      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      SECURE_MINIO_URL: ${SECURE_MINIO_URL}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion59:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=motion59"
+      - "traefik.port=20059"
+      - "traefik.frontend.rule=Host:motion59.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion71:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion71
+    hostname: motion71
+    restart: always
+    ports:
+      - 20071:20071
+      - 21071:21071
+    environment:
+      WEBCONTROL_PORT: 20071
+      STREAM_PORT: 21071
+      RTSP_URL: ${RTSP_URL_71}
+      RTSP_AUTH: ${RTSP_AUTH_71}
+      RTSP_LABEL: ${RTSP_LABEL_71}
+      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      SECURE_MINIO_URL: ${SECURE_MINIO_URL}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion71:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=motion71"
+      - "traefik.port=20071"
+      - "traefik.frontend.rule=Host:motion71.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
