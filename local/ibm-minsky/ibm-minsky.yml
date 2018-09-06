@@ -60,9 +60,9 @@ volumes:
   minio:
     driver: local
     driver_opts:
-      type: nfs
-      o: addr=192.168.1.63,rw
-      device: ":/data/minio/jupyterhub"
+      type: 'none'
+      o: 'bind'
+      device: '/import/minio/jupyterhub'
 
 services:
 
