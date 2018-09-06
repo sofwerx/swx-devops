@@ -451,7 +451,12 @@ RUN pip install scilab_kernel
 
 ADD test_cuda_docker.ipynb .
 
+RUN pip install -U numpy==1.14.5
+RUN pip install -U scipy
+RUN pip install -U scikit-image
+
 RUN chown -R $NB_USER:users /home/$NB_USER
+RUN chown -R $NB_USER:users /usr/local
 
 ## Install VNC
 #RUN apt-get install -y --no-install-recommends xterm xfonts-base x11-xserver-utils supervisor openbox wget bzip2 ca-certificates websockify xinit novnc xfce4
@@ -463,8 +468,30 @@ RUN chown -R $NB_USER:users /home/$NB_USER
 #RUN jupyter nbextension     install --py nbnovnc
 #RUN jupyter nbextension     enable  --py nbnovnc
 #
+#RUN git clone https://github.com/ryanlovett/nbnovnc nbnovnc && \
+#    cd nbnovnc && \
+#    python setup.py install && \
+#    cd .. && \
+#    rm -fr nbnovnc
+#
+#RUN git clone https://github.com/jupyterhub/nbserverproxy nbserverproxy && \
+#    cd nbserverproxy && \
+#    python setup.py install && \
+#    cd .. && \
+#    rm -fr nbserverproxy
+#
+#RUN git clone https://github.com/novnc/websockify websockify && \
+#    cd websockify && \
+#    python setup.py install && \
+#    cd .. && \
+#    rm -fr websockify
+#
+#RUN jupyter serverextension enable  --py nbserverproxy
+#RUN jupyter serverextension enable  --py nbnovnc
+
+## This is not necessary
 #COPY supervisord.conf /etc/supervisor/supervisord.conf
 #COPY menu.xml /etc/xdg/openbox/menu.xml
 #
 #CMD "/usr/bin/supervisord"
-#
+
