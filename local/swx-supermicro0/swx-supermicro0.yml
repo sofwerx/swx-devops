@@ -136,7 +136,7 @@ services:
     hostname: "gitlab.${DNS_DOMAIN}"
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url "https://gitlab.${DNS_DOMAIN}:60443"
+        external_url "https://gitlab.${DNS_DOMAIN}"
         nginx['redirect_http_to_https'] = true
         gitlab_rails['gitlab_shell_ssh_port'] = 60022
         gitlab_rails['lfs_enabled'] = true
@@ -189,7 +189,7 @@ services:
       - gitlab-runner-cache:/cache
     environment:
       #CI_DEBUG_TRACE: "true"
-      CI_SERVER_URL: "https://gitlab.${DNS_DOMAIN}:60443"
+      CI_SERVER_URL: "https://gitlab.${DNS_DOMAIN}"
       DOCKER_IMAGE: ruby:2.1
       DOCKER_VOLUME_DRIVER: overlay2
       REGISTER_LOCKED: "false"
