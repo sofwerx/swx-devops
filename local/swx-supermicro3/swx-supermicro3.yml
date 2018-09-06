@@ -16,12 +16,12 @@ volumes:
   traefik-ssl:
     driver: local
 
-  minio-data:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '/data/minio'
+#  minio-data:
+#    driver: local
+#    driver_opts:
+#      type: 'none'
+#      o: 'bind'
+#      device: '/data/minio'
 
 services:
 
@@ -62,7 +62,7 @@ services:
     container_name: minio
     hostname: minio
     volumes:
-      - minio-data:/export
+      - /data/minio:/export
     ports:
       - "9000:9000"
     networks:
