@@ -25,9 +25,9 @@ volumes:
   minio:
     driver: local
     driver_opts:
-      type: nfs
-      o: addr=192.168.1.63,rw,soft,intr,nosuid,tcp
-      device: ":/data/minio"
+      type: 'none'
+      o: 'bind'
+      device: '/import/minio/jupyterhub/osm'
   osm-postgis-data:
     driver: local
   osm-import_done:
@@ -257,8 +257,8 @@ services:
     volumes:
       - 'osm-postgis-data:/var/lib/postgresql'
     # Uncomment to use the postgis database from outside the docker network
-    # ports:
-    #  - "35432:5432"
+    ports:
+      - "35432:5432"
     healthcheck:
         test: "exit 0"
     labels:
