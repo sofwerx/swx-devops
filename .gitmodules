@@ -494,3 +494,6 @@
 [submodule "local/swx-supermicro0/docker-jira"]
 	path = local/swx-supermicro0/docker-jira
 	url = https://github.com/sofwerx/docker-jira
+[submodule "local/swx-vmhost/mapserver-docker"]
+	path = local/swx-vmhost/mapserver-docker
+	url = https://github.com/sofwerx/mapserver-docker
