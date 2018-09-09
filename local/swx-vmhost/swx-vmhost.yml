@@ -39,9 +39,9 @@ volumes:
   osm-settings:
     driver: local
     driver_opts:
-      type: nfs
-      o: addr=192.168.1.63,rw,soft,intr,nosuid,tcp
-      device: ":/data/minio/jupyterhub/osm"
+      type: 'none'
+      o: 'bind'
+      device: '/import/minio/jupyterhub/osm'
   qgis-logs:
     driver: local
   geoserver-data:
@@ -391,6 +391,27 @@ services:
       - "traefik.backend=geoserver"
       - "traefik.port=8080"
       - "traefik.frontend.rule=Host:geoserver.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  mapserver:
+    hostname: mapserver
+    container_name: mapserver
+    build:
+      context: mapserver-docker/
+      args:
+        GDAL_VERSION: 2.3.1
+        MAPSERVER_VERSION: 7.2.0
+    image: sofwerx/mapserver:7.2.0
+    restart: always
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mapserver"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:mapserver.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
