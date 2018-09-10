@@ -13,7 +13,7 @@ This project contains documentation and infrastructure as code for our internal 
     * [Trousseau](#trousseau)
   - [Using the Environment](#using-the-environment)
     * [Project Environments](#project-environments)
-    * [Docker-Machine](#docker-machine vs dm)
+    * [Docker-Machine](#docker-machine-vs-dm)
     * [AWS](#aws)
     * [SWX](#swx)
     * [Trousseau](#using-trousseau)
