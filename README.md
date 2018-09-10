@@ -9,7 +9,7 @@ This project contains documentation and infrastructure as code for our internal 
     * [Windows](#windows)
   - [SECURITY](#security)
     * [Docker](#with-docker)
-    * [Manual Setup](#manual)
+    * [Manual Setup](#manual-if-not-using-docker)
     * [Trousseau](#trousseau)
   - [Using the Environment](#using-the-environment)
     * [Project Environments](#project-environments)
@@ -124,8 +124,7 @@ No files under `secrets/` should ever be committed to this git repo. Any secrets
 
 If using docker, just make the 'secrets/gnupg' in the repo directory and run './docker.sh'.
 
-### Manual
-(if not using Docker)
+### Manual (if not using Docker)
 
 #### gnupg 2.0
 
