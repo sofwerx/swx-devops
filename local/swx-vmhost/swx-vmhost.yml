@@ -247,6 +247,7 @@ services:
     image: kartoza/postgis:9.6-2.4
     hostname: osm-postgis
     container_name: osm-postgis
+    restart: always
     environment:
       - POSTGRES_USER=${OSM_POSTGRES_USER}
       - POSTGRES_PASS=${OSM_POSTGRES_PASS}
@@ -414,4 +415,12 @@ services:
       - "traefik.frontend.rule=Host:mapserver.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  rml:
+    build:
+      context: dockerRML/
+      dockerfile: Dockerfile.GPU
+      args:
+        ARCH: ${ARCH}
+    image: sofwerx/rml:${ARCH}-GPU
 
