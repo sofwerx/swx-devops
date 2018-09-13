@@ -449,7 +449,7 @@ services:
   jupyterhub:
     build:
       context: docker-jupyterhub/
-      dockerfile: Dockerfile.${ARCH}
+      dockerfile: Dockerfile
     restart: always
     image: jupyterhub
     container_name: jupyterhub
