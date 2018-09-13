@@ -46,6 +46,10 @@ volumes:
     driver: local
   geoserver-data:
     driver: local
+  django-geopackage-server_data:
+    driver: local
+  django-geopackage-server-media:
+    driver: local
 
 services:
 
@@ -416,6 +420,30 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  django-geopackage-server:
+    extends:
+      file: DjangoGeoPackageServer/docker-compose.yml
+      service: django-geopackage-server
+    image: sofwerx/django-geopackage-server
+    container_name: django-geopackage-server
+    hostname: django-geopackage-server
+    restart: always
+    logging: *default-logging
+    volumes:
+      - django-geopackage-server_data:/data
+      - django-geopackage-server-media:/app/GPKGServer/media
+    environment:
+      SQLITE_DB_PATH: /data/db.sqlite3
+      DJANGO_HOSTNAME: django-geopackage-server.${DNS_DOMAIN}
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=django-geopackage-server"
+      - "traefik.port=7999"
+      - "traefik.frontend.rule=Host:django-geopackage-server.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
   rml:
     build:
       context: dockerRML/
