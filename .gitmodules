@@ -497,3 +497,6 @@
 [submodule "local/swx-vmhost/mapserver-docker"]
 	path = local/swx-vmhost/mapserver-docker
 	url = https://github.com/sofwerx/mapserver-docker
+[submodule "local/swx-vmhost/DjangoGeoPackageServer"]
+	path = local/swx-vmhost/DjangoGeoPackageServer
+	url = https://github.com/sofwerx/DjangoGeoPackageServer.git
