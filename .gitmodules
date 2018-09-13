@@ -500,3 +500,6 @@
 [submodule "local/swx-vmhost/dockerRML"]
 	path = local/swx-vmhost/dockerRML
 	url = https://github.com/sofwerx/dockerRML
+[submodule "local/swx-vmhost/safehouse"]
+	path = local/swx-vmhost/safehouse
+	url = https://github.com/sofwerx/safehouse
