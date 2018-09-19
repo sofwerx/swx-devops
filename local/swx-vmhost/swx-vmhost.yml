@@ -452,3 +452,19 @@ services:
         ARCH: ${ARCH}
     image: sofwerx/rml:${ARCH}-GPU
 
+  osh-core:
+    extends:
+      file: docker-osh/docker-compose.yml
+      service: osh-core
+    restart: always
+    networks:
+      - default
+    ports:
+      - 8181:8181
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=osh-core"
+      - "traefik.port=8181"
+      - "traefik.frontend.rule=Host:osh.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
