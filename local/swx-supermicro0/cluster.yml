@@ -134,4 +134,6 @@ network:
 
 ingress:
     provider: nginx
+    node_selector:
+      app: ingress
 
