@@ -449,7 +449,7 @@ services:
   jupyterhub:
     build:
       context: docker-jupyterhub/
-      dockerfile: Dockerfile.${ARCH}
+      dockerfile: Dockerfile
     restart: always
     image: jupyterhub
     container_name: jupyterhub
@@ -491,10 +491,10 @@ services:
   jupyter-notebook:
     build:
       context: docker-jupyterhub/jupyter-notebook/
-      dockerfile: Dockerfile.${ARCH}
+      dockerfile: Dockerfile.${ARCH}-${TARGET}
       args:
         ARCH: ${ARCH}
-    image: sofwerx/jupyter-notebook:${ARCH}
+    image: sofwerx/jupyter-notebook:${ARCH}-${TARGET}
     container_name: jupyter-notebook
     hostname: jupyter-notebook
 

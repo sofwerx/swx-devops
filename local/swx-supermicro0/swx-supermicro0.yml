@@ -101,6 +101,8 @@ services:
       - "traefik.frontend.rule=Host:jira.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:https://jira.${DNS_DOMAIN}||Vary:Origin"
+      - "traefik.frontend.headers.customRequestHeaders=Origin:http://jira.${DNS_DOMAIN}"
 
   jira-postgres:
     container_name: jira-postgres
