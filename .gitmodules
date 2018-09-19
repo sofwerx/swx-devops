@@ -509,3 +509,6 @@
 [submodule "local/swx-supermicro0/docker-confluence"]
 	path = local/swx-supermicro0/docker-confluence
 	url = https://github.com/sofwerx/docker-confluence
+[submodule "local/swx-vmhost/docker-jupyterhub"]
+	path = local/swx-vmhost/docker-jupyterhub
+	url = https://github.com/sofwerx/docker-jupyterhub
