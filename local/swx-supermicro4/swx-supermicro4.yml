@@ -15,6 +15,27 @@ volumes:
   traefik-ssl:
     driver: local
 
+  aletheios-mirror:
+    driver: local
+  aletheios-src:
+    driver: local
+  aletheios-tmp:
+    driver: local
+  aletheios-ccache:
+    driver: local
+  aletheios-zips:
+    driver: local
+  aletheios-local_manifests:
+    driver: local
+  aletheios-delta:
+    driver: local
+  aletheios-keys:
+    driver: local
+  aletheios-logs:
+    driver: local
+  aletheios-userscripts:
+    driver: local
+
 services:
 
   traefik:
@@ -47,4 +68,42 @@ services:
       - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  aletheios-cicd:
+    container_name: aletheios-cicd
+    hostname: aletheios-cicd
+    build: docker-aletheios-cicd/
+    volumes:
+    - aletheios-mirror:/srv/mirror
+    - aletheios-src:/srv/src
+    - aletheios-tmp:/srv/tmp
+    - aletheios-ccache:/srv/ccache
+    - aletheios-zips:/srv/zips
+    - aletheios-local_manifests:/srv/local_manifests
+    - aletheios-delta:/srv/delta
+    - aletheios-keys:/srv/keys
+    - aletheios-logs:/srv/logs
+    - aletheios-userscripts:/srv/userscripts
+    environment:
+      BRANCH_NAME: 'lineage-15.1'
+      DEVICE_LIST: 'taimen'
+      SIGNATURE_SPOOFING: 'restricted'
+      SIGN_BUILDS: "false"
+      #CUSTOM_PACKAGES:
+      #OTA_URL:
+      #INCLUDE_PROPRIETARY: false
+      WITH_SU: 'true'
+      RELEASE_TYPE: UNOFFICIAL
+      LOCAL_MIRROR: 'false'
+      CRONTAB_TIME: now
+      CUSTOM_PACKAGES: GmsCore GsfProxy FakeStore MozillaNlpBackend OpenBmapNlpBackend LocalWifiNlpBackend LocalGSMBackend NominatimNlpBackend com.google.android.maps.jar FDroid FDroidPrivilegedExtension
+      OPENDELTA_BUILDS_JSON: ota.json
+      USE_CCACHE: 1
+      CCACHE_COMPRESS: 1
+      CCACHE_SIZE: 50G
+      USER_NAME: DevOps
+      USER_MAIL: devops@sofwerx.org
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 
