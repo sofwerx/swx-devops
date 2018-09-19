@@ -24,6 +24,8 @@ volumes:
     driver: local
   portainer-data:
     driver: local
+  cassandra-data:
+    driver: local
 
 services:
 
@@ -178,7 +180,8 @@ services:
       - "traefik.frontend.rule=Host:kibana.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
-      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
+## Do not uncomment this - Ian
+#      - "traefik.frontend.auth.basic=elastic:${ELASTIC_PASSWORD_APR1}"
 
   setup_kibana:
     build:
@@ -465,4 +468,92 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 #      - "traefik.frontend.auth.basic=admin:${ELASTIC_PASSWORD_APR1}"
+
+  # Cassandra database
+  cassandra:
+    build: cassandra/
+    image: sofwerx/cassandra
+    container_name: cassandra
+    restart: always
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    network_mode: host
+#    networks:
+#      - default
+#    hostname: cassandra
+#    ports:
+#     # http://docs.cassandradb.com/kb/posix/
+#     # REST API
+#     - "10000:10000"
+#     # CQL ports (native_transport_port)
+#     - "9042:9042"
+#     # Thrift (rpc_port)
+#     - "9160:9160"
+#     # Internode
+#     - "7000:7000"
+#     - "7001:7001"
+#     # JMX
+#     - "7199:7199"
+#     # Prometheus monitoring
+#     - "9180:9180"
+#     - "9100:9100"
+    environment:
+      CASSANDRA_NUM_TOKENS: 256
+      CASSANDRA_SEEDS: ${CASSANDRA_SEEDS}
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_START_RPC: 1
+      CASSANDRA_DC: underground
+      CASSANDRA_RACK: orange
+      CASSANDRA_CLUSTER_NAME: ${CASSANDRA_CLUSTER_NAME}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=cassandra"
+      - "traefik.port=10000"
+      - "traefik.frontend.rule=Host:cassandra.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=admin:${ELASTIC_PASSWORD_APR1}"
+
+  # Janus server
+  janusgraph:
+    build: janusgraph/
+    image: sofwerx/janusgraph
+    container_name: janusgraph
+    restart: always
+    network_mode: host
+#    networks:
+#      - default
+#    hostname: janusgraph
+#    ports:
+#      - "8182:8182"
+#      - "8184:8184"
+    environment:
+      CASSANDRA_CLUSTER_NAME: ${CASSANDRA_CLUSTER_NAME}
+      ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
+      ELASTIC_CLUSTER_IP: ${ELASTIC_CLUSTER_IP}
+      JAVA_OPTIONS: -Xms2048m -Xmx2048m
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=janusgraph"
+      - "traefik.port=8182"
+      - "traefik.frontend.rule=Host:janusgraph.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.auth.basic=admin:${ELASTIC_PASSWORD_APR1}"
+
+#  tshark_template:
+#    build:
+#      context: es-tshark/
+#      args:
+#        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+#      dockerfile: Dockerfile.template
+#    image: sofwerx/es-tshark_template:${ELASTICSEARCH_VERSION}
+#    container_name: tshark_template
+#    hostname: tshark_template
+#    environment:
+#      ES_HOST: ${ELASTIC_HOST}
+#      ES_USER: ${ELASTIC_USER}
+#      ES_PASSWORD: ${ELASTIC_PASSWORD}
 
