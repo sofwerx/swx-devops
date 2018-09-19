@@ -28,6 +28,20 @@ volumes:
       o: bind
       device: /data/jira-postgres
 
+  confluence-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/confluence
+
+  confluence-postgres-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/confluence-postgres
+
   gitlab-runner-config:
     driver: local
   gitlab-runner-data:
@@ -116,6 +130,67 @@ services:
       - default
     volumes:
       - jira-postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${JIRA_DB_USER}
+      POSTGRES_PASSWORD: ${JIRA_DB_PASSWORD}
+      POSTGRES_DB: ${JIRA_DB_NAME}
+      POSTGRES_ENCODING: UNICODE
+      POSTGRES_COLLATE: C
+      POSTGRES_COLLATE_TYPE: C
+    logging: *default-logging
+    labels:
+      com.blacklabelops.description: "PostgreSQL Database Server"
+      com.blacklabelops.service: "postgresql"
+    labels:
+      - "traefik.enable=false"
+
+  confluence:
+    container_name: confluence
+    hostname: confluence
+    build:
+      context: docker-confluence/
+      args:
+        CONFLUENCE_VERSION: ${CONFLUENCE_VERSION}
+    image: sofwerx/confluence:${JIRA_VERSION}
+    networks:
+      - default
+    volumes:
+      - confluence-data:/var/atlassian/confluence
+    environment:
+      CATALINA_OPTS: "-Xms256m -Xmx4g"
+      CONFLUENCE_DATABASE_URL: postgresql://${JIRA_DB_USER}@confluence-postgres/${JIRA_DB_NAME}
+      CONFLUENCE_DB_PASSWORD: ${JIRA_DB_PASSWORD}
+      #CONFLUENCE_PROXY_NAME:
+      #CONFLUENCE_PROXY_PORT:
+      #CONFLUENCE_PROXY_SCHEME:
+      #CONFLUENCE_DELAYED_START:
+      CONFLUENCE_VERSION: ${CONFLUENCE_VERSION}
+    logging: *default-logging
+    labels:
+      com.blacklabelops.description: "Atlassian Confluence"
+      com.blacklabelops.service: "confluence"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=confluence"
+      - "traefik.port=8090"
+      - "traefik.frontend.rule=Host:confluence.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:https://confluence.${DNS_DOMAIN}||Vary:Origin"
+      - "traefik.frontend.headers.customRequestHeaders=Origin:http://confluence.${DNS_DOMAIN}"
+
+  confluence-postgres:
+    container_name: confluence-postgres
+    hostname: confluence-postgres
+    build:
+      context: docker-jira-postgres/
+      args:
+        POSTGRES_VERSION: ${JIRA_DB_VERSION}
+    image: sofwerx/jira-postgres:${JIRA_DB_VERSION}
+    networks:
+      - default
+    volumes:
+      - confluence-postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${JIRA_DB_USER}
       POSTGRES_PASSWORD: ${JIRA_DB_PASSWORD}

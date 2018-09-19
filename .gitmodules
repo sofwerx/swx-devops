@@ -506,3 +506,6 @@
 [submodule "local/swx-vmhost/safehouse"]
 	path = local/swx-vmhost/safehouse
 	url = https://github.com/sofwerx/safehouse
+[submodule "local/swx-supermicro0/docker-confluence"]
+	path = local/swx-supermicro0/docker-confluence
+	url = https://github.com/sofwerx/docker-confluence
