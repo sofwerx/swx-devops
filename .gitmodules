@@ -512,3 +512,6 @@
 [submodule "local/swx-vmhost/docker-jupyterhub"]
 	path = local/swx-vmhost/docker-jupyterhub
 	url = https://github.com/sofwerx/docker-jupyterhub
+[submodule "local/ibm-minsky/docker-jupyterhub"]
+	path = local/ibm-minsky/docker-jupyterhub
+	url = https://github.com/sofwerx/docker-jupyterhub
