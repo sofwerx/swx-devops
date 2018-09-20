@@ -1,0 +1,35 @@
+version: '2.1'
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks: 
+
+  default:
+    driver: bridge
+
+services:
+
+  aad-ui:
+    build: AAD-UI/
+    image: sofwerx/aad-ui:${ARCH}
+    container_name: aad-ui
+    hostname: aad-ui
+    restart: always
+    environment:
+      API_URL: https://saad-api.${DNS_DOMAIN}:9443
+      PUBLIC_URL: https://saad.${DNS_DOMAIN}:9443
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      traefik.backend: "aad-ui"
+      traefik.port: "3000"
+      traefik.frontend.rule: "Host:saad.${DNS_DOMAIN}"
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.entryPoints: "http,https"
+
