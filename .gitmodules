@@ -515,3 +515,9 @@
 [submodule "local/ibm-minsky/docker-jupyterhub"]
 	path = local/ibm-minsky/docker-jupyterhub
 	url = https://github.com/sofwerx/docker-jupyterhub
+[submodule "local/ibm-minsky/AAD-UI"]
+	path = local/ibm-minsky/AAD-UI
+	url = https://github.com/sofwerx/AAD-UI
+[submodule "local/ibm-minsky/AAD-API"]
+	path = local/ibm-minsky/AAD-API
+	url = https://github.com/sofwerx/AAD-API
