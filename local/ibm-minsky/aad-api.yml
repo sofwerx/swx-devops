@@ -1,0 +1,58 @@
+version: '2.1'
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks: 
+
+  default:
+    driver: bridge
+
+volumes:
+
+  aad-postgres-data:
+    driver: local
+
+services:
+
+  aad-postgres:
+    image: postgres:9.5
+    container_name: aad-postgres
+    hostname: aad-postgres
+    restart: always
+    networks:
+      - default
+    environment:
+      POSTGRES_DB: ${AAD_POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_PASSWORD: ${AAD_POSTGRES_PASSWORD}
+    volumes:
+      - "aad-postgres-data:/var/lib/postgresql/data"
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  aad-api:
+    build: AAD-API/
+    image: sofwerx/aad-api:${ARCH}
+    container_name: aad-api
+    hostname: aad-api
+    restart: always
+    environment:
+      PUBLIC_URL: https://saad.${DNS_DOMAIN}:9443
+      DATABASE_CLIENT: pg
+      DATABASE_URL: "postgres://postgres:${AAD_POSTGRES_PASSWORD}@aad-postgres/${AAD_POSTGRES_DB}"
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      traefik.backend: "aad-api"
+      traefik.port: "3000"
+      traefik.frontend.rule: "Host:saad-api.${DNS_DOMAIN}"
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.entryPoints: "http,https"
+
