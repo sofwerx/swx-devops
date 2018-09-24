@@ -6,13 +6,13 @@ With that enabled, all containers on that docker-engine will now be able to use 
 
 # Prepare the docker-engine host
 
-On ubuntu, for the current latest `nvidia-390` driver:
+On ubuntu, for the current latest `nvidia-410` driver:
 
     sudo apt-get update
     sudo apt-get install -y software-properties-common
     sudo add-apt-repository -y ppa:graphics-drivers
     sudo apt-get update
-    sudo apt-get install -y nvidia-390
+    sudo apt-get install -y nvidia-driver-410 xserver-xorg-video-nvidia-410 libnvidia-cfg1-410
 
 To find the latest cuda library for the linux flavor and release you are using for your docker-engine host:
 
@@ -29,7 +29,8 @@ For CUDA on Ubuntu 18.04, for example:
 For nvidia-docker2:
 
     # Add the package repositories
-    curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+    curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
     curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
     sudo apt-get update
     sudo apt-get install -y nvidia-docker2

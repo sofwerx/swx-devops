@@ -524,3 +524,6 @@
 [submodule "local/shuttlex/docker-traefik"]
 	path = local/shuttlex/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/shuttlex/docker-jupyterhub"]
+	path = local/shuttlex/docker-jupyterhub
+	url = https://github.com/sofwerx/docker-jupyterhub
