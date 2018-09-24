@@ -521,3 +521,6 @@
 [submodule "local/ibm-minsky/AAD-API"]
 	path = local/ibm-minsky/AAD-API
 	url = https://github.com/sofwerx/AAD-API
+[submodule "local/shuttlex/docker-traefik"]
+	path = local/shuttlex/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
