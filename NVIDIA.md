@@ -12,7 +12,7 @@ On ubuntu, for the current latest `nvidia-410` driver:
     sudo apt-get install -y software-properties-common
     sudo add-apt-repository -y ppa:graphics-drivers
     sudo apt-get update
-    sudo apt-get install -y nvidia-driver-410 xserver-xorg-video-nvidia-410 libnvidia-cfg1-410
+    sudo apt-get install -y nvidia-driver-410 xserver-xorg-video-nvidia-410 libnvidia-cfg1-410 libnvidia-gl-410 nvidia-dkms-410 libnvidia-decode-410 libnvidia-encode-410 nvidia-kernel-source-410 nvidia-utils-410
 
 To find the latest cuda library for the linux flavor and release you are using for your docker-engine host:
 
