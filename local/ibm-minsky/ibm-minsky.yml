@@ -83,11 +83,7 @@ services:
   traefik:
     container_name: traefik
     hostname: traefik
-    build:
-      context: docker-traefik/
-      dockerfile: Dockerfile.${ARCH}
-      args:
-        ARCH: ${ARCH}
+    build: docker-traefik/
     image: sofwerx/traefik:${ARCH}
     restart: always
     ports:
@@ -468,7 +464,7 @@ services:
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${COMPOSE_PROJECT_NAME}_default
       # JupyterHub will spawn this Notebook image for users
-      DOCKER_NOTEBOOK_IMAGE: sofwerx/jupyter-notebook:${ARCH}
+      DOCKER_NOTEBOOK_IMAGE: sofwerx/jupyter-notebook:${ARCH}-${TARGET}
       # Notebook directory inside user image
       DOCKER_NOTEBOOK_DIR: /home/jovyan/work
       # Using this run command (optional)
