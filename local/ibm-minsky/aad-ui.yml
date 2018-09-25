@@ -23,6 +23,7 @@ services:
     environment:
       API_URL: https://saad-api.${DNS_DOMAIN}:9443
       PUBLIC_URL: https://saad.${DNS_DOMAIN}:9443
+      SLACK_TOKEN: ${SLACK_TOKEN}
     networks:
       - default
     logging: *default-logging
