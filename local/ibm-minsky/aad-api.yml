@@ -55,4 +55,6 @@ services:
       traefik.frontend.rule: "Host:saad-api.${DNS_DOMAIN}"
       traefik.frontend.passHostHeader: "true"
       traefik.frontend.entryPoints: "http,https"
+      traefik.frontend.headers.customResponseHeaders: "Access-Control-Allow-Origin:https://saad.${DNS_DOMAIN}:9443||Vary:Origin"
+      traefik.frontend.headers.customRequestHeaders: "Origin:http://saad.${DNS_DOMAIN}:9443"
 
