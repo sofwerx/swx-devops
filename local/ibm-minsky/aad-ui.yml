@@ -21,9 +21,9 @@ services:
     hostname: aad-ui
     restart: always
     environment:
-      API_URL: https://saad-api.${DNS_DOMAIN}:9443
-      PUBLIC_URL: https://saad.${DNS_DOMAIN}:9443
-      SLACK_TOKEN: ${SLACK_TOKEN}
+      REACT_APP_API_URL: https://saad-api.${DNS_DOMAIN}:9443
+      REACT_APP_PUBLIC_URL: https://saad.${DNS_DOMAIN}:9443
+      REACT_APP_SLACK_TOKEN: ${SLACK_TOKEN}
     networks:
       - default
     logging: *default-logging
