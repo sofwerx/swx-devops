@@ -6,24 +6,20 @@ With that enabled, all containers on that docker-engine will now be able to use 
 
 # Prepare the docker-engine host
 
-On ubuntu, for the current latest `nvidia-410` driver:
-
-    sudo apt-get update
-    sudo apt-get install -y software-properties-common
-    sudo add-apt-repository -y ppa:graphics-drivers
-    sudo apt-get update
-    sudo apt-get install -y nvidia-driver-410 xserver-xorg-video-nvidia-410 libnvidia-cfg1-410 libnvidia-gl-410 nvidia-dkms-410 libnvidia-decode-410 libnvidia-encode-410 nvidia-kernel-source-410 nvidia-utils-410
-
 To find the latest cuda library for the linux flavor and release you are using for your docker-engine host:
 
 - https://developer.nvidia.com/cuda-downloads
 
-For CUDA on Ubuntu 18.04, for example:
+For example, to install the the current latest `nvidia-410` driver and CUDA on ubuntu 18.04:
 
     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
     sudo dpkg -i cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
     sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
     sudo apt-get update
+    sudo apt-get install -y software-properties-common
+    sudo add-apt-repository -y ppa:graphics-drivers
+    sudo apt-get update
+    sudo apt-get install -y nvidia-driver-410 xserver-xorg-video-nvidia-410 libnvidia-cfg1-410 libnvidia-gl-410 nvidia-dkms-410 libnvidia-decode-410 libnvidia-encode-410 nvidia-kernel-source-410 nvidia-utils-410
     sudo apt-get install -y cuda
 
 For nvidia-docker2:
