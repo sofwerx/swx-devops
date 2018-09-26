@@ -47,6 +47,7 @@ services:
       PUBLIC_URL: https://saad.${DNS_DOMAIN}:9443
       DATABASE_CLIENT: pg
       DATABASE_URL: "postgres://postgres:${AAD_POSTGRES_PASSWORD}@aad-postgres/${AAD_POSTGRES_DB}"
+      NODE_ENV: production
     networks:
       - default
     logging: *default-logging
