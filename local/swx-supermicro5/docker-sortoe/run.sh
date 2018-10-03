@@ -4,8 +4,8 @@ cat <<EOF > /etc/nginx/html/config/server.js
 configs = {
  SORTOE_API_URL: "${SORTOE_API_URL}",
  SORTOE_API_VERSION: "${SORTOE_API_VERSION}",
- SORTOE_DATASERVICE_HOST: "sortoe.${DNS_DOMAIN}",
- SORTOE_GRAPHQL_URL: "https://sortoe.${DNS_DOMAIN}/v1.0.0/graphiql"
+ SORTOE_DATASERVICE_HOST: "${SORTOE_DATASERVICE_HOST}",
+ SORTOE_GRAPHQL_URL: "${SORTOE_GRAPHQL_URL}"
 };
 EOF
 exec nginx -g 'daemon off;'
