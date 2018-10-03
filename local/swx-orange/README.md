@@ -29,10 +29,14 @@ Due to `COMPOSE_FILE=swx-orange.yml` in the swx-orange environment, the `swx-ora
 
 ## dm creation
 
-    seq 0 7 | while read number ; do \
-        docker-machine create -d generic --generic-ip-address 192.168.1.12$number --generic-ssh-port 22 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 2376 --engine-storage-driver zfs swx-u-ub-orange$number ; \
-        swx dm import swx-u-ub-orange$number ; \
-    done
+    docker-machine create -d generic --generic-ip-address 172.109.152.124 --generic-ssh-port 50022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 50376 --engine-storage-driver zfs swx-u-ub-orange0
+    docker-machine create -d generic --generic-ip-address 172.109.152.124 --generic-ssh-port 51022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 51376 --engine-storage-driver zfs swx-u-ub-orange1
+    docker-machine create -d generic --generic-ip-address 172.109.152.124 --generic-ssh-port 52022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 52376 --engine-storage-driver zfs swx-u-ub-orange2
+    docker-machine create -d generic --generic-ip-address 172.109.152.124 --generic-ssh-port 53022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 53376 --engine-storage-driver zfs swx-u-ub-orange3
+    docker-machine create -d generic --generic-ip-address 172.109.152.124 --generic-ssh-port 54022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 54376 --engine-storage-driver zfs swx-u-ub-orange4
+    docker-machine create -d generic --generic-ip-address 172.109.152.124 --generic-ssh-port 55022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 55376 --engine-storage-driver zfs swx-u-ub-orange5
+    docker-machine create -d generic --generic-ip-address 172.109.152.124 --generic-ssh-port 56022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 56376 --engine-storage-driver zfs swx-u-ub-orange6
+    docker-machine create -d generic --generic-ip-address 172.109.152.124 --generic-ssh-port 57022 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --generic-engine-port 57376 --engine-storage-driver zfs swx-u-ub-orange7
 
 ## docker swarm
 
