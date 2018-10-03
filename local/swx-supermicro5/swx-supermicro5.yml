@@ -62,7 +62,7 @@ services:
     networks:
       - default
     volumes:
-      - sortoe-static:/var/sortoe
+      - sortoe-static:/var/www
     logging: *default-logging
     labels:
       - "traefik.enable=true"
