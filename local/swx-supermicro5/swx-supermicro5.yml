@@ -59,6 +59,7 @@ services:
       - sortoe-web
     container_name: sortoe-nginx
     hostname: sortoe-nginx
+    restart: always
     networks:
       - default
     volumes:
@@ -79,18 +80,19 @@ services:
     image: sortoe-web
     container_name: sortoe-web
     hostname: sortoe-web
+    restart: always
     networks:
       - default
     environment:
       SORTOE_API_URL: /v1.0.0
-      #SORTOE_API_URL: https://sortoe.${DNS_DOMAIN}:65443/v1.0.0
+      #SORTOE_API_URL: https://sortoe.${DNS_DOMAIN}/v1.0.0
       SORTOE_API_VERSION: 1.0.0
       SORTOE_DATASERVICE_HOST: ""
       #SORTOE_DATASERVICE_HOST: sortoe.${DNS_DOMAIN}
       SORTOE_GRAPHQL_URL: /v1.0.0/graphiql
-      #SORTOE_GRAPHQL_URL: https://sortoe.${DNS_DOMAIN}:65443/v1.0.0/graphiql
+      #SORTOE_GRAPHQL_URL: https://sortoe.${DNS_DOMAIN}/v1.0.0/graphiql
       NODE_ENV: production
-      PUBLIC_URL: https://sortoe.${DNS_DOMAIN}:65443
+      PUBLIC_URL: https://sortoe.${DNS_DOMAIN}
       #REGISTER_SERVICE_WORKER: 'false'
     volumes:
       - sortoe-static:/var/sortoe
@@ -109,6 +111,7 @@ services:
       - sortoe-db
     container_name: sortoe-service-1.0.0
     hostname: sortoe-service-1.0.0
+    restart: always
     networks:
       - default
     environment:
@@ -131,6 +134,7 @@ services:
     image: 212171213234.dkr.ecr.us-east-1.amazonaws.com/sortoe/db:latest
     container_name: sortoe-db
     hostname: sortoe-db
+    restart: always
     networks:
       - default
     environment:
