@@ -48,6 +48,7 @@ services:
       DATABASE_CLIENT: pg
       DATABASE_URL: "postgres://postgres:${AAD_POSTGRES_PASSWORD}@aad-postgres/${AAD_POSTGRES_DB}"
       NODE_ENV: production
+      SLACK_TOKEN: ${SLACK_TOKEN}
     networks:
       - default
     logging: *default-logging
