@@ -20,7 +20,7 @@ This is wired to a SAS 45 drive JBOD array, with 9 of those drives as a ZFS pool
 
 For the supermicro servers, with the ZFS volume driver:
 
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 63022 --generic-engine-port 63376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro3
+    docker-machine create -d generic --generic-ip-address 172.109.152.119 --generic-ssh-port 63022 --generic-engine-port 63376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro3
 
 If you run into any problems doing this, you may safely remove this and try again:
 
