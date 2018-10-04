@@ -92,6 +92,7 @@ services:
       args:
         JIRA_VERSION: ${JIRA_VERSION}
     image: sofwerx/jira:${JIRA_VERSION}
+    restart: always
     networks:
       - default
     volumes:
@@ -126,6 +127,7 @@ services:
       args:
         POSTGRES_VERSION: ${JIRA_DB_VERSION}
     image: sofwerx/jira-postgres:${JIRA_DB_VERSION}
+    restart: always
     networks:
       - default
     volumes:
@@ -152,6 +154,7 @@ services:
       args:
         CONFLUENCE_VERSION: ${CONFLUENCE_VERSION}
     image: sofwerx/confluence:${JIRA_VERSION}
+    restart: always
     networks:
       - default
     volumes:
@@ -187,6 +190,7 @@ services:
       args:
         POSTGRES_VERSION: ${JIRA_DB_VERSION}
     image: sofwerx/jira-postgres:${JIRA_DB_VERSION}
+    restart: always
     networks:
       - default
     volumes:
