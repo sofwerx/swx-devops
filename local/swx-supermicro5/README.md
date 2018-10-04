@@ -14,7 +14,7 @@ This is NOT wired to the SAS array.
 
 6. Run docker-machine with the generic driver:
 
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 65022 --generic-engine-port 65376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro5
+    docker-machine create -d generic --generic-ip-address 172.109.152.121 --generic-ssh-port 65022 --generic-engine-port 65376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro5
 
 If that fails, you may safely remove it and try it again:
 
