@@ -332,6 +332,7 @@ services:
     depends_on:
       osm-postgis:
         condition: service_healthy
+    restart: always
     environment:
       # These are all currently the defaults but listed here for your
       # convenience if you want to change them
