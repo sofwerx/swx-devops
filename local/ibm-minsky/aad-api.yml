@@ -44,7 +44,7 @@ services:
     restart: always
     environment:
       JWT_KEY: ${AAD_JWT_KEY}
-      PUBLIC_URL: https://saad.${DNS_DOMAIN}:9443
+      PUBLIC_URL: https://saad.${DNS_DOMAIN}
       DATABASE_CLIENT: pg
       DATABASE_URL: "postgres://postgres:${AAD_POSTGRES_PASSWORD}@aad-postgres/${AAD_POSTGRES_DB}"
       NODE_ENV: production
@@ -57,6 +57,6 @@ services:
       traefik.frontend.rule: "Host:saad-api.${DNS_DOMAIN}"
       traefik.frontend.passHostHeader: "true"
       traefik.frontend.entryPoints: "http,https"
-      traefik.frontend.headers.customResponseHeaders: "Access-Control-Allow-Origin:https://saad.${DNS_DOMAIN}:9443||Vary:Origin"
-      traefik.frontend.headers.customRequestHeaders: "Origin:http://saad.${DNS_DOMAIN}:9443"
+      traefik.frontend.headers.customResponseHeaders: "Access-Control-Allow-Origin:https://saad.${DNS_DOMAIN}||Vary:Origin"
+      traefik.frontend.headers.customRequestHeaders: "Origin:http://saad.${DNS_DOMAIN}"
 
