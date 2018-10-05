@@ -1,12 +1,12 @@
 # devops
-> This project contains documentation and infrastructure as code for our internal devops efforts.  The following are instructions on how to prepare your computer to have access to the devops environment that runs on the SOFWERX server.
+> This project contains documentation and infrastructure as code for our internal devops efforts.  The following are instructions on how to prepare your computer to have access to the devops environment that runs on the [SOFWERX](https://www.sofwerx.org) server.
 
 ### Legend
-  - [INSTALLATION](#installation)
-    * [docker](#docker)
+  - [Installation](#installation)
+    * [Docker](#docker)
     * [Vagrant](#vagrant)
     * [Windows](#windows)
-  - [SECURITY](#security)
+  - [Security](#security)
     * [Docker](#with-docker)
     * [Manual Setup](#manual-if-not-using-docker)
     * [Trousseau](#trousseau)
@@ -41,16 +41,16 @@ The easiest way to gain access to the devops environment is by using Docker.  Th
 
 [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
 
-### Windows or linux
+### Other Operating Systems
 
 Please refer to these links for the most up-to-date installation instructions for Docker:
 
-- https://docs.docker.com/engine/installation/
-- https://docs.docker.com/machine/install-machine/#installing-machine-directly
-- https://docs.docker.com/compose/install/
+- [Docker](https://docs.docker.com/engine/installation/)
+- [docker-machine](https://docs.docker.com/machine/install-machine/#installing-machine-directly)
+- [docker-compose](https://docs.docker.com/compose/install/)
 
 
-### After Docker installation :
+### After Docker installation
 - Clone the [devops](https://github.com/sofwerx/swx-devops.git) repository. 
    - For guidance on cloning a repository click [here](https://help.github.com/articles/cloning-a-repository/).
 - Run `./docker.sh` in the new swx-devops directory. 
@@ -62,8 +62,7 @@ Verify that you are in the devops environment by typing `swx` .
 
 ### Linux
 
-Install [Vagrant](https://www.vagrantup.com/) and spin up a local virtual machine (VM):
-- https://www.vagrantup.com/docs/installation/
+Install [Vagrant](https://www.vagrantup.com/) and [install a local virtual machine (VM)](https://www.vagrantup.com/docs/installation/).
 
 There is a `Vagrantfile` that prepares a Ubuntu environment using the `./dependencies/ubuntu.sh` script:
 
@@ -76,8 +75,8 @@ There is a `Vagrantfile` that prepares a Ubuntu environment using the `./depende
 #### On 64-bit Windows 10 Anniversary Update or later (build 1607+)
 
 Please refer to the documentation below for the most up-to-date instructions:
-- https://msdn.microsoft.com/en-us/commandline/wsl/about
-- https://msdn.microsoft.com/en-us/commandline/wsl/install-win10
+- [About the Windows Subsystyem for Linux ](https://msdn.microsoft.com/en-us/commandline/wsl/about)
+- [Instructions for installing the Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/install-win10)
 
 This runs Linux binaries natively without having to run a VM for a Linux kernel.
 
@@ -100,7 +99,7 @@ Note: Windows Subsystem for Linux:
 
 Once you install a local docker-engine with volume share access to this working directory, then you can proceed. The key here is having a local docker-engine installed that has volume mount access to this directory.
 
-# SECURITY
+# Security
 
 ## Secrets
 
@@ -124,7 +123,7 @@ You need a gnupg key for `trousseau` below.
 
 The reason for gnupg 2.0 is trousseau reads directly from `pubring.gpg`, and is no longer supported in gnupg 2.1 and newer.
 
-#### On a Mac
+#### Mac
 
 There is a `gpg` built-in to MacOS in `/usr/bin/gpg`, and that is incompatible with `trousseau`.
 
@@ -143,7 +142,7 @@ If you also install pinentry, you will get a nice pop-up dialog box for your gpg
 
     brew install pinentry
 
-#### On Ubuntu 16.04
+#### Ubuntu 16.04
 
 Try running:
 
@@ -151,13 +150,11 @@ Try running:
 
 That should install the correct versions of all of your dependencies.
 
-#### On other operating systems
+#### Other Operating Systems
 
 For general compatiblity and ease of developer station convergence, this project has a Vagrantfile that defines a Vagrant machine to run an Ubuntu virtual machine and install the dependencies.
 
-Install Vagrant for your operating system:
-
-- https://www.vagrantup.com/downloads.html
+[Install Vagrant for your operating system](https://www.vagrantup.com/downloads.html).
 
 The biggest challenge managing Vagrant persistence will be syncing or sharing a folder between your host and the virtual machine.
 This differs based on the virtual machine engine you use with Vagrant (VirtualBox, VMWare Workstation, VMWare Fusion, Parallels, xhyve, etc).
@@ -178,13 +175,13 @@ This prepares your gnupg keychain and environment.
 ### GPG Verification and Key Creation
 > The correct version is critical to running the program. If your keys are not configured correctly, problems will arise. 
 
-#### Verify the correct version of gpg was installed:
+#### Verify the correct version of gpg was installed
 
     gpg --version
 
 The version should be 2.0, nothing higher. 
 
-#### After installing gnupg 2.0, generate a private/public keypair:
+#### After installing gnupg 2.0, generate a private/public keypair
 
     gpg --gen-key
 
@@ -215,7 +212,7 @@ The result of any trousseau commands will alter the `.trousseau` file in the cur
 This file is under git management, and is entirely safe as the contents of the file are encrypted.
 This is far easier than dealing with a shared s3 bucket or other shared repository.
 
-#### Installing troussea 
+#### Installing trousseau
 
 To install the `trousseau` command, download pre-built binaries from [the releases page](https://github.com/oleiade/trousseau/releases).
 
@@ -232,13 +229,13 @@ To build from the Go source follow these build instructions:
     make
     cp $GOPATH/go/bin/trousseau /usr/local/bin/trousseau
 
-# USING THE ENVIRONMENT
+# Using the Environment
 
 ## Project Environments
 
 These are the tools and projects that are available in the devops environment.
 
-#### Non-cloud resources:
+#### Non-cloud resources
 - [local/dev](local/dev/README.md) - Your local `dev` environment
 - [local/geo](local/geo/README.md) - Our `geo` mintpc in our Data Science pit
 - [local/ibm-minsky](local/ibm-minsky) - The IBM Minsky box (ppc64le)
@@ -251,12 +248,12 @@ These are the tools and projects that are available in the devops environment.
 - [local/pi-r-squared](local/pi-r-squared/README.md) - A shared raspberry-pi docker host in our Data Science pit
 
 
-#### Cloud based resources:
+#### Cloud based resources
 - [aws/tor-vpin](https://github.com/sofwerx/tor-dfpk/tree/7fa2708a215b91ff0491c45c282a678a290b4256) - private tor network deploy for warfighter nomination
 - [aws/swx-blueteam](aws/cellar/swx-blueteam) - Blue Team box
 
 
-#### Archived resources:
+#### Archived resources
 - [cellar/swx-gpu](cellar/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
 - [cellar/swx-dev](cellar/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
 - [cellar/rcloud-dev](cellar/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
@@ -292,24 +289,24 @@ To create a dm, first create a machine with `docker-machine`, then use `swx dm i
 
 Then `git add .trousseau ; git commit` to save the newly added dm secret.
 
-# AWS
+## AWS
 > This project models some cloud resources under the `aws/` folder.
 
-## awscli
+### awscli
 
-### Mac
+#### Mac
 
 Install `awscli` with Homebrew:
 
     brew install awscli
 
-### Other Operating Systems
+#### Other Operating Systems
 
 Use Python `pip`:
 
     pip install awscli
 
-# Choosing  between `~/.aws/` and `secrets/aws`
+## Choosing  between `~/.aws/` and `secrets/aws`
 
 If you make a `secrets/aws` folder, your secrets will be stored there, instead of `~/.aws/`:
 
@@ -363,7 +360,7 @@ After doing this, make sure to restart your `shell.bash` to pick up these enviro
 
 The AWS documentation for this can be found [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html).
 
-## Running `aws`
+### Running `aws`
 
 To find out what AWS IAM user you are currently using the credentials for:
 
@@ -380,13 +377,13 @@ To find out what AWS IAM user you are currently using the credentials for:
     }
 
 
-## `.bashrc`
+### `.bashrc`
 
 The "glue" of this harness is currently in the `.bashrc` file.
 
 This will eventually get broken out into a script directory tree as simplicity demands it.
 
-## `shell.bash`
+### `shell.bash`
 
 Before running trousseau or any other tools against a project environment, obtain a shell using `shell.bash`:
 
@@ -396,7 +393,7 @@ You will get a prompt that tells you the `AWS_PROFILE`, `SWX_ENVIRONMENT`, and `
 
     [sofwerx::] icbvtcmbp:swx-devops ianblenke$
 
-## Information about `swx`
+### Information about `swx`
 > Before attempting `swx` commands, remember to be in the environment (run `shell.bash` or `docker.sh`). 
 
 When running under `shell.bash`, which merely sources the `.bashrc` here, your primary interaction with this harness is through the `swx` command.
@@ -422,7 +419,7 @@ This also works for subcommands:
       env    - Source the environment to interact with a dm instance using docker
       import - Import a docker-machine instance into a dm
 
-## Using trousseau
+### Using trousseau
 > Ensure you are in a `shell.bash` or a `docker.sh` session.
 
 By default `trousseau` will use a `~/.trousseau` file in your home directory.
@@ -480,7 +477,7 @@ To encrypt a file under secrets:
 
 After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
 
-## Using `swx`
+### Using `swx`
 
 The `swx` function commands are available when you start a `shell.bash` session.
 
@@ -518,7 +515,7 @@ Now you are ready to run any `docker-compose` commands in the correct folders.
 
 If you are switching between environments, it will ensure that any variables defined in the previous environment are unset before setting the new environment's variables to be used.
 
-### Using `swx gpg`
+#### Using `swx gpg`
 
 When using the `swx` or `trousseau` commands that require access to the trousseau secrets, the `gpg-agent` prompts you for a passphrase.
 
@@ -537,7 +534,7 @@ Typically, try a `swx forget` followed by an `swx remember` first, and see if th
 
 If this fails, try a `swx reset` followed by a `swx prepare`, which will restart `gpg-agent` and hopefully let you enter a passphrase the next time you try using an `swx` or `trousseau` command that requires access to your trousseau secrets.
 
-### The `swx environment`
+#### The `swx environment`
 
 In addition to listing (`swx environment ls`) and switching (`swx environment switch ENVIRONMENT`), there are a few other `swx environment` commands for dealing with `environment:` prefixed trousseau keys that store environment variables for environments:
 
@@ -546,21 +543,21 @@ In addition to listing (`swx environment ls`) and switching (`swx environment sw
     swx environment set VARIABLE VALUE
     swx environment del VARIABLE
 
-## terraform
+### terraform
 
 Use [terraform](https://www.terraform.io/) to deploy and converge our cloud resources.
 
-### Mac Installation
+#### Mac Installation
 
 To install the Hashicorp `terraform`, install it with HomeBrew:
 
     brew install terraform
     
-### Other operating systems
+#### Other operating systems
 
 Please refer to the [offical documentation](https://www.terraform.io/intro/getting-started/install.html).
 
-### Tips for using terraform. 
+#### Tips for using terraform. 
 
 It is very important that we track the same version of terraform between ourselves, and that we upgrade terraform in unison, as resources tend to change between terraform versions.
 I am presently running the latest terraform: `0.10.7`.
