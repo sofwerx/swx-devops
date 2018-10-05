@@ -12,7 +12,7 @@
     * [Trousseau](#trousseau)
   - [Using the Environment](#using-the-environment)
     * [Project Environments](#project-environments)
-    * [Docker-Machine](#docker-machine-vs-dm)
+    * [Docker-Machine](#docker-machine-and-dm)
     * [AWS](#aws)
     * [SWX](#information-about-swx)
     * [Trousseau](#using-trousseau)
@@ -37,7 +37,8 @@ The easiest way to gain access to the devops environment is by using Docker.  Th
 ### Mac
 
 [HomeBrew](https://brew.sh) makes it easy to update:
-   - `brew install docker docker-machine docker-compose docker-machine-driver-xhyve`
+   
+   `brew install docker docker-machine docker-compose docker-machine-driver-xhyve`
 
 [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
 
@@ -51,23 +52,24 @@ Please refer to these links for the most up-to-date installation instructions fo
 
 
 ### After Docker installation
-- Clone the [devops](https://github.com/sofwerx/swx-devops.git) repository. 
+1. Clone the [devops](https://github.com/sofwerx/swx-devops.git) repository. 
    - For guidance on cloning a repository click [here](https://help.github.com/articles/cloning-a-repository/).
-- Run `./docker.sh` in the new swx-devops directory. 
 
-Verify that you are in the devops environment by typing `swx` .
+2. Run `./docker.sh` in the new swx-devops directory. 
+
+3. Verify that you are in the devops environment by typing `swx` .
 
 ## Vagrant
 > Only use if Docker is not applicable. 
 
 ### Linux
 
-Install [Vagrant](https://www.vagrantup.com/) and [install a local virtual machine (VM)](https://www.vagrantup.com/docs/installation/).
+1. Install [Vagrant](https://www.vagrantup.com/) and [install a local virtual machine (VM)](https://www.vagrantup.com/docs/installation/).
 
-There is a `Vagrantfile` that prepares a Ubuntu environment using the `./dependencies/ubuntu.sh` script:
+2. There is a `Vagrantfile` that prepares a Ubuntu environment using the `./dependencies/ubuntu.sh` script:
 
-    vagrant up
-    vagrant ssh
+    `vagrant up`
+    `vagrant ssh`
 
 ### Windows
 > For Windows, you need to install Windows Subsystem for Linux.
@@ -80,24 +82,24 @@ Please refer to the documentation below for the most up-to-date instructions:
 
 This runs Linux binaries natively without having to run a VM for a Linux kernel.
 
-To enable the Windows Subsystem for Linux:
+1. Enable the Windows Subsystem for Linux:
 
-    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+    `Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux`
 
-After selecting Ubuntu as your favorite Linux distribution, and following the prompts and rebooting, open a Command Prompt and run `bash`:
+2. After selecting Ubuntu as your favorite Linux distribution, and following the prompts and rebooting, open a Command Prompt and run `bash`:
 
-    C:\> bash
+    `C:\> bash`
 
-Now you can `cd` into the directory where you cloned this git repository, and run:
+3. Now you can `cd` into the directory where you cloned this git repository, and run:
 
-    bash$ ./dependencies/ubuntu.sh
+    `bash$ ./dependencies/ubuntu.sh`
 
 
 Note: Windows Subsystem for Linux:
 - It is not possible to run a Linux docker-engine without a Linux kernel.
 - You are installing docker-engine natively on Windows so that you have a local Hyper-V Linux VM to run that kernel.
 
-Once you install a local docker-engine with volume share access to this working directory, then you can proceed. The key here is having a local docker-engine installed that has volume mount access to this directory.
+4. Once you install a local docker-engine with volume share access to this working directory, then you can proceed. The key here is having a local docker-engine installed that has volume mount access to this directory.
 
 # Security
 
@@ -127,18 +129,18 @@ The reason for gnupg 2.0 is trousseau reads directly from `pubring.gpg`, and is 
 
 There is a `gpg` built-in to MacOS in `/usr/bin/gpg`, and that is incompatible with `trousseau`.
 
-Install `gpg` v2.0 to /usr/local/bin (until we can submit a PR to fix this in `trousseau`).
+1. Install `gpg` v2.0 to /usr/local/bin (until we can submit a PR to fix this in `trousseau`).
 
-If you happened to `brew install gnupg` already, just unlink first.
+- If you happened to `brew install gnupg` already, just unlink first.
 
-    brew unlink gnupg
+    `brew unlink gnupg`
 
-To install the `gpg` command on a Mac, install `gnupg@2.0` with HomeBrew:
+2. To install the `gpg` command on a Mac, install `gnupg@2.0` with HomeBrew:
 
-    brew install gnupg@2.0
-    brew link --force gnupg@2.0
+    `brew install gnupg@2.0`
+    `brew link --force gnupg@2.0`
 
-If you also install pinentry, you will get a nice pop-up dialog box for your gpg passphrase:
+- If you also install pinentry, you will get a nice pop-up dialog box for your gpg passphrase:
 
     brew install pinentry
 
@@ -161,46 +163,51 @@ This differs based on the virtual machine engine you use with Vagrant (VirtualBo
 
 ### GPG Configuration 
 
-While you _can_ use the default `~/.gnupg` config folder, it is recommended to create a `secrets/gnupg` directory to keep your keychain local to this repo directory:
+1. Create a `secrets/gnupg` directory:
 
-    mkdir -p secrets/gnupg
+    `mkdir -p secrets/gnupg`
 
-Run the `shell.bash` or `docker.sh` to enter the environment:
+Note: While you _can_ use the default `~/.gnupg` config folder, it is recommended to create a `secrets/gnupg` directory to keep your keychain local to this repo directory.
 
-    ./shell.bash            OR            ./docker.sh 
+2. Run the `shell.bash` or `docker.sh` to enter the environment:
+
+    `./shell.bash`            OR            `./docker.sh` 
     
-
 This prepares your gnupg keychain and environment.
 
 ### GPG Verification and Key Creation
 > The correct version is critical to running the program. If your keys are not configured correctly, problems will arise. 
 
-#### Verify the correct version of gpg was installed
+#### Verification
+
+To verify the correct version of gpg was installed
 
     gpg --version
 
 The version should be 2.0, nothing higher. 
 
-#### After installing gnupg 2.0, generate a private/public keypair
+#### After installing gnupg
+
+1. Generate a private/public keypair
 
     gpg --gen-key
 
- - While the prompt is for 2048 bits, use 4096 instead.
+2. While the prompt is for 2048 bits, use 4096 instead.
    -  If your `gpg` does not prompt you for the number of bits, then you're using a gnupg newer than 2.0 which will not work with trousseau.
 
-After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
+3. After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
 
-    gpg --export --armor > gpg/yourname@sofwerx.org
-    git add gpg/yourname@sofwerx.org
-    git commit -m 'Adding gpg/yourname@sofwerx.org public key'
+    `gpg --export --armor > gpg/yourname@sofwerx.org`
+    `git add gpg/yourname@sofwerx.org`
+    `git commit -m 'Adding gpg/yourname@sofwerx.org public key`
 
-The convention in this repository is that the filename must be your email address, to make trousseau management easier.
+- The convention in this repository is that the filename must be your email address, to make trousseau management easier.
 
-You can import all of our public keys at any time by running:
+- You can import all of our public keys at any time by running:
 
     cat gpg/* | gpg --import
 
-Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
+4. Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
 
 ### trousseau
 
@@ -214,11 +221,11 @@ This is far easier than dealing with a shared s3 bucket or other shared reposito
 
 #### Installing trousseau
 
-To install the `trousseau` command, download pre-built binaries from [the releases page](https://github.com/oleiade/trousseau/releases).
+1. To install the `trousseau` command, download pre-built binaries from [the releases page](https://github.com/oleiade/trousseau/releases).
 
-To build from the Go source follow these build instructions:
+2. To build from the Go source follow these build instructions:
 
-    mkdir ~/go/bin
+    `mkdir ~/go/bin
     export GOPATH=~/go
     export PATH=~/go/bin:$PATH
     go get github.com/tools/godep
@@ -227,7 +234,7 @@ To build from the Go source follow these build instructions:
     cd $GOPATH/src/github.com/oleiade/trousseau
     godep
     make
-    cp $GOPATH/go/bin/trousseau /usr/local/bin/trousseau
+    cp $GOPATH/go/bin/trousseau /usr/local/bin/trousseau`
 
 # Using the Environment
 
@@ -236,51 +243,52 @@ To build from the Go source follow these build instructions:
 These are the tools and projects that are available in the devops environment.
 
 #### Non-cloud resources
-- [local/dev](local/dev/README.md) - Your local `dev` environment
-- [local/geo](local/geo/README.md) - Our `geo` mintpc in our Data Science pit
-- [local/ibm-minsky](local/ibm-minsky) - The IBM Minsky box (ppc64le)
-- [local/icbgamingpc](local/icbgamingpc) - Ian's home gaming rig
-- [local/mobile](local/mobile) - A mint box setup to run OpenSTF
-- [local/cellar/orange](local/orange/README.md) - Our tranquilpc 8-blade docker swarm server in our Data Science pit
-- [local0/cellar/osgeo](local/osgeo) - A mint box setup to run OSGEO and guacamole
-- [local/swx-pandora](local/swx-pandora) - Pandora-FMS box
-- [local/swx-vmhost](local/vmhost) - The pop-os based System76 Silverback server
-- [local/pi-r-squared](local/pi-r-squared/README.md) - A shared raspberry-pi docker host in our Data Science pit
+- [Dev](local/dev/README.md) - Your local `dev` environment
+- [Geo](local/geo/README.md) - Our `geo` mintpc in our Data Science pit
+- [IBM Minsky](local/ibm-minsky) - The IBM Minsky box (ppc64le)
+- [icbgamingpc](local/icbgamingpc) - Ian's home gaming rig
+- [Mobile](local/mobile) - A mint box setup to run OpenSTF
+- [Orange](local/swx-orange) - Our tranquilpc 8-blade docker swarm server in our Data Science pit
+- [Osgeo](local/osgeo) - A mint box setup to run OSGEO and guacamole
+- [swx-pandora](local/swx-pandora) - Pandora-FMS box
+- [swx-vmhost](local/swx-vmhost) - The pop-os based System76 Silverback server
+- [pi-r-squared](local/pi-r-squared/README.md) - A shared raspberry-pi docker host in our Data Science pit
 
 
 #### Cloud based resources
-- [aws/tor-vpin](https://github.com/sofwerx/tor-dfpk/tree/7fa2708a215b91ff0491c45c282a678a290b4256) - private tor network deploy for warfighter nomination
-- [aws/swx-blueteam](aws/cellar/swx-blueteam) - Blue Team box
+- [Tor-vpin](https://github.com/sofwerx/tor-dfpk/tree/7fa2708a215b91ff0491c45c282a678a290b4256) - private tor network deploy for warfighter nomination
 
 
 #### Archived resources
-- [cellar/swx-gpu](cellar/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
-- [cellar/swx-dev](cellar/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
-- [cellar/rcloud-dev](cellar/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
-- [cellar/huntclub-moodle](cellar/huntclub-moodle) - Moodle deploy for Hunt Club (Destroyed)
-- [cellar/jumpbox-kali](cellar/jumpbox-kali) - Kali guacamole jump box (Destroyed)
-- [cellar/marklogic-datahub](cellar/marklogic-datahub) - Apache Nifi + Marklogic (Destroyed)
-- [cellar/nerdherd-vpn](cellar/nerdherd-vpn) - Nerdherd VPN box (Destroyed)
-- [cellar/swx-geotools1](cellar/swx-geotools1) - GIS Tools box (Destroyed)
-- [cellar/swx-redteam](cellar/swx-redteam) - Red Team box (Destroyed)
-- [cellar/swx-xmpp](cellar/swx-xmpp) - XMPP Server for ATAK (Destroyed)
+- [swx-gpu](cellar/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
+- [swx-dev](cellar/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
+- [rcloud-dev](cellar/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
+- [huntclub-moodle](cellar/huntclub-moodle) - Moodle deploy for Hunt Club (Destroyed)
+- [jumpbox-kali](cellar/jumpbox-kali) - Kali guacamole jump box (Destroyed)
+- [marklogic-datahub](cellar/marklogic-datahub) - Apache Nifi + Marklogic (Destroyed)
+- [nerdherd-vpn](cellar/nerdherd-vpn) - Nerdherd VPN box (Destroyed)
+- [swx-geotools1](cellar/swx-geotools1) - GIS Tools box (Destroyed)
+- [swx-redteam](cellar/swx-redteam) - Red Team box (Destroyed)
+- [swx-xmpp](cellar/swx-xmpp) - XMPP Server for ATAK (Destroyed)
+- [swx-blueteam](/cellar/swx-blueteam) - Blue Team box
 
 
-### docker-machine vs dm
+### docker-machine and dm
 > This project imports docker-machine configs into JSON "dm" objects stored in trousseau.
 
 The `swx dm` commands interact with these "dm" objects:
 
     swx dm ls
 
-This lists the dm file secrets stored in trousseau under `file:secrets/dm/*`
+- This lists the dm file secrets stored in trousseau under `file:secrets/dm/*`
 
 To source one of the environments, use `swx dm env`.
+
 To source a specific dm:
 
     swx dm env rcloud-dev-00
 
-This acts similar to a `eval $(docker-machine env {machinename})`.
+- This acts similar to a `eval $(docker-machine env {machinename})`.
 
 To create a dm, first create a machine with `docker-machine`, then use `swx dm import` to export it:
 
@@ -322,7 +330,7 @@ Our `shell.bash` assumes using an `AWS_PROFILE` name of "sofwerx".
 
 This enables you to manage multiple profiles for different AWS credentials under different profiles.
 
-Either create these files with a text editor (they are in an .ini file format internally) as decribed below,
+1. Either create these files with a text editor (they are in an .ini file format internally) as decribed below,
 or use the following commands to prompt you:
 
     mkdir ~/.aws
@@ -335,28 +343,28 @@ or
     touch secrets/aws/config secrets/aws/credentials
     aws configure --profile sofwerx
 
-At the prompt enter:
+2. At the prompt enter:
 
-    AWS Access Key ID [None]: AWS_ACCESS_KEY
+    `AWS Access Key ID [None]: AWS_ACCESS_KEY
     AWS Secret Access Key [None]: AWS_SECRET_ACCESS_KEY
     Default region name [None]: us-east-1
-    Default output format [None]: json
+    Default output format [None]: json`
 
-After entering these, you can examine your updated files:
+3. After entering these, you can examine your updated files:
 
-    $ cat ~/.aws/config secrets/aws/config
+    `$ cat ~/.aws/config secrets/aws/config
     [profile sofwerx]
     output = json
-    region = us-east-1
+    region = us-east-1`
 
-    $ cat ~/.aws/credentials secrets/aws/credentials
+    `$ cat ~/.aws/credentials secrets/aws/credentials
     [sofwerx]
     aws_access_key_id = AWS_ACCESS_KEY
-    aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+    aws_secret_access_key = AWS_SECRET_ACCESS_KEY`
 
 Where the `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` are the credentials you obtained by creating a key under the AWS console in IAM services for your user account.
 
-After doing this, make sure to restart your `shell.bash` to pick up these environment variables in your shell.
+5. After doing this, make sure to restart your `shell.bash` to pick up these environment variables in your shell.
 
 The AWS documentation for this can be found [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html).
 
@@ -420,22 +428,24 @@ This also works for subcommands:
       import - Import a docker-machine instance into a dm
 
 ### Using trousseau
-> Ensure you are in a `shell.bash` or a `docker.sh` session.
+> Make sure you are in a `shell.bash` or a `docker.sh` session.
 
 By default `trousseau` will use a `~/.trousseau` file in your home directory.
 Using a `shell.bash` session, the `.trousseau` file in this project will be used and updated as things are changed.
 This is essential to contribute the changes back to the git repository for others to use.
 
-After your gpg/ PR is merged, get someone else, who is already a trusted trousseau recipient, to add your public key to their keychain and run `trousseau add-recipient` for your email address:
+1. After your gpg/ PR is merged, get someone else, who is already a trusted trousseau recipient, to add your public key to their keychain and run `trousseau add-recipient` for your email address:
 
-    trousseau add-recipient ian@sofwerx.org
+    `trousseau add-recipient ian@sofwerx.org`
 
-After this, they need to:
+2. After this, they need to:
 
-    git add .trousseau
-    git commit -a -m 'Added ian@sofwerx.org to recipients'
+    `git add .trousseau`
+    `git commit -a -m 'Added ian@sofwerx.org to recipients`
 
 Now future trousseau operations will also be encrypted for you to be able to see with your gpg key.
+
+#### Commands
 
 To set a trousseau key:
 
@@ -451,15 +461,19 @@ To delete a key:
 
 Running `trousseau` on its own will show the other usable commands.
 
+#### Use with gpg
+
 The `.trousseau` file in this project is the actual gpg encrypted contents used to manage our environments.
 If you fork this repo, you need to remove `.trousseau` and create a new one with `trousseau create {gpg key email or id}`.
 
 After your gpg key is added, and you are added as a trousseau reciepient, you will be able to use the trousseau command.
 
-Our key naming convention will evolve over time.
+#### Naming Convention
 
 - `file:` prefixed trousseau keys hold base64 encoded values of the content of the files.
 - `environment:` prefixed trousseau keys hold environment variables for terraform to use
+
+#### Automation
 
 There are two functions and an alias presently defined in the `.bashrc` to automate the process.
 
