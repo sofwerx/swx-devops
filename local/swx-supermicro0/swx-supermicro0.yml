@@ -281,3 +281,40 @@ services:
       RUNNER_ENV: "DOCKER_DRIVER=overlay2"
       RUNNER_EXECUTOR: docker
       RUNNER_NAME: gitlab-runner
+
+  motion43:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion43
+    hostname: motion43
+    restart: always
+    ports:
+      - 20043:20043
+      - 21043:21043
+    environment:
+      WEBCONTROL_PORT: 20043
+      STREAM_PORT: 21043
+      RTSP_URL: ${RTSP_URL_43}
+      RTSP_AUTH: ${RTSP_AUTH_43}
+      RTSP_LABEL: ${RTSP_LABEL_43}
+      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      SECURE_MINIO_URL: ${SECURE_MINIO_URL}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion43:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=motion43"
+      - "traefik.port=20043"
+      - "traefik.frontend.rule=Host:motion43.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
