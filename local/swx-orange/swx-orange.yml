@@ -568,7 +568,13 @@ services:
       - cassandra-schema
     logging: *default-logging
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.backend=jaeger-collector"
+      - "traefik.port=14268"
+      - "traefik.frontend.rule=Host:jaeger-collector.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
   jaeger-query:
     image: jaegertracing/jaeger-query
@@ -597,7 +603,12 @@ services:
     depends_on:
       - jaeger-collector
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.backend=jaeger-agent"
+      - "traefik.port=5778"
+      - "traefik.frontend.rule=Host:jaeger-agent.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
   cassandra-schema:
     image: jaegertracing/jaeger-cassandra-schema
