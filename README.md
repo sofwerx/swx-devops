@@ -1,5 +1,5 @@
 # devops
-> This project contains documentation and infrastructure as code for our internal devops efforts.  Following are instructions on how to prep your computer to have access to the devops environment that runs on the SOFWERX server.
+> This project contains documentation and infrastructure as code for our internal devops efforts.  The following are instructions on how to prepare your computer to have access to the devops environment that runs on the SOFWERX server.
 
 ### Legend
   - [INSTALLATION](#installation)
@@ -14,21 +14,21 @@
     * [Project Environments](#project-environments)
     * [Docker-Machine](#docker-machine-vs-dm)
     * [AWS](#aws)
-    * [SWX](#swx)
+    * [SWX](#information-about-swx)
     * [Trousseau](#using-trousseau)
     * [Terraform](#terraform)
 
-# INSTALLATION
+# Installation
 
 There are a number of tools that will need to be installed:
 
-- awscli
-- terraform
-- gnupg 2.0
-- trousseau
-- docker
-- docker-compose
-- docker-machine (optional)
+- [awscli](#awscli)
+- [docker](#docker)
+- [docker-compose](#docker)
+- [docker-machine (optional)](#docker)
+- [gnupg 2.0](#gnupg)
+- [terraform](#terraform)
+- [trousseau](#trousseau)
 
 The easiest way to gain access to the devops environment is by using Docker.  This project uses Docker heavily. You will find `docker-compose.yml` files in the environment directories.
 
@@ -37,10 +37,9 @@ The easiest way to gain access to the devops environment is by using Docker.  Th
 ### Mac
 
 [HomeBrew](https://brew.sh) makes it easy to update:
-    `brew install docker docker-machine docker-compose docker-machine-driver-xhyve`
+   - `brew install docker docker-machine docker-compose docker-machine-driver-xhyve`
 
-Docker for Mac:
-   https://docs.docker.com/docker-for-mac/install/
+[Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
 
 ### Windows or linux
 
@@ -53,7 +52,7 @@ Please refer to these links for the most up-to-date installation instructions fo
 
 ### After Docker installation :
 - Clone the [devops](https://github.com/sofwerx/swx-devops.git) repository. 
-   - For guidance on cloning a repository click [here](https://help.github.com/ance therticles/cloning-a-repository/).
+   - For guidance on cloning a repository click [here](https://help.github.com/articles/cloning-a-repository/).
 - Run `./docker.sh` in the new swx-devops directory. 
 
 Verify that you are in the devops environment by typing `swx` .
@@ -63,8 +62,8 @@ Verify that you are in the devops environment by typing `swx` .
 
 ### Linux
 
-Install Vagrant and spin up a local virtual machine (VM):
-- https://www.vagrantup.com/
+Install [Vagrant](https://www.vagrantup.com/) and spin up a local virtual machine (VM):
+- https://www.vagrantup.com/docs/installation/
 
 There is a `Vagrantfile` that prepares a Ubuntu environment using the `./dependencies/ubuntu.sh` script:
 
@@ -72,11 +71,11 @@ There is a `Vagrantfile` that prepares a Ubuntu environment using the `./depende
     vagrant ssh
 
 ### Windows
-> For Windows you will need to install Windows Subsystem for Linux.
+> For Windows, you need to install Windows Subsystem for Linux.
 
 #### On 64-bit Windows 10 Anniversary Update or later (build 1607+)
 
-Please refer to the Documentation for the most up-to-date instructions:
+Please refer to the documentation below for the most up-to-date instructions:
 - https://msdn.microsoft.com/en-us/commandline/wsl/about
 - https://msdn.microsoft.com/en-us/commandline/wsl/install-win10
 
@@ -95,11 +94,11 @@ Now you can `cd` into the directory where you cloned this git repository, and ru
     bash$ ./dependencies/ubuntu.sh
 
 
-Note: For the Windows Subsystem for Linux:
+Note: Windows Subsystem for Linux:
 - It is not possible to run a Linux docker-engine without a Linux kernel.
-- You are installing docker-engine natively on Windows so that you have a local Hyper-V linux VM to run that kernel.
+- You are installing docker-engine natively on Windows so that you have a local Hyper-V Linux VM to run that kernel.
 
-Once you install a local docker-engine with volume share access to this working directory, then you are ready to proceed. The key here is having a local docker-engine installed that has volume mount access to this directory.
+Once you install a local docker-engine with volume share access to this working directory, then you can proceed. The key here is having a local docker-engine installed that has volume mount access to this directory.
 
 # SECURITY
 
@@ -119,11 +118,11 @@ If using Docker, just make the 'secrets/gnupg' in the repo directory and run './
 
 ### Manual (if not using Docker)
 
-#### gnupg 2.0
+#### gnupg
 
-You will need a gnupg key for `trousseau` below.
+You need a gnupg key for `trousseau` below.
 
-The reason for gnupg 2.0 is that trousseau reads directly from `pubring.gpg`, and they did away with that file in gnupg 2.1 and newer.
+The reason for gnupg 2.0 is trousseau reads directly from `pubring.gpg`, and is no longer supported in gnupg 2.1 and newer.
 
 #### On a Mac
 
@@ -163,34 +162,40 @@ Install Vagrant for your operating system:
 The biggest challenge managing Vagrant persistence will be syncing or sharing a folder between your host and the virtual machine.
 This differs based on the virtual machine engine you use with Vagrant (VirtualBox, VMWare Workstation, VMWare Fusion, Parallels, xhyve, etc).
 
+### GPG Configuration 
+
 While you _can_ use the default `~/.gnupg` config folder, it is recommended to create a `secrets/gnupg` directory to keep your keychain local to this repo directory:
 
     mkdir -p secrets/gnupg
 
-Then run the `shell.bash` to enter the environment:
+Run the `shell.bash` or `docker.sh` to enter the environment:
 
-    ./shell.bash
+    ./shell.bash            OR            ./docker.sh 
+    
 
-This will prepare your gnupg keychain and environment.
+This prepares your gnupg keychain and environment.
 
-Verify the correct version of gpg was installed:
+### GPG Verification and Key Creation
+> The correct version is critical to running the program. If your keys are not configured correctly, problems will arise. 
 
-    `gpg --version`
+#### Verify the correct version of gpg was installed:
+
+    gpg --version
 
 The version should be 2.0, nothing higher. 
 
-After installing gnupg 2.0, generate a private/public keypair:
+#### After installing gnupg 2.0, generate a private/public keypair:
 
-    `gpg --gen-key`
+    gpg --gen-key
 
  - While the prompt is for 2048 bits, use 4096 instead.
    -  If your `gpg` does not prompt you for the number of bits, then you're using a gnupg newer than 2.0 which will not work with trousseau.
 
 After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
 
-    #gpg --export --armor > gpg/yourname@sofwerx.org
-    #git add gpg/yourname@sofwerx.org
-    #git commit -m 'Adding gpg/yourname@sofwerx.org public key'
+    gpg --export --armor > gpg/yourname@sofwerx.org
+    git add gpg/yourname@sofwerx.org
+    git commit -m 'Adding gpg/yourname@sofwerx.org public key'
 
 The convention in this repository is that the filename must be your email address, to make trousseau management easier.
 
@@ -202,7 +207,7 @@ Best practice is to publish your gnupg public key on some of the public key serv
 
 ### trousseau
 
-Trousseau uses gnupg to encrypt a JSON file for a number of administrators that stores "key=value" secrets.
+[Trousseau](https://github.com/oleiade/trousseau) uses gnupg to encrypt a JSON file for a number of administrators that stores "key=value" secrets.
 
 Trousseau can use various cloud storage platforms to share these encrypted secrets between administrators.
 
@@ -210,11 +215,9 @@ The result of any trousseau commands will alter the `.trousseau` file in the cur
 This file is under git management, and is entirely safe as the contents of the file are encrypted.
 This is far easier than dealing with a shared s3 bucket or other shared repository.
 
-The trousseau project is [here](https://github.com/oleiade/trousseau).
+#### Installing troussea 
 
-To install the `trousseau` command, download pre-built binaries from the releases page:
-
-- https://github.com/oleiade/trousseau/releases
+To install the `trousseau` command, download pre-built binaries from [the releases page](https://github.com/oleiade/trousseau/releases).
 
 To build from the Go source follow these build instructions:
 
@@ -235,8 +238,7 @@ To build from the Go source follow these build instructions:
 
 These are the tools and projects that are available in the devops environment.
 
-Non-cloud resources:
-
+#### Non-cloud resources:
 - [local/dev](local/dev/README.md) - Your local `dev` environment
 - [local/geo](local/geo/README.md) - Our `geo` mintpc in our Data Science pit
 - [local/ibm-minsky](local/ibm-minsky) - The IBM Minsky box (ppc64le)
@@ -248,13 +250,13 @@ Non-cloud resources:
 - [local/swx-vmhost](local/vmhost) - The pop-os based System76 Silverback server
 - [local/pi-r-squared](local/pi-r-squared/README.md) - A shared raspberry-pi docker host in our Data Science pit
 
-Cloud based resources:
 
-- [aws/tor-vpin](aws/tor-vpin @ 7fa2708) - private tor network deploy for warfighter nomination
+#### Cloud based resources:
+- [aws/tor-vpin](https://github.com/sofwerx/tor-dfpk/tree/7fa2708a215b91ff0491c45c282a678a290b4256) - private tor network deploy for warfighter nomination
 - [aws/swx-blueteam](aws/cellar/swx-blueteam) - Blue Team box
 
-Archived resources:
 
+#### Archived resources:
 - [cellar/swx-gpu](cellar/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
 - [cellar/swx-dev](cellar/swx-dev/README.md) - AWS EC2 docker-engine host for various cloud deployment testing~~ (Destroyed)
 - [cellar/rcloud-dev](cellar/rcloud-dev/README.md) - AWS EC2 docker-engine host for our rcloud evaluation~~ (Destroyed)
@@ -266,16 +268,18 @@ Archived resources:
 - [cellar/swx-redteam](cellar/swx-redteam) - Red Team box (Destroyed)
 - [cellar/swx-xmpp](cellar/swx-xmpp) - XMPP Server for ATAK (Destroyed)
 
+
 ### docker-machine vs dm
-> This project will import docker-machine configs into JSON "dm" objects stored in trousseau.
+> This project imports docker-machine configs into JSON "dm" objects stored in trousseau.
 
 The `swx dm` commands interact with these "dm" objects:
 
     swx dm ls
 
-This will list the dm file secrets stored in trousseau under `file:secrets/dm/*`
+This lists the dm file secrets stored in trousseau under `file:secrets/dm/*`
 
-To source one of the environments, use `swx dm env` to source a specific dm:
+To source one of the environments, use `swx dm env`.
+To source a specific dm:
 
     swx dm env rcloud-dev-00
 
@@ -295,13 +299,13 @@ Then `git add .trousseau ; git commit` to save the newly added dm secret.
 
 ### Mac
 
-If you are on a Mac, install `awscli` with Homebrew:
+Install `awscli` with Homebrew:
 
     brew install awscli
 
 ### Other Operating Systems
 
-Use Python `pip` to install it as well:
+Use Python `pip`:
 
     pip install awscli
 
@@ -321,8 +325,8 @@ Our `shell.bash` assumes using an `AWS_PROFILE` name of "sofwerx".
 
 This enables you to manage multiple profiles for different AWS credentials under different profiles.
 
-You can either create these files with a text editor (they are in an .ini file format internally) as decribed below,
-or you can use the following commands to prompt you:
+Either create these files with a text editor (they are in an .ini file format internally) as decribed below,
+or use the following commands to prompt you:
 
     mkdir ~/.aws
     touch ~/.aws/config ~/.aws/credentials
@@ -516,7 +520,7 @@ If you are switching between environments, it will ensure that any variables def
 
 ### Using `swx gpg`
 
-When using the `swx` or `trousseau` commands that require access to the trousseau secrets, the `gpg-agent` will prompt you for a passphrase.
+When using the `swx` or `trousseau` commands that require access to the trousseau secrets, the `gpg-agent` prompts you for a passphrase.
 
 If you enter this passphrase incorrectly, these commands will fail until you "repair" your `gpg-agent`; which will not prompt you for another passphrase until the ttl expires, which is quite long.
 
@@ -544,17 +548,21 @@ In addition to listing (`swx environment ls`) and switching (`swx environment sw
 
 ## terraform
 
-Use `terraform` to deploy and converge our cloud resources.
+Use [terraform](https://www.terraform.io/) to deploy and converge our cloud resources.
 
-- https://www.terraform.io/
+### Mac Installation
 
-To install the Hashicorp `terraform` command on a Mac, install it with HomeBrew:
+To install the Hashicorp `terraform`, install it with HomeBrew:
 
     brew install terraform
+    
+### Other operating systems
 
-The Hashicorp Terraform site is [here](https://www.terraform.io/).
+Please refer to the [offical documentation](https://www.terraform.io/intro/getting-started/install.html).
 
-Note: It is very important that we track the same version of terraform between ourselves, and that we upgrade terraform in unison, as resources tend to change between terraform versions.
+### Tips for using terraform. 
+
+It is very important that we track the same version of terraform between ourselves, and that we upgrade terraform in unison, as resources tend to change between terraform versions.
 I am presently running the latest terraform: `0.10.7`.
 
 Internally, we use an AWS bucket named `sofwerx-terraform` for the shared `.tfstate` files. You will see how to set those up in the README.md for each environment.
