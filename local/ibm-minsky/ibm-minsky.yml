@@ -210,7 +210,7 @@ services:
       - ethereum-mainnet-datadir:/datadir
       - ethereum-mainnet-keystore:/keystore
     command: >-
-      geth --fast --cache=2048
+      geth --cache=2048
       --datadir=/datadir --keystore=/keystore 
       --ethash.cachedir=/cachedir --ethash.dagdir=/dagdir
       --ipcpath=/datadir/geth.ipc
@@ -246,7 +246,7 @@ services:
       - ethereum-rinkeby-datadir:/datadir
       - ethereum-rinkeby-keystore:/keystore
     command: >-
-      geth --rinkeby --fast --cache=2048
+      geth --rinkeby --cache=2048
       --datadir=/datadir --keystore=/keystore 
       --ethash.cachedir=/cachedir --ethash.dagdir=/dagdir
       --ipcpath=/datadir/geth.ipc

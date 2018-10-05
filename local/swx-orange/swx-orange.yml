@@ -557,3 +557,66 @@ services:
 #      ES_USER: ${ELASTIC_USER}
 #      ES_PASSWORD: ${ELASTIC_PASSWORD}
 
+  jaeger-collector:
+    image: jaegertracing/jaeger-collector
+    container_name: jaeger-collector
+    hostname: jaeger-collector
+    command: ["--cassandra.keyspace=jaeger_v1_dc1", "--cassandra.servers=localhost", "--collector.zipkin.http-port=9411"]
+    network_mode: host
+    restart: on-failure
+    depends_on:
+      - cassandra-schema
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=jaeger-collector"
+      - "traefik.port=14268"
+      - "traefik.frontend.rule=Host:jaeger-collector.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+
+  jaeger-query:
+    image: jaegertracing/jaeger-query
+    container_name: jaeger-query
+    hostname: jaeger-query
+    command: ["--cassandra.keyspace=jaeger_v1_dc1", "--cassandra.servers=localhost"]
+    network_mode: host
+    restart: on-failure
+    depends_on:
+      - cassandra-schema
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=jaeger"
+      - "traefik.port=16686"
+      - "traefik.frontend.rule=Host:jaeger.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  jaeger-agent:
+    image: jaegertracing/jaeger-agent
+    container_name: jaeger-agent
+    hostname: jaeger-agent
+    command: ["--collector.host-port=localhost:14267"]
+    network_mode: host
+    restart: on-failure
+    depends_on:
+      - jaeger-collector
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=jaeger-agent"
+      - "traefik.port=5778"
+      - "traefik.frontend.rule=Host:jaeger-agent.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  cassandra-schema:
+    image: jaegertracing/jaeger-cassandra-schema
+    container_name: cassandra-schema
+    hostname: cassandra-schema
+    network_mode: host
+    depends_on:
+      - cassandra
+    labels:
+      - "traefik.enable=false"
+
