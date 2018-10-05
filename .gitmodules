@@ -530,3 +530,6 @@
 [submodule "local/swx-supermicro5/docker-traefik"]
 	path = local/swx-supermicro5/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/swx-supermicro0/docker-motion"]
+	path = local/swx-supermicro0/docker-motion
+	url = https://github.com/sofwerx/docker-motion
