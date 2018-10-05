@@ -318,3 +318,75 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  motion44:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion44
+    hostname: motion44
+    restart: always
+    ports:
+      - 20044:20044
+      - 21044:21044
+    environment:
+      WEBCONTROL_PORT: 20044
+      STREAM_PORT: 21044
+      RTSP_URL: ${RTSP_URL_44}
+      RTSP_AUTH: ${RTSP_AUTH_44}
+      RTSP_LABEL: ${RTSP_LABEL_44}
+      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      SECURE_MINIO_URL: ${SECURE_MINIO_URL}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion44:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=motion44"
+      - "traefik.port=20044"
+      - "traefik.frontend.rule=Host:motion44.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  motion45:
+    build: docker-motion/
+    image: sofwerx/motion
+    volumes:
+    container_name: motion45
+    hostname: motion45
+    restart: always
+    ports:
+      - 20045:20045
+      - 21045:21045
+    environment:
+      WEBCONTROL_PORT: 20045
+      STREAM_PORT: 21045
+      RTSP_URL: ${RTSP_URL_45}
+      RTSP_AUTH: ${RTSP_AUTH_45}
+      RTSP_LABEL: ${RTSP_LABEL_45}
+      ES_MOTION_URL: ${ES_MOTION_URL}
+#      ES_MOTION_HTTP_AUTH: ${ES_MOTION_HTTP_AUTH}
+      SECURE_MINIO_URL: ${SECURE_MINIO_URL}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      FRAMERATE: 7
+    volumes:
+      - /data/motion45:/data
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=motion45"
+      - "traefik.port=20045"
+      - "traefik.frontend.rule=Host:motion45.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
