@@ -40,7 +40,7 @@ The easiest way to gain access to the devops environment is by using Docker.  Th
    
    `brew install docker docker-machine docker-compose docker-machine-driver-xhyve`
 
-[Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
+For more information see: [Docker for Mac](https://docs.docker.com/docker-for-mac/install/).
 
 ### Other Operating Systems
 
@@ -69,6 +69,7 @@ Please refer to these links for the most up-to-date installation instructions fo
 2. There is a `Vagrantfile` that prepares a Ubuntu environment using the `./dependencies/ubuntu.sh` script:
 
     `vagrant up`
+    
     `vagrant ssh`
 
 ### Windows
@@ -115,7 +116,7 @@ No files under `secrets/` should ever be committed to this git repo. Any secrets
 
 ### With Docker
 
-If using Docker, just make the 'secrets/gnupg' in the repo directory and run './docker.sh'.
+If using Docker, just make the `secrets/gnupg` in the repo directory and run `./docker.sh`.
 
 ### Manual (if not using Docker)
 
@@ -140,9 +141,9 @@ There is a `gpg` built-in to MacOS in `/usr/bin/gpg`, and that is incompatible w
     `brew install gnupg@2.0`
     `brew link --force gnupg@2.0`
 
-- If you also install pinentry, you will get a nice pop-up dialog box for your gpg passphrase:
+- If you also install `pinentry`, you will get a nice pop-up dialog box for your gpg passphrase:
 
-    brew install pinentry
+    `brew install pinentry`
 
 #### Ubuntu 16.04
 
@@ -190,7 +191,7 @@ The version should be 2.0, nothing higher.
 
 1. Generate a private/public keypair
 
-    gpg --gen-key
+    `gpg --gen-key`
 
 2. While the prompt is for 2048 bits, use 4096 instead.
    -  If your `gpg` does not prompt you for the number of bits, then you're using a gnupg newer than 2.0 which will not work with trousseau.
@@ -198,14 +199,16 @@ The version should be 2.0, nothing higher.
 3. After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
 
     `gpg --export --armor > gpg/yourname@sofwerx.org`
+    
     `git add gpg/yourname@sofwerx.org`
+    
     `git commit -m 'Adding gpg/yourname@sofwerx.org public key`
 
 - The convention in this repository is that the filename must be your email address, to make trousseau management easier.
 
 - You can import all of our public keys at any time by running:
 
-    cat gpg/* | gpg --import
+    `cat gpg/* | gpg --import`
 
 4. Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
 
@@ -225,16 +228,25 @@ This is far easier than dealing with a shared s3 bucket or other shared reposito
 
 2. To build from the Go source follow these build instructions:
 
-    `mkdir ~/go/bin
-    export GOPATH=~/go
-    export PATH=~/go/bin:$PATH
-    go get github.com/tools/godep
-    go get github.com/urfave/cli
-    go get github.com/oleiade/trousseau
-    cd $GOPATH/src/github.com/oleiade/trousseau
-    godep
-    make
-    cp $GOPATH/go/bin/trousseau /usr/local/bin/trousseau`
+    `mkdir ~/go/bin`
+    
+    `export GOPATH=~/go`
+    
+    `export PATH=~/go/bin:$PATH`
+    
+    `go get github.com/tools/godep`
+    
+    `go get github.com/urfave/cli`
+    
+    `go get github.com/oleiade/trousseau`
+    
+    `cd $GOPATH/src/github.com/oleiade/trousseau`
+    
+    `godep`
+    
+    `make`
+    
+    `cp $GOPATH/go/bin/trousseau /usr/local/bin/trousseau`
 
 # Using the Environment
 
@@ -333,15 +345,19 @@ This enables you to manage multiple profiles for different AWS credentials under
 1. Either create these files with a text editor (they are in an .ini file format internally) as decribed below,
 or use the following commands to prompt you:
 
-    mkdir ~/.aws
-    touch ~/.aws/config ~/.aws/credentials
-    aws configure --profile sofwerx
+    `mkdir ~/.aws`
+    
+    `touch ~/.aws/config ~/.aws/credentials`
+    
+    `aws configure --profile sofwerx`
 
 or
 
-    mkdir secrets/aws
-    touch secrets/aws/config secrets/aws/credentials
-    aws configure --profile sofwerx
+    `mkdir secrets/aws`
+    
+    `touch secrets/aws/config secrets/aws/credentials`
+    
+    `aws configure --profile sofwerx`
 
 2. At the prompt enter:
 
@@ -352,15 +368,22 @@ or
 
 3. After entering these, you can examine your updated files:
 
-    `$ cat ~/.aws/config secrets/aws/config
-    [profile sofwerx]
-    output = json
-    region = us-east-1`
+    `$ cat ~/.aws/config secrets/aws/config`
+    
+    `[profile sofwerx]`
+    
+    `output = json`
+    
+    `region = us-east-1`
 
-    `$ cat ~/.aws/credentials secrets/aws/credentials
-    [sofwerx]
-    aws_access_key_id = AWS_ACCESS_KEY
-    aws_secret_access_key = AWS_SECRET_ACCESS_KEY`
+
+    `$ cat ~/.aws/credentials secrets/aws/credentials`
+    
+    `[sofwerx]`
+    
+    `aws_access_key_id = AWS_ACCESS_KEY`
+    
+    `aws_secret_access_key = AWS_SECRET_ACCESS_KEY`
 
 Where the `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` are the credentials you obtained by creating a key under the AWS console in IAM services for your user account.
 
