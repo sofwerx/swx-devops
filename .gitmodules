@@ -533,3 +533,6 @@
 [submodule "local/swx-supermicro0/docker-motion"]
 	path = local/swx-supermicro0/docker-motion
 	url = https://github.com/sofwerx/docker-motion
+[submodule "local/swx-supermicro2/docker-motion"]
+	path = local/swx-supermicro2/docker-motion
+	url = https://github.com/sofwerx/docker-motion
