@@ -14,7 +14,7 @@ This is wired to a SAS 45 drive JBOD array, with 12 of those drives as a ZFS poo
 
 6. Run docker-machine with the generic driver:
 
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 64022 --generic-engine-port 64376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro4
+    docker-machine create -d generic --generic-ip-address 172.109.152.120 --generic-ssh-port 64022 --generic-engine-port 64376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-supermicro4
 
 If that fails, you may safely remove it and try it again:
 
