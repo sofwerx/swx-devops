@@ -65,6 +65,8 @@ volumes:
       device: '/import/minio/jupyterhub'
   aad-postgres-data:
     driver: local
+  aad-public-uploads:
+    driver: local
 
 services:
 

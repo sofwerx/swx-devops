@@ -17,6 +17,9 @@ volumes:
   aad-postgres-data:
     driver: local
 
+  aad-public-uploads:
+    driver: local
+
 services:
 
   aad-postgres:
@@ -51,11 +54,13 @@ services:
       SLACK_TOKEN: ${SLACK_TOKEN}
     networks:
       - default
-#    logging: *default-logging
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://192.168.1.120:514"
+    logging: *default-logging
+#    logging:
+#      driver: syslog
+#      options:
+#        syslog-address: "tcp://192.168.1.120:514"
+    volumes:
+      - aad-public-uploads:/app/public/uploads
     labels:
       traefik.backend: "aad-api"
       traefik.port: "3000"
