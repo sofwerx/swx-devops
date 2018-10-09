@@ -51,6 +51,7 @@ services:
       SLACK_TOKEN: ${SLACK_TOKEN}
     networks:
       - default
+#    logging: *default-logging
     logging:
       driver: syslog
       options:
