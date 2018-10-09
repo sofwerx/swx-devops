@@ -54,11 +54,11 @@ services:
       SLACK_TOKEN: ${SLACK_TOKEN}
     networks:
       - default
-    logging: *default-logging
-#    logging:
-#      driver: syslog
-#      options:
-#        syslog-address: "tcp://192.168.1.120:514"
+#    logging: *default-logging
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://192.168.1.120:514"
     volumes:
       - aad-public-uploads:/app/public/uploads
     labels:
