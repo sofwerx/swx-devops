@@ -260,8 +260,8 @@ services:
       POSTGRES_PASSWORD: ${ZABBIX_POSTGRES_PASSWORD}
       POSTGRES_DB: zabbix
       # ZBX_DBSCHEMA: public
-      # ZBX_SERVER_HOST: zabbix-server
-      # ZBX_SERVER_PORT: 10051
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_SERVER_PORT: 10051
       ZBX_SERVER_NAME: "Composed installation"
       # ZBX_HISTORYSTORAGEURL: http://elasticsearch:9200/
       # ZBX_HISTORYSTORAGETYPES: "['uint', 'dbl', 'str', 'text', 'log']"
@@ -328,6 +328,7 @@ services:
       POSTGRES_USER: zabbix
       POSTGRES_PASSWORD: ${ZABBIX_POSTGRES_PASSWORD}
       POSTGRES_DB: zabbix
+      #ZBX_HOSTNAMEITEM: zabbix-server
       # ZBX_LISTENIP: ""
       # ZBX_HISTORYSTORAGEURL: http://elasticsearch:9200/ # Available since 3.4.5
       # ZBX_HISTORYSTORAGETYPES: uint,dbl,str,log,text # Available since 3.4.5
@@ -401,6 +402,44 @@ services:
     container_name: zabbix-agent
     hostname: zabbix-agent
     image: zabbix/zabbix-agent:alpine-4.0-latest
+    environment:
+      ## https://hub.docker.com/r/zabbix/zabbix-agent/
+      # ZBX_SOURCEIP=
+      # ZBX_DEBUGLEVEL=3
+      # ZBX_ENABLEREMOTECOMMANDS=0
+      # ZBX_LOGREMOTECOMMANDS=0
+      ZBX_SERVER_HOST: 172.16.238.1
+      ZBX_SERVER_PORT: 10051
+      #ZBX_ACTIVESERVERS: zabbix-server:10051,172.16.238.1:10051
+      #ZBX_PASSIVESERVERS: zabbix-server:10051,172.16.238.1:10051
+      #ZBX_PASSIVE_ALLOW: "true"
+      #ZBX_ACTIVE_ALLOW: "true"
+      # ZBX_ACTIVESERVERS=
+      # ZBX_LISTENIP=
+      # ZBX_STARTAGENTS=3
+      ZBX_HOSTNAME: zabbix-server
+      ZBX_HOSTNAMEITEM: zabbix-server
+      # ZBX_METADATA=
+      # ZBX_METADATAITEM=
+      # ZBX_REFRESHACTIVECHECKS=120
+      # ZBX_BUFFERSEND=5
+      # ZBX_BUFFERSIZE=100
+      # ZBX_MAXLINESPERSECOND=20
+      # ZBX_ALIAS=""
+      # ZBX_TIMEOUT=3
+      # ZBX_UNSAFEUSERPARAMETERS=0
+      # ZBX_LOADMODULE="dummy1.so,dummy2.so,dummy10.so"
+      # ZBX_TLSCONNECT=unencrypted
+      # ZBX_TLSACCEPT=unencrypted
+      # ZBX_TLSCAFILE=
+      # ZBX_TLSCRLFILE=
+      # ZBX_TLSSERVERCERTISSUER=
+      # ZBX_TLSSERVERCERTSUBJECT=
+      # ZBX_TLSCERTFILE=
+      # ZBX_TLSKEYFILE=
+      # ZBX_TLSPSKIDENTITY=
+      # ZBX_TLSPSKFILE=
+
     ports:
       - "10050:10050"
     volumes:
@@ -436,7 +475,9 @@ services:
     image: zabbix/zabbix-java-gateway:alpine-4.0-latest
     ports:
       - "10052:10052"
-    #environment:
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_SERVER_PORT: 10051
       # ZBX_START_POLLERS: 5
       # ZBX_TIMEOUT: 3
       ## Possible values: trace, debug, info, want, error, all, off
@@ -462,6 +503,9 @@ services:
     image: zabbix/zabbix-snmptraps:alpine-4.0-latest
     ports:
       - "162:162/udp"
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_SERVER_PORT: 10051
     volumes:
       - zbx-snmptraps:/var/lib/zabbix/snmptraps
     user: root
