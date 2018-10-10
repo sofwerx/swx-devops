@@ -11,6 +11,18 @@ networks:
   default:
     driver: bridge
 
+  zabbix:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
+        gateway: 172.16.238.1
+#      - subnet: 2001:3984:3989::/64
+#        gateway: 2001:3984:3989::1
+
 volumes:
   traefik-ssl:
     driver: local
@@ -25,6 +37,27 @@ volumes:
   takserver-logs:
     driver: local
   takserver-certs:
+    driver: local
+
+  zbx-snmptraps:
+    driver: local
+  zbx-postgres:
+    driver: local
+  zbx-agentd:
+    driver: local
+  zbx-modules:
+    driver: local
+  zbx-enc:
+    driver: local
+  zbx-ssh_keys:
+    driver: local
+  zbx-ssl-nginx:
+    driver: local
+  zbx-alertscripts:
+    driver: local
+  zbx-externalscripts:
+    driver: local
+  zbx-mibs:
     driver: local
 
 services:
@@ -47,10 +80,10 @@ services:
       HTTPS_PORT: "443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
-      SUBDOMAINS: ${SUBDOMAINS}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION}
+      AWS_HOSTED_ZONE_ID: ${AWS_HOSTED_ZONE_ID}
     logging: *default-logging
     labels:
       - "traefik.enable=true"
@@ -61,38 +94,44 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-  pandorafms:
-    image: pandorafms/pandorafms:7
-    container_name: pandorafms
-    hostname: console.${DNS_DOMAIN}
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${PANDORA_DB_NAME}
-      MYSQL_USER: ${PANDORA_DB_USER}
-      MYSQL_PASSWORD: ${PANDORA_DB_PASSWORD}
-      HOMEURL: /pandora_console
-      PUBLIC_URL: https://console.${DNS_DOMAIN}/pandora_console
-      HTTPS: 'true'
-    volumes:
-      - pandorafms7-mysql:/var/lib/mysql
-      - traefik-ssl:/ssl
-    networks:
-      - default
-    ports:
-      - 41121:41121
-      - 60080:80
-      - 8022:8022
-      - 8023:8023
-    restart: always
-    logging: *default-logging
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=console"
-      - "traefik.backend.loadbalancer.method=wrr"
-      - "traefik.port=80"
-      - "traefik.frontend.rule=Host:console.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
+#  pandorafms:
+#    #build: docker-pandorafms/pandorafms7
+#    image: pandorafms/pandorafms:7
+#    container_name: pandorafms
+#    hostname: console.${DNS_DOMAIN}
+#    environment:
+#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#      MYSQL_DATABASE: ${PANDORA_DB_NAME}
+#      MYSQL_USER: ${PANDORA_DB_USER}
+#      MYSQL_PASSWORD: ${PANDORA_DB_PASSWORD}
+#      PANDORA_DB_NAME: ${PANDORA_DB_NAME}
+#      PANDORA_DB_USER: ${PANDORA_DB_USER}
+#      PANDORA_DB_PASSWORD: ${PANDORA_DB_PASSWORD}
+#      PANDORA_DB_HOST: localhost
+#      HOMEURL: /pandora_console
+#      PUBLIC_URL: https://console.${DNS_DOMAIN}/pandora_console
+#      HTTPS: 'true'
+#      SERVER_PORT: '443'
+#    volumes:
+#      - pandorafms7-mysql:/var/lib/mysql
+#      - traefik-ssl:/ssl
+#    networks:
+#      - default
+#    ports:
+#      - 41121:41121
+#      - 60080:80
+#      - 8022:8022
+#      - 8023:8023
+#    restart: always
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=console"
+#      - "traefik.backend.loadbalancer.method=wrr"
+#      - "traefik.port=80"
+#      - "traefik.frontend.rule=Host:console.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
 
 #  pandora-mysql:
 #    image: pandorafms/pandorafms-mysql:6
@@ -241,4 +280,265 @@ services:
 ##    logging: *default-logging
 ##    labels:
 ##      - "traefik.enable=false"
+
+  zabbix:
+    container_name: zabbix
+    hostname: zabbix
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-4.0-latest
+    links:
+     - zabbix-postgres-server:postgres-server
+     - zabbix-server:zabbix-server
+    volumes:
+     - /etc/localtime:/etc/localtime:ro
+     - /etc/timezone:/etc/timezone:ro
+     - zbx-ssl-nginx:/etc/ssl/nginx:ro
+    environment:
+      DB_SERVER_HOST: zabbix-postgres-server
+      DB_SERVER_PORT: 5432
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: ${ZABBIX_POSTGRES_PASSWORD}
+      POSTGRES_DB: zabbix
+      # ZBX_DBSCHEMA: public
+      # ZBX_SERVER_HOST: zabbix-server
+      # ZBX_SERVER_PORT: 10051
+      ZBX_SERVER_NAME: "Composed installation"
+      # ZBX_HISTORYSTORAGEURL: http://elasticsearch:9200/
+      # ZBX_HISTORYSTORAGETYPES: "['uint', 'dbl', 'str', 'text', 'log']"
+      # ZBX_MAXEXECUTIONTIME: 600
+      # ZBX_MEMORYLIMIT: 128M
+      # ZBX_POSTMAXSIZE: 16M
+      # ZBX_UPLOADMAXFILESIZE: 2M
+      # ZBX_MAXINPUTTIME: 300
+      ## Timezone one of: http://php.net/manual/en/timezones.php
+      # PHP_TZ: Europe/Riga
+    user: root
+    networks:
+      zabbix:
+        aliases:
+          - zabbix-web-nginx-pgsql
+          - zabbix-web-nginx-alpine-pgsql
+          - zabbix-web-nginx-pgsql-alpine
+      default:
+        aliases:
+          - zabbix
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.backend.loadbalancer.method=wrr"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:zabbix.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+      - "com.zabbix.description=Zabbix frontend on Nginx web-server with PostgreSQL database support"
+      - "com.zabbix.company=Zabbix SIA"
+      - "com.zabbix.component=zabbix-frontend"
+      - "com.zabbix.webserver=nginx"
+      - "com.zabbix.dbtype=pgsql"
+      - "com.zabbix.os=alpine"
+
+  zabbix-server:
+    container_name: zabbix-server
+    hostname: zabbix-server
+    image: zabbix/zabbix-server-pgsql:alpine-4.0-latest
+    ports:
+     - 10051:10051
+    volumes:
+     - /etc/localtime:/etc/localtime
+     - /etc/timezone:/etc/timezone
+     - zbx-alertscripts:/usr/lib/zabbix/alertscripts
+     - zbx-externalscripts:/usr/lib/zabbix/externalscripts
+     - zbx-modules:/var/lib/zabbix/modules
+     - zbx-enc:/var/lib/zabbix/enc
+     - zbx-ssh_keys:/var/lib/zabbix/ssh_keys
+     - zbx-mibs:/var/lib/zabbix/mibs
+     - zbx-snmptraps:/var/lib/zabbix/snmptraps
+    links:
+     - zabbix-postgres-server:postgres-server
+     - zabbix-java-gateway:zabbix-java-gateway
+    ulimits:
+     nproc: 65535
+     nofile:
+      soft: 20000
+      hard: 40000
+    environment:
+      DB_SERVER_HOST: zabbix-postgres-server
+      DB_SERVER_PORT: 5432
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: ${ZABBIX_POSTGRES_PASSWORD}
+      POSTGRES_DB: zabbix
+      # ZBX_LISTENIP: ""
+      # ZBX_HISTORYSTORAGEURL: http://elasticsearch:9200/ # Available since 3.4.5
+      # ZBX_HISTORYSTORAGETYPES: uint,dbl,str,log,text # Available since 3.4.5
+      # ZBX_HISTORYSTORAGEDATEINDEX: 0 # Available since 4.0.0
+      # ZBX_DEBUGLEVEL: 3
+      # ZBX_STARTPOLLERS: 5
+      # ZBX_IPMIPOLLERS: 0
+      # ZBX_STARTPREPROCESSORS: 3 # Available since 3.4.0
+      # ZBX_STARTPOLLERSUNREACHABLE: 1
+      # ZBX_STARTTRAPPERS: 5
+      # ZBX_STARTPINGERS: 1
+      # ZBX_STARTDISCOVERERS: 1
+      # ZBX_STARTHTTPPOLLERS: 1
+      # ZBX_STARTTIMERS: 1
+      # ZBX_STARTESCALATORS: 1
+      # ZBX_STARTALERTERS: 3 # Available since 3.4.0
+      ZBX_JAVAGATEWAY_ENABLE: "true"
+      # ZBX_JAVAGATEWAY: zabbix-java-gateway
+      # ZBX_JAVAGATEWAYPORT: 10052
+      ZBX_STARTJAVAPOLLERS: 5
+      # ZBX_STARTVMWARECOLLECTORS: 0
+      # ZBX_VMWAREFREQUENCY: 60
+      # ZBX_VMWAREPERFFREQUENCY: 60
+      # ZBX_VMWARECACHESIZE: 8M
+      # ZBX_VMWARETIMEOUT: 10
+      ZBX_ENABLE_SNMP_TRAPS: "true"
+      # ZBX_SOURCEIP: ""
+      # ZBX_HOUSEKEEPINGFREQUENCY: 1
+      # ZBX_MAXHOUSEKEEPERDELETE: 5000
+      # ZBX_SENDERFREQUENCY: 30
+      # ZBX_CACHESIZE: 8M
+      # ZBX_CACHEUPDATEFREQUENCY: 60
+      # ZBX_STARTDBSYNCERS: 4
+      # ZBX_HISTORYCACHESIZE: 16M
+      # ZBX_HISTORYINDEXCACHESIZE: 4M
+      # ZBX_TRENDCACHESIZE: 4M
+      # ZBX_VALUECACHESIZE: 8M
+      # ZBX_TIMEOUT: 4
+      # ZBX_TRAPPERIMEOUT: 300
+      # ZBX_UNREACHABLEPERIOD: 45
+      # ZBX_UNAVAILABLEDELAY: 60
+      # ZBX_UNREACHABLEDELAY: 15
+      # ZBX_LOGSLOWQUERIES: 3000
+      # ZBX_STARTPROXYPOLLERS: 1
+      # ZBX_PROXYCONFIGFREQUENCY: 3600
+      # ZBX_PROXYDATAFREQUENCY: 1
+      # ZBX_LOADMODULE: dummy1.so,dummy2.so,dummy10.so"
+      # ZBX_TLSCAFILE: 
+      # ZBX_TLSCRLFILE: 
+      # ZBX_TLSCERTFILE: 
+      # ZBX_TLSKEYFILE: 
+    user: root
+    networks:
+     zabbix:
+      aliases:
+       - zabbix-server
+       - zabbix-server-pgsql
+       - zabbix-server-alpine-pgsql
+       - zabbix-server-pgsql-alpine
+    restart: always
+    logging: *default-logging
+    labels:
+     - "traefik.enable=false"
+     - "com.zabbix.description=Zabbix server with PostgreSQL database support"
+     - "com.zabbix.company=Zabbix SIA"
+     - "com.zabbix.component=zabbix-server"
+     - "com.zabbix.dbtype=pgsql"
+     - "com.zabbix.os=alpine"
+  
+  zabbix-agent:
+    container_name: zabbix-agent
+    hostname: zabbix-agent
+    image: zabbix/zabbix-agent:alpine-4.0-latest
+    ports:
+      - "10050:10050"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - zbx-agentd:/etc/zabbix/zabbix_agentd.d:ro
+      - zbx-modules:/var/lib/zabbix/modules:ro
+      - zbx-enc:/var/lib/zabbix/enc:ro
+      - zbx-ssh_keys:/var/lib/zabbix/ssh_keys:ro
+    links:
+     - zabbix-server:zabbix-server
+    user: root
+    privileged: true
+    pid: "host"
+    networks:
+     zabbix:
+      aliases:
+       - zabbix-agent
+       - zabbix-agent-passive
+       - zabbix-agent-alpine
+    restart: always
+    logging: *default-logging
+    labels:
+     - "traefik.enable=false"
+     - "com.zabbix.description=Zabbix agent"
+     - "com.zabbix.company=Zabbix SIA"
+     - "com.zabbix.component=zabbix-agentd"
+     - "com.zabbix.os=alpine"
+
+  zabbix-java-gateway:
+    container_name: zabbix-java-gateway
+    hostname: zabbix-java-gateway
+    image: zabbix/zabbix-java-gateway:alpine-4.0-latest
+    ports:
+      - "10052:10052"
+    #environment:
+      # ZBX_START_POLLERS: 5
+      # ZBX_TIMEOUT: 3
+      ## Possible values: trace, debug, info, want, error, all, off
+      # ZBX_DEBUGLEVEL: info
+    user: root
+    networks:
+      zabbix:
+        aliases:
+          - zabbix-java-gateway
+          - zabbix-java-gateway-alpine
+    restart: always
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+      - "com.zabbix.description=Zabbix Java Gateway"
+      - "com.zabbix.company=Zabbix SIA"
+      - "com.zabbix.component=java-gateway"
+      - "com.zabbix.os=alpine"
+
+  zabbix-snmptraps:
+    container_name: zabbix-snmptraps
+    hostname: zabbix-snmptraps
+    image: zabbix/zabbix-snmptraps:alpine-4.0-latest
+    ports:
+      - "162:162/udp"
+    volumes:
+      - zbx-snmptraps:/var/lib/zabbix/snmptraps
+    user: root
+    networks:
+      zabbix:
+        aliases:
+          - zabbix-snmptraps
+    restart: always
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+      - "com.zabbix.description=Zabbix snmptraps"
+      - "com.zabbix.company=Zabbix SIA"
+      - "com.zabbix.component=snmptraps"
+      - "com.zabbix.os=ubuntu"
+
+  zabbix-postgres-server:
+    container_name: zabbix-postgres-server
+    hostname: zabbix-postgres-server
+    image: postgres:10.5
+    volumes:
+      - zbx-postgres:/var/lib/postgresql/data
+    environment:
+      # DB_SERVER_HOST: postgres-server
+      # DB_SERVER_PORT: 5432
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: ${ZABBIX_POSTGRES_PASSWORD}
+      POSTGRES_DB: zabbix
+      # ZBX_DBSCHEMA: public
+    user: root
+    networks:
+      zabbix:
+        aliases:
+          - postgres-server
+          - pgsql-server
+          - pgsql-database
+    restart: always
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 
