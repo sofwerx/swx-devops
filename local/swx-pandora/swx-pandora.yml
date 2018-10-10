@@ -94,45 +94,6 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
-#  pandorafms:
-#    #build: docker-pandorafms/pandorafms7
-#    image: pandorafms/pandorafms:7
-#    container_name: pandorafms
-#    hostname: console.${DNS_DOMAIN}
-#    environment:
-#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#      MYSQL_DATABASE: ${PANDORA_DB_NAME}
-#      MYSQL_USER: ${PANDORA_DB_USER}
-#      MYSQL_PASSWORD: ${PANDORA_DB_PASSWORD}
-#      PANDORA_DB_NAME: ${PANDORA_DB_NAME}
-#      PANDORA_DB_USER: ${PANDORA_DB_USER}
-#      PANDORA_DB_PASSWORD: ${PANDORA_DB_PASSWORD}
-#      PANDORA_DB_HOST: localhost
-#      HOMEURL: /pandora_console
-#      PUBLIC_URL: https://console.${DNS_DOMAIN}/pandora_console
-#      HTTPS: 'true'
-#      SERVER_PORT: '443'
-#    volumes:
-#      - pandorafms7-mysql:/var/lib/mysql
-#      - traefik-ssl:/ssl
-#    networks:
-#      - default
-#    ports:
-#      - 41121:41121
-#      - 60080:80
-#      - 8022:8022
-#      - 8023:8023
-#    restart: always
-#    logging: *default-logging
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.backend=console"
-#      - "traefik.backend.loadbalancer.method=wrr"
-#      - "traefik.port=80"
-#      - "traefik.frontend.rule=Host:console.${DNS_DOMAIN}"
-#      - "traefik.frontend.passHostHeader=true"
-#      - "traefik.frontend.entryPoints=http,https"
-
 #  pandora-mysql:
 #    image: pandorafms/pandorafms-mysql:6
 #    container_name: pandora-mysql
