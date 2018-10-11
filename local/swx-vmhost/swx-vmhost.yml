@@ -50,8 +50,6 @@ volumes:
     driver: local
   django-geopackage-server-media:
     driver: local
-  splunk-var:
-    driver: local
 
 services:
 
@@ -489,7 +487,7 @@ services:
       - 9997/tcp
     restart: always
     volumes:
-      - splunk-var:/opt/splunk/var
+      - /data/splunk:/opt/splunk/var
     networks:
       - default
     logging: *default-logging
