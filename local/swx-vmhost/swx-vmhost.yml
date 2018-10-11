@@ -50,6 +50,8 @@ volumes:
     driver: local
   django-geopackage-server-media:
     driver: local
+  splunk-var:
+    driver: local
 
 services:
 
@@ -469,3 +471,34 @@ services:
       - "traefik.frontend.rule=Host:osh.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  splunk:
+    container_name: splunk
+    hostname: splunk
+    image: splunk/splunk:latest 
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD}
+    ports:
+      - 8000:8000/tcp
+      - 4001/tcp
+      - 8065/tcp
+      - 8088-8089/tcp
+      - 8191/tcp
+      - 9887/tcp
+      - 9997/tcp
+    restart: always
+    volumes:
+      - splunk-var:/opt/splunk/var
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=splunk"
+      - "traefik.port=8000"
+      - "traefik.frontend.rule=Host:splunk.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+
