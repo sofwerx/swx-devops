@@ -53,7 +53,9 @@ services:
       - "traefik.frontend.entryPoints=http,https"
 
   sortoe-nginx:
-    image: 212171213234.dkr.ecr.us-east-1.amazonaws.com/sortoe/nginx:0.3.0
+    build:
+      context: docker-sortoe/
+      dockerfile: Dockerfile.nginx
     depends_on:
       - sortoe-service-1.0.0
       - sortoe-web
