@@ -12,3 +12,5 @@ tmp/
 .npm
 .vim
 kube_config_cluster.yml
+.config
+.gnupg
