@@ -347,26 +347,22 @@ This enables you to manage multiple profiles for different AWS credentials under
 1. Either create these files with a text editor (they are in an .ini file format internally) as decribed below,
 or use the following commands to prompt you:
 
-    `mkdir ~/.aws`
-    
-    `touch ~/.aws/config ~/.aws/credentials`
-    
-    `aws configure --profile sofwerx`
+    mkdir ~/.aws
+    touch ~/.aws/config ~/.aws/credentials
+    aws configure --profile sofwerx
 
 or
 
-    `mkdir secrets/aws`
-    
-    `touch secrets/aws/config secrets/aws/credentials`
-    
-    `aws configure --profile sofwerx`
+    mkdir secrets/aws
+    touch secrets/aws/config secrets/aws/credentials
+    aws configure --profile sofwerx
 
 2. At the prompt enter:
 
-    `AWS Access Key ID [None]: AWS_ACCESS_KEY
+    AWS Access Key ID [None]: AWS_ACCESS_KEY
     AWS Secret Access Key [None]: AWS_SECRET_ACCESS_KEY
     Default region name [None]: us-east-1
-    Default output format [None]: json`
+    Default output format [None]: json
 
 3. After entering these, you can examine your updated files:
 
