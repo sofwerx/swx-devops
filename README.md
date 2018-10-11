@@ -344,14 +344,9 @@ Our `shell.bash` assumes using an `AWS_PROFILE` name of "sofwerx".
 
 This enables you to manage multiple profiles for different AWS credentials under different profiles.
 
-1. Either create these files with a text editor (they are in an .ini file format internally) as decribed below,
-or use the following commands to prompt you:
+1. Either create these files with a text editor (they are in an .ini file format internally) as decribed below
 
-    mkdir ~/.aws
-    touch ~/.aws/config ~/.aws/credentials
-    aws configure --profile sofwerx
-
-or
+or use the following commands:
 
     mkdir secrets/aws
     touch secrets/aws/config secrets/aws/credentials
