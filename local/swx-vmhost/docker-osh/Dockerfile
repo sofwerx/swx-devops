@@ -14,7 +14,9 @@ RUN apt-get -q update && apt-get install -y -qq \
   sudo \
   apt-utils \
   unzip \
-  openjdk-7-jdk \
+# no more 7, hope 8 works
+#  openjdk-7-jdk \
+  openjdk-8-jdk \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /opt

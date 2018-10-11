@@ -539,3 +539,6 @@
 [submodule "local/swx-supermicro4/docker-motion"]
 	path = local/swx-supermicro4/docker-motion
 	url = https://github.com/sofwerx/docker-motion
+[submodule "local/swx-vmhost/docker-splunk"]
+	path = local/swx-vmhost/docker-splunk
+	url = https://github.com/sofwerx/docker-splunk.git
