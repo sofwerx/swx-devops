@@ -21,7 +21,7 @@ RUN apt-get -q update && apt-get install -y -qq \
 
 WORKDIR /opt
 
-RUN curl -sL https://github.com/opensensorhub/osh-core/releases/download/v1.3.1/osh-base-install-1.3.1.zip | sudo -E bash - \
+RUN curl -sL https://github.com/opensensorhub/osh-core/releases/download/v1.3.1/osh-base-install-1.3.1.zip | unzip osh-base-install-1.3.1.zip | sudo -E bash - 
 
 WORKDIR /opt/osh-base-install-1.3.1
 
