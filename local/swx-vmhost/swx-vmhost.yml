@@ -50,6 +50,8 @@ volumes:
     driver: local
   django-geopackage-server-media:
     driver: local
+  splunk-etc:
+    driver: local
 
 services:
 
@@ -488,6 +490,8 @@ services:
     restart: always
     volumes:
       - /data/splunk:/opt/splunk/var
+      - splunk-etc:/opt/splunk/etc
+      - /import/minio:/import/minio
     networks:
       - default
     logging: *default-logging
