@@ -52,6 +52,10 @@ volumes:
     driver: local
   splunk-etc:
     driver: local
+  osh-db:
+    driver: local
+  osh-logs:
+    driver: local
 
 services:
 
@@ -464,6 +468,9 @@ services:
       - default
     ports:
       - 8181:8181
+    volumes:
+      - osh-logs:/data/logs/
+      - osh-db:/data/db/
     labels:
       - "traefik.enable=true"
       - "traefik.backend=osh-core"

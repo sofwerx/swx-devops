@@ -7,7 +7,9 @@ networks:
 
 volumes:
 
-  osh-core:
+  osh-db:
+    driver: local
+  osh-logs:
     driver: local
 
 services:
@@ -18,6 +20,9 @@ services:
     container_name: osh-core
     hostname: osh-core
     restart: always
+    volumes:
+      - osh-logs:/data/logs
+      - osh-db:/data/db
     networks:
       - default
     ports:

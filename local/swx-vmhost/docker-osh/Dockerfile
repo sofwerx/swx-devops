@@ -21,12 +21,17 @@ RUN apt-get -q update && apt-get install -y -qq \
 
 WORKDIR /opt
 
-RUN curl -sL https://github.com/opensensorhub/osh-core/releases/download/v1.3.1/osh-base-install-1.3.1.zip | unzip osh-base-install-1.3.1.zip | sudo -E bash - 
+RUN curl -sLo osh-base-install-1.3.1.zip https://github.com/opensensorhub/osh-core/releases/download/v1.3.1/osh-base-install-1.3.1.zip \
+ && unzip osh-base-install-1.3.1.zip \
+ && rm -f osh-base-install-1.3.1.zip
 
 WORKDIR /opt/osh-base-install-1.3.1
 
-#ADD run.sh /run.sh
+ADD config.json .
+ADD logback.xml .
 
-# run it!
-CMD ./launch.sh
+VOLUME /data/logs/
+VOLUME /data/db/
+
+CMD java -Xmx128m -Dlogback.configurationFile=./logback.xml -cp "lib/*" -Djava.system.class.loader="org.sensorhub.utils.NativeClassLoader" org.sensorhub.impl.SensorHub config.json /data/db
 
