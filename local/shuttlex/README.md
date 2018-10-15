@@ -31,10 +31,10 @@ The OSes arel on the 256G NVMe drives, and docker store is on the 1G internal dr
 
 6. Run docker-machine with the generic driver:
 
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 40022 --generic-engine-port 40376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-shuttlex0
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 41022 --generic-engine-port 41376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-shuttlex1
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 42022 --generic-engine-port 42376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-shuttlex2
-    docker-machine create -d generic --generic-ip-address 172.109.143.82 --generic-ssh-port 43022 --generic-engine-port 43376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-shuttlex3
+    docker-machine create -d generic --generic-ip-address 172.109.152.114 --generic-ssh-port 40022 --generic-engine-port 40376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-shuttlex0
+    docker-machine create -d generic --generic-ip-address 172.109.152.114 --generic-ssh-port 41022 --generic-engine-port 41376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-shuttlex1
+    docker-machine create -d generic --generic-ip-address 172.109.152.114 --generic-ssh-port 42022 --generic-engine-port 42376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-shuttlex2
+    docker-machine create -d generic --generic-ip-address 172.109.152.114 --generic-ssh-port 43022 --generic-engine-port 43376 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user swxadmin --engine-storage-driver overlay2 swx-u-ub-shuttlex3
 
 If that fails, you may safely remove it and try it again:
 
