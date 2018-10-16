@@ -102,9 +102,9 @@ services:
       JIRA_DB_PASSWORD: ${JIRA_DB_PASSWORD}
       SETENV_JVM_MINIMUM_MEMORY: 256m
       SETENV_JVM_MAXIMUM_MEMORY: 4g
-      #JIRA_PROXY_NAME:
-      #JIRA_PROXY_PORT:
-      #JIRA_PROXY_SCHEME:
+      JIRA_PROXY_NAME: jira.${DNS_DOMAIN}
+      JIRA_PROXY_PORT: 443
+      JIRA_PROXY_SCHEME: https
     logging: *default-logging
     labels:
       com.blacklabelops.description: "Atlassian Jira"
@@ -117,7 +117,7 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
       - "traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:https://jira.${DNS_DOMAIN}||Vary:Origin"
-      - "traefik.frontend.headers.customRequestHeaders=Origin:http://jira.${DNS_DOMAIN}"
+      - "traefik.frontend.headers.customRequestHeaders=Origin:https://jira.${DNS_DOMAIN}"
 
   jira-postgres:
     container_name: jira-postgres
