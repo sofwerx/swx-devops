@@ -1,0 +1,147 @@
+version: "3.4"
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+volumes:
+
+  consul-data:
+    driver: local
+  consul-config:
+    driver: local
+
+services:
+
+  consul0:
+    hostname: consul0
+    image: consul
+    command: >-
+      agent
+        -node consul0
+        -server
+        -retry-join consul1
+        -retry-join consul2
+        -config-dir=/consul/config
+        -data-dir=/consul/data
+        -bootstrap-expect=3
+        -raft-protocol=3
+        -rejoin
+        -ui
+        -log-level debug
+        -advertise='{{ GetInterfaceIP "eth0" }}'
+        -client='127.0.0.1 {{ GetInterfaceIP "eth0" }}'
+        -serf-lan-bind='{{ GetInterfaceIP "eth0" }}'
+    volumes:
+      - consul-data:/consul/data
+      - consul-config:/consul/config
+    logging: *default-logging
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.hostname == swx-u-ub-shuttlex0"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=consul"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.backend.loadbalancer.method=wrr"
+        - "traefik.port=8500"
+        - "traefik.frontend.rule=Host:consul.${DNS_DOMAIN}"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  consul1:
+    hostname: consul1
+    image: consul
+    command: >-
+      agent
+        -node consul1
+        -server
+        -retry-join consul0
+        -retry-join consul2
+        -config-dir=/consul/config
+        -data-dir=/consul/data
+        -bootstrap-expect=3
+        -raft-protocol=3
+        -rejoin
+        -ui
+        -log-level debug
+        -advertise='{{ GetInterfaceIP "eth0" }}'
+        -client='127.0.0.1 {{ GetInterfaceIP "eth0" }}'
+        -serf-lan-bind='{{ GetInterfaceIP "eth0" }}'
+    volumes:
+      - consul-data:/consul/data
+      - consul-config:/consul/config
+    logging: *default-logging
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.hostname == swx-u-ub-shuttlex1"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=consul"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.backend.loadbalancer.method=wrr"
+        - "traefik.port=8500"
+        - "traefik.frontend.rule=Host:consul.${DNS_DOMAIN}"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
+  consul2:
+    hostname: consul2
+    image: consul
+    command: >-
+      agent
+        -node consul2
+        -server
+        -retry-join consul0
+        -retry-join consul1
+        -config-dir=/consul/config
+        -data-dir=/consul/data
+        -bootstrap-expect=3
+        -raft-protocol=3
+        -rejoin
+        -ui
+        -log-level debug
+        -advertise='{{ GetInterfaceIP "eth0" }}'
+        -client='127.0.0.1 {{ GetInterfaceIP "eth0" }}'
+        -serf-lan-bind='{{ GetInterfaceIP "eth0" }}'
+    volumes:
+      - consul-data:/consul/data
+      - consul-config:/consul/config
+    logging: *default-logging
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - "node.hostname == swx-u-ub-shuttlex2"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=consul"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.backend.loadbalancer.method=wrr"
+        - "traefik.port=8500"
+        - "traefik.frontend.rule=Host:consul.${DNS_DOMAIN}"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
