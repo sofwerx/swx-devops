@@ -1,0 +1,38 @@
+version: "3.4"
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+services:
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    logging: *default-logging
+    deploy:
+      mode: replicated
+      endpoint_mode: vip
+      replicas: 1
+      placement:
+        constraints:
+          - "node.hostname == swx-u-ub-shuttlex0"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=visualizer"
+        - "traefik.backend.loadbalancer.swarm=true"
+        - "traefik.backend.loadbalancer.method=wrr"
+        - "traefik.port=8080"
+        - "traefik.frontend.rule=Host:visualizer.${DNS_DOMAIN}"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http,https"
+
