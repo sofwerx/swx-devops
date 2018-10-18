@@ -144,4 +144,5 @@ services:
         - "traefik.frontend.rule=Host:consul.${DNS_DOMAIN}"
         - "traefik.frontend.passHostHeader=true"
         - "traefik.frontend.entryPoints=http,https"
+        - "traefik.frontend.auth.basic=admin:${CONSUL_UI_PASSWORD_APR1}"
 
