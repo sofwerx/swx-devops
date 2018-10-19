@@ -542,3 +542,6 @@
 [submodule "local/swx-vmhost/docker-splunk"]
 	path = local/swx-vmhost/docker-splunk
 	url = https://github.com/sofwerx/docker-splunk.git
+[submodule "local/swx-vmhost/sensorhub"]
+	path = local/swx-vmhost/sensorhub
+	url = https://github.com/sofwerx/sensorhub
