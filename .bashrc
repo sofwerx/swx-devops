@@ -7,8 +7,9 @@ fi
 
 devops="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 alias ch="cd ${devops}"
+alias ll="ls -lah"
 
-alias gitdammit="git submodule update --init --recursive"
+git config --global alias.dammit 'submodule update --init --recursive'
 
 for swx_step in ${devops}/swx.d/* ; do
   . "${swx_step}"
