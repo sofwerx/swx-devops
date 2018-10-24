@@ -167,6 +167,7 @@ services:
       XPACK_MONITORING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
       XPACK_REPORTING_ENCRYPTIONKEY: ${ELASTIC_PASSWORD}
       XPACK_REPORTING_ENCRYPTION_KEY: ${ELASTIC_PASSWORD}
+      XPACK_REPORTING_CSV_MAXSIZEBYTES: 209715200
     ports: ['5601:5601']
     logging: *default-logging
     labels:
@@ -459,6 +460,7 @@ services:
     volumes:
       - portainer-data:/data
       - /var/run/docker.sock:/var/run/docker.sock 
+    restart: always
     logging: *default-logging
     labels:
       - "traefik.enable=true"
