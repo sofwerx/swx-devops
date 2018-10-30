@@ -265,9 +265,15 @@ This is far easier than dealing with a shared s3 bucket or other shared reposito
     go get github.com/urfave/cli
     go get github.com/oleiade/trousseau
     cd $GOPATH/src/github.com/oleiade/trousseau
-    godep
     make
-    cp $GOPATH/go/bin/trousseau/usr/local/bin/trousseau`
+    cp $GOPATH/go/bin/trousseau/usr/local/bin/trousseau
+    ```
+    
+3. To build from the Go source using the `swx` command follow these steps from your `swx-devops` clone directory:
+
+    ```bash
+    $ ./shell.bash
+    $ swx secrets install
     ```
 # Using the Environment
 
