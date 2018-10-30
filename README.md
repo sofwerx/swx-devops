@@ -68,9 +68,12 @@ Please refer to these links for the most up-to-date installation instructions fo
 
 2. There is a `Vagrantfile` that prepares a Ubuntu environment using the `./dependencies/ubuntu.sh` script:
 
-    `vagrant up`
-    
-    `vagrant ssh`
+    ```bash
+    vagrant up
+    ```
+    ```bash
+    vagrant ssh
+    ```
 
 ### Windows
 > For Windows, you need to install Windows Subsystem for Linux.
