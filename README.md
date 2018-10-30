@@ -38,7 +38,9 @@ The easiest way to gain access to the devops environment is by using Docker.  Th
 
 [HomeBrew](https://brew.sh) makes it easy to update:
    
-   `brew install docker docker-machine docker-compose docker-machine-driver-xhyve`
+   ```bash
+   brew install docker docker-machine docker-compose docker-machine-driver-xhyve
+   ```
 
 For more information see: [Docker for Mac](https://docs.docker.com/docker-for-mac/install/).
 
@@ -88,16 +90,21 @@ This runs Linux binaries natively without having to run a VM for a Linux kernel.
 
 1. Enable the Windows Subsystem for Linux:
 
-    `Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux`
+    ```
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+    ```
 
 2. After selecting Ubuntu as your favorite Linux distribution, and following the prompts and rebooting, open a Command Prompt and run `bash`:
 
-    `C:\> bash`
+    ```
+    C:\> bash
+    ```
 
 3. Now you can `cd` into the directory where you cloned this git repository, and run:
 
-    `bash$ ./dependencies/ubuntu.sh`
-
+    ```
+    bash$ ./dependencies/ubuntu.sh
+    ```
 
 Note: Windows Subsystem for Linux:
 - It is not possible to run a Linux docker-engine without a Linux kernel.
@@ -137,16 +144,24 @@ There is a `gpg` built-in to MacOS in `/usr/bin/gpg`, and that is incompatible w
 
 - If you happened to `brew install gnupg` already, just unlink first.
 
-    `brew unlink gnupg`
+    ```
+    brew unlink gnupg
+    ```
 
 2. To install the `gpg` command on a Mac, install `gnupg@2.0` with HomeBrew:
 
-    `brew install gnupg@2.0`
-    `brew link --force gnupg@2.0`
+    ```bash
+    brew install gnupg@2.0
+    ```
+    ```bash
+    brew link --force gnupg@2.0
+    ```
 
 - If you also install `pinentry`, you will get a nice pop-up dialog box for your gpg passphrase:
 
-    `brew install pinentry`
+    ```bash
+    brew install pinentry
+    ```
 
 #### Ubuntu 16.04
 
@@ -169,13 +184,15 @@ This differs based on the virtual machine engine you use with Vagrant (VirtualBo
 
 1. Create a `secrets/gnupg` directory:
 
-    `mkdir -p secrets/gnupg`
+    ```bash
+    mkdir -p secrets/gnupg
+    ```
 
 Note: While you _can_ use the default `~/.gnupg` config folder, it is recommended to create a `secrets/gnupg` directory to keep your keychain local to this repo directory.
 
 2. Run the `shell.bash` or `docker.sh` to enter the environment:
 
-    `./shell.bash`            OR            `./docker.sh` 
+    `./shell.bash` OR `./docker.sh` 
     
 This prepares your gnupg keychain and environment.
 
@@ -186,34 +203,41 @@ This prepares your gnupg keychain and environment.
 
 To verify the correct version of gpg was installed
 
-    gpg --version
+```bash
+gpg --version
+```
 
 The version should be 2.0, nothing higher. 
 
 #### After installing gnupg
 
 1. Generate a private/public keypair
-
-    `gpg --gen-key`
+```bash
+gpg --gen-key
+```
 
 2. While the prompt is for 2048 bits, use 4096 instead.
    -  If your `gpg` does not prompt you for the number of bits, then you're using a gnupg newer than 2.0 which will not work with trousseau.
 
 3. After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
 
-    `gpg --export --armor > gpg/yourname@sofwerx.org`
-    
-    `git add gpg/yourname@sofwerx.org`
-    
-    `git commit -m 'Adding gpg/yourname@sofwerx.org public key'`
-    
-    `git push`
+    ```bash
+    gpg --export --armor > gpg/<yourname>@sofwerx.org
+    ```
 
+    ```bash
+    git add gpg/<yourname>@sofwerx.org
+    git commit -m 'adding gpg/<yourname>@sofwerx.org public key'
+    git push
+    ```    
+    
 - The convention in this repository is that the filename must be your email address, to make trousseau management easier.
 
 - You can import all of our public keys at any time by running:
 
-    `cat gpg/* | gpg --import`
+    ```bash
+    cat gpg/* | gpg --import
+    ```
 
 4. Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
 
@@ -233,26 +257,18 @@ This is far easier than dealing with a shared s3 bucket or other shared reposito
 
 2. To build from the Go source follow these build instructions:
 
-    `mkdir ~/go/bin`
-    
-    `export GOPATH=~/go`
-    
-    `export PATH=~/go/bin:$PATH`
-    
-    `go get github.com/tools/godep`
-    
-    `go get github.com/urfave/cli`
-    
-    `go get github.com/oleiade/trousseau`
-    
-    `cd $GOPATH/src/github.com/oleiade/trousseau`
-    
-    `godep`
-    
-    `make`
-    
-    `cp $GOPATH/go/bin/trousseau /usr/local/bin/trousseau`
-
+    ```bash
+    mkdir ~/go/bin
+    export GOPATH=~/go
+    export PATH=~/go/bin:$PATH
+    go get github.com/tools/godep
+    go get github.com/urfave/cli
+    go get github.com/oleiade/trousseau
+    cd $GOPATH/src/github.com/oleiade/trousseau
+    godep
+    make
+    cp $GOPATH/go/bin/trousseau/usr/local/bin/trousseau`
+    ```
 # Using the Environment
 
 ## Project Environments
@@ -295,7 +311,9 @@ These are the tools and projects that are available in the devops environment.
 
 The `swx dm` commands interact with these "dm" objects:
 
-    swx dm ls
+```bash
+swx dm ls
+```
 
 - This lists the dm file secrets stored in trousseau under `file:secrets/dm/*`
 
@@ -303,14 +321,25 @@ To source one of the environments, use `swx dm env`.
 
 To source a specific dm:
 
-    swx dm env rcloud-dev-00
+```bash
+swx dm env rcloud-dev-00
+```
 
 - This acts similar to a `eval $(docker-machine env {machinename})`.
 
 To create a dm, first create a machine with `docker-machine`, then use `swx dm import` to export it:
 
-    docker-machine create -d generic --generic-ip-address 192.168.14.194 --generic-ssh-key ${devops}/secrets/ssh/sofwerx --generic-ssh-user pi --engine-storage-driver overlay2 swx-pi
-    swx dm import swx-pi
+```bash
+docker-machine create -d generic \
+--generic-ip-address 192.168.14.194 \ 
+--generic-ssh-key ${devops}/secrets/ssh/sofwerx \
+--generic-ssh-user pi \ 
+--engine-storage-driver overlay2 swx-pi
+```
+
+```bash
+swx dm import swx-pi
+```
 
 Then `git add .trousseau ; git commit` to save the newly added dm secret.
 
@@ -323,19 +352,24 @@ Then `git add .trousseau ; git commit` to save the newly added dm secret.
 
 Install `awscli` with Homebrew:
 
-    brew install awscli
-
+```bash
+brew install awscli
+```
 #### Other Operating Systems
 
 Use Python `pip`:
 
-    pip install awscli
+```bash
+pip install awscli
+```
 
 ## Choosing  between `~/.aws/` and `secrets/aws`
 
 If you make a `secrets/aws` folder, your secrets will be stored there, instead of `~/.aws/`:
 
-    mkdir secrets/aws
+```bash
+mkdir secrets/aws
+```
 
 The `~/.aws/` folder, or `secrets/aws` folder, contains two files: `config` and `credentials`.
 
@@ -347,13 +381,13 @@ Our `shell.bash` assumes using an `AWS_PROFILE` name of "sofwerx".
 
 This enables you to manage multiple profiles for different AWS credentials under different profiles.
 
-1. Either create these files with a text editor (they are in an .ini file format internally) as decribed below
+1. Either create these files with a text editor (they are in an .ini file format internally) as described below or use the following commands:
 
-or use the following commands:
-
-    mkdir secrets/aws
-    touch secrets/aws/config secrets/aws/credentials
-    aws configure --profile sofwerx
+```bash
+mkdir secrets/aws
+touch secrets/aws/config secrets/aws/credentials
+aws configure --profile sofwerx
+```
 
 2. At the prompt enter:
 
@@ -364,22 +398,19 @@ or use the following commands:
 
 3. After entering these, you can examine your updated files:
 
-    `$ cat ~/.aws/config secrets/aws/config`
-    
-    `[profile sofwerx]`
-    
-    `output = json`
-    
-    `region = us-east-1`
+    ```bash
+    $ cat ~/.aws/config secrets/aws/config
+    [profile sofwerx]
+    output=json
+    region=us-east-1
+    ```
 
-
-    `$ cat ~/.aws/credentials secrets/aws/credentials`
-    
-    `[sofwerx]`
-    
-    `aws_access_key_id = AWS_ACCESS_KEY`
-    
-    `aws_secret_access_key = AWS_SECRET_ACCESS_KEY`
+    ```bash
+    $ cat ~/.aws/credentials secrets/aws/credentials
+    [sofwerx]
+    aws_access_key_id=<AWS_ACCESS_KEY>
+    aws_secret_access_key=<AWS_SECRET_ACCESS_KEY>
+    ```
 
 Where the `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` are the credentials you obtained by creating a key under the AWS console in IAM services for your user account.
 
@@ -387,22 +418,23 @@ Where the `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` are the credentials you o
 
 The AWS documentation for this can be found [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html).
 
-### Running `aws`
+### Running AWS
 
 To find out what AWS IAM user you are currently using the credentials for:
 
-    $ aws iam get-user
-    {
-        "User": {
-            "UserName": "ianblenke",
-            "PasswordLastUsed": "2017-10-03T13:51:54Z",
-            "CreateDate": "2017-10-03T12:49:28Z",
-            "UserId": "AIDAREDACTED2REDACTED",
-            "Path": "/",
-            "Arn": "arn:aws:iam::123456789012:user/ianblenke"
-        }
+```bash
+$ aws iam get-user
+{
+    "User": {
+        "UserName": "ianblenke",
+        "PasswordLastUsed": "2017-10-03T13:51:54Z",
+         "CreateDate": "2017-10-03T12:49:28Z",
+         "UserId": "AIDAREDACTED2REDACTED",
+         "Path": "/",
+         "Arn": "arn:aws:iam::123456789012:user/ianblenke"
     }
-
+}
+``` 
 
 ### `.bashrc`
 
@@ -414,11 +446,14 @@ This will eventually get broken out into a script directory tree as simplicity d
 
 Before running trousseau or any other tools against a project environment, obtain a shell using `shell.bash`:
 
-    icbmbp:swx-devops ianblenke$ ./shell.bash
-
+```bash
+icbmbp:swx-devops ianblenke$ ./shell.bash
+```
 You will get a prompt that tells you the `AWS_PROFILE`, `SWX_ENVIRONMENT`, and `DOCKER_MACHINE_NAME` variables:
 
-    [sofwerx::] icbvtcmbp:swx-devops ianblenke$
+```bash
+[sofwerx::] icbvtcmbp:swx-devops ianblenke$
+```
 
 ### Information about `swx`
 > Before attempting `swx` commands, remember to be in the environment (run `shell.bash` or `docker.sh`). 
@@ -429,22 +464,26 @@ Implemented as a series of bash functions, the `swx` command has _full tab compl
 
 The `swx` command also has full usage instructions. Run the commands without arguments, and usage will be shown:
 
-    $ swx
-    Usage: swx {command}
-      dm          - Manage dm (docker-machines)
-      environment - Source project-lifecycle environment variables
-      gpg         - Interact with your gpg-agent
-      secrets     - Deal with secrets/ folder
-      ssh         - Attempt to ssh into a dm
-      tf          - Run Terraform for a project-lifecycle
-
+```bash
+$ swx
+  Usage: swx {command}
+    dm          - Manage dm (docker-machines)
+    environment - Source project-lifecycle environment variables
+    gpg         - Interact with your gpg-agent
+    secrets     - Deal with secrets/ folder
+    ssh         - Attempt to ssh into a dm
+    tf          - Run Terraform for a project-lifecycle
+```
+    
 This also works for subcommands:
 
-    $ swx dm
-    Usage: swx dm {action}
-      ls     - List dm instances
-      env    - Source the environment to interact with a dm instance using docker
-      import - Import a docker-machine instance into a dm
+```bash
+$ swx dm
+  Usage: swx dm {action}
+    ls     - List dm instances
+    env    - Source the environment to interact with a dm instance using docker
+    import - Import a docker-machine instance into a dm
+``` 
 
 ### Using trousseau
 > Make sure you are in a `shell.bash` or a `docker.sh` session.
@@ -453,14 +492,18 @@ By default `trousseau` will use a `~/.trousseau` file in your home directory.
 Using a `shell.bash` session, the `.trousseau` file in this project will be used and updated as things are changed.
 This is essential to contribute the changes back to the git repository for others to use.
 
-1. After your gpg/ PR is merged, get someone else, who is already a trusted trousseau recipient, to add your public key to their keychain and run `trousseau add-recipient` for your email address:
+1. After your `gpg/<yourname>@sofwerx.org` pull request is merged, get someone else, who is already a trusted trousseau recipient, to add your public key to their keychain and run `trousseau add-recipient` for your email address:
 
-    `trousseau add-recipient ian@sofwerx.org`
+```bash
+trousseau add-recipient yourname@sofwerx.org
+```
 
 2. After this, they need to:
 
-    `git add .trousseau`
-    `git commit -a -m 'Added ian@sofwerx.org to recipients`
+```bash
+git add .trousseau
+git commit -m 'Added ian@sofwerx.org to recipients'
+```
 
 Now future trousseau operations will also be encrypted for you to be able to see with your gpg key.
 
@@ -468,15 +511,19 @@ Now future trousseau operations will also be encrypted for you to be able to see
 
 To set a trousseau key:
 
-    trousseau set myvariable somevalue
-
+```bash
+trousseau set myvariable somevalue
+```
 To retrieve the value for a key:
 
-    trousseau get myvariable
-
+```bash
+trousseau get myvariable
+```
 To delete a key:
 
-    trousseau del myvariable
+```bash
+trousseau del myvariable
+```
 
 Running `trousseau` on its own will show the other usable commands.
 
@@ -498,15 +545,21 @@ There are two functions and an alias presently defined in the `.bashrc` to autom
 
 To automatically pull all of the latest trousseau `file:secrets/` prefixed files:
 
-    swx secrets pull
+```bash
+swx secrets pull
+```
 
 To decrypt a specific file under secrets:
 
-    swx secrets decrypt secrets/ssh/sofwerx
+```bash
+swx secrets decrypt secrets/ssh/sofwerx
+```
 
 To encrypt a file under secrets:
 
-    swx secrets encrypt secrets/ssh/sofwerx
+```bash
+swx secrets encrypt secrets/ssh/sofwerx
+```
 
 After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
 
@@ -516,33 +569,43 @@ The `swx` function commands are available when you start a `shell.bash` session.
 
 Your primary interaction will be through the `swx` function. Run a command and it will show usage for that command:
 
-    $ swx
-    Usage: swx {command}
-      dm          - Manage dm (docker-machines)
-      environment - Source project-lifecycle environment variables
-      secrets     - Deal with secrets/ folder
-      tf          - Run Terraform for a project-lifecycle
-      dc          - Run docker-compose for a project-lifecycle
+```bash
+$ swx
+  Usage: swx {command}
+    dm          - Manage dm (docker-machines)
+    environment - Source project-lifecycle environment variables
+    secrets     - Deal with secrets/ folder
+    tf          - Run Terraform for a project-lifecycle
+    dc          - Run docker-compose for a project-lifecycle
+``` 
 
 The `swx` command also has bash tab completion.
 
 Note, that there is no selected `SWX_ENVIRONMENT` yet. To select `swx-dev`, you would use this function:
 
-    swx environment switch swx-dev
+```bash
+swx environment switch swx-dev
+```
 
 This could look something like:
 
-    [sofwerx::] icbvtcmbp:swx-devops ianblenke$ swx environment switch swx-dev
-    [sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$
+```bash
+[sofwerx::] icbvtcmbp:swx-devops ianblenke$ swx environment switch swx-dev
+[sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$
+```
 
 Also note, that there is no selected `DOCKER_MACHINE_NAME` yet. To select `swx-dev`, use this function:
 
-    swx dm env swx-dev-0
+```bash
+swx dm env swx-dev-0
+```
 
 Which could look something like:
 
-    [sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$ swx dm env swx-dev
-    [sofwerx:swx-dev:swx-dev-0] icbvtcmbp:swx-devops ianblenke$
+```bash
+[sofwerx:swx-dev:] icbvtcmbp:swx-devops ianblenke$ swx dm env swx-dev
+[sofwerx:swx-dev:swx-dev-0] icbvtcmbp:swx-devops ianblenke$
+```
 
 Now you are ready to run any `docker-compose` commands in the correct folders.
 
@@ -571,10 +634,12 @@ If this fails, try a `swx reset` followed by a `swx prepare`, which will restart
 
 In addition to listing (`swx environment ls`) and switching (`swx environment switch ENVIRONMENT`), there are a few other `swx environment` commands for dealing with `environment:` prefixed trousseau keys that store environment variables for environments:
 
-    swx environment keys
-    swx environment get VARIABLE
-    swx environment set VARIABLE VALUE
-    swx environment del VARIABLE
+```bash
+swx environment keys
+swx environment get VARIABLE
+swx environment set VARIABLE VALUE
+swx environment del VARIABLE
+```
 
 ### terraform
 
@@ -584,8 +649,10 @@ Use [terraform](https://www.terraform.io/) to deploy and converge our cloud reso
 
 To install the Hashicorp `terraform`, install it with HomeBrew:
 
-    brew install terraform
-    
+```bash
+brew install terraform
+```    
+
 #### Other operating systems
 
 Please refer to the [offical documentation](https://www.terraform.io/intro/getting-started/install.html).
