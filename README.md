@@ -202,7 +202,7 @@ The version should be 2.0, nothing higher.
     
     `git add gpg/yourname@sofwerx.org`
     
-    `git commit -m 'Adding gpg/yourname@sofwerx.org public key`
+    `git commit -m 'Adding gpg/yourname@sofwerx.org public key'`
     
     `git push`
 
