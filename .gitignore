@@ -14,3 +14,4 @@ tmp/
 kube_config_cluster.yml
 .config
 .gnupg
+.idea/
