@@ -25,7 +25,7 @@ _swx ()
     "swx secrets encrypt "*) COMPREPLY=( $( compgen -W "$(find secrets/ -type f | grep -v -e 'gnupg\|docker')" -- $cur ) ) ;;
     "swx secrets decrypt "*) COMPREPLY=( $( compgen -W "$(trousseau keys | grep -e ^file:secrets/ | sed -e s/^file://)" -- $cur ) ) ;;
     "swx secrets pull "*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
-    "swx secrets"*) COMPREPLY=( $( compgen -W "addrecipients decrypt encrypt pull" -- $cur ) ) ;;
+    "swx secrets"*) COMPREPLY=( $( compgen -W "addrecipients decrypt encrypt install pull" -- $cur ) ) ;;
     "swx tf"*) COMPREPLY=( $( compgen -W "apply destroy fmt get graph import init output plan push refresh remote show taint untaint validate version state" -- $cur ) ) ;;
     *) COMPREPLY=( $( compgen -W 'dc dm environment gpg secrets tf' -- $cur ) ) ;;
   esac
