@@ -105,6 +105,7 @@ services:
       JIRA_PROXY_NAME: jira.${DNS_DOMAIN}
       JIRA_PROXY_PORT: 443
       JIRA_PROXY_SCHEME: https
+      #CATALINA_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8099
     logging: *default-logging
     labels:
       com.blacklabelops.description: "Atlassian Jira"
@@ -219,7 +220,7 @@ services:
       GITLAB_OMNIBUS_CONFIG: |
         external_url "https://gitlab.${DNS_DOMAIN}"
         nginx['redirect_http_to_https'] = true
-        gitlab_rails['gitlab_shell_ssh_port'] = 60022
+        gitlab_rails['gitlab_shell_ssh_port'] = 60122
         gitlab_rails['lfs_enabled'] = true
         # Each address is added to the the NGINX config as 'set_real_ip_from <address>;'
         nginx['real_ip_trusted_addresses'] = [ '172.18.0.0/24' ]
@@ -243,7 +244,7 @@ services:
         # gitlab_rails['smtp_ca_file'] = "/etc/ssl/certs/ca-certificates.crt"
         ## Add any other gitlab.rb configuration here, each on its own line
     ports:
-      - "60022:22"
+      - "60122:22"
     volumes:
       - '/data/gitlab/config:/etc/gitlab'
       - '/data/gitlab/logs:/var/log/gitlab'
