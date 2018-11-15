@@ -32,6 +32,8 @@ There are a number of tools that will need to be installed:
 
 The easiest way to gain access to the devops environment is by using Docker.  This project uses Docker heavily. You will find `docker-compose.yml` files in the environment directories.
 
+[Back to the top](#devops) 
+
 ## Docker
 
 ### Mac
@@ -60,6 +62,8 @@ Please refer to these links for the most up-to-date installation instructions fo
 2. Run `./docker.sh` in the new swx-devops directory. 
 
 3. Verify that you are in the devops environment by typing `swx` .
+
+[Back to the top](#devops)
 
 ## Vagrant
 > Only use if Docker is not applicable. 
@@ -111,6 +115,8 @@ Note: Windows Subsystem for Linux:
 - You are installing docker-engine natively on Windows so that you have a local Hyper-V Linux VM to run that kernel.
 
 4. Once you install a local docker-engine with volume share access to this working directory, then you can proceed. The key here is having a local docker-engine installed that has volume mount access to this directory.
+
+[Back to the top](#devops)
 
 # Security
 
@@ -180,6 +186,8 @@ For general compatiblity and ease of developer station convergence, this project
 The biggest challenge managing Vagrant persistence will be syncing or sharing a folder between your host and the virtual machine.
 This differs based on the virtual machine engine you use with Vagrant (VirtualBox, VMWare Workstation, VMWare Fusion, Parallels, xhyve, etc).
 
+[Back to the top](#devops)
+
 ### GPG Configuration 
 
 1. Create a `secrets/gnupg` directory:
@@ -241,6 +249,8 @@ gpg --gen-key
 
 4. Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
 
+[Back to the top](#devops)
+
 ### trousseau
 
 [Trousseau](https://github.com/oleiade/trousseau) uses gnupg to encrypt a JSON file for a number of administrators that stores "key=value" secrets.
@@ -275,6 +285,9 @@ This is far easier than dealing with a shared s3 bucket or other shared reposito
     $ ./shell.bash
     $ swx secrets install
     ```
+
+[Back to the top](#devops)
+
 # Using the Environment
 
 ## Project Environments
@@ -311,6 +324,7 @@ These are the tools and projects that are available in the devops environment.
 - [swx-xmpp](cellar/swx-xmpp) - XMPP Server for ATAK (Destroyed)
 - [swx-blueteam](/cellar/swx-blueteam) - Blue Team box
 
+[Back to the top](#devops)
 
 ### docker-machine and dm
 > This project imports docker-machine configs into JSON "dm" objects stored in trousseau.
@@ -349,6 +363,8 @@ swx dm import swx-pi
 
 Then `git add .trousseau ; git commit` to save the newly added dm secret.
 
+[Back to the top](#devops)
+
 ## AWS
 > This project models some cloud resources under the `aws/` folder.
 
@@ -368,6 +384,8 @@ Use Python `pip`:
 ```bash
 pip install awscli
 ```
+
+[Back to the top](#devops)
 
 ## Choosing  between `~/.aws/` and `secrets/aws`
 
@@ -424,6 +442,8 @@ Where the `AWS_ACCESS_KEY` and `AWS_SECRET_ACCESS_KEY` are the credentials you o
 
 The AWS documentation for this can be found [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html).
 
+[Back to the top](#devops)
+
 ### Running AWS
 
 To find out what AWS IAM user you are currently using the credentials for:
@@ -461,6 +481,8 @@ You will get a prompt that tells you the `AWS_PROFILE`, `SWX_ENVIRONMENT`, and `
 [sofwerx::] icbvtcmbp:swx-devops ianblenke$
 ```
 
+[Back to the top](#devops)
+
 ### Information about `swx`
 > Before attempting `swx` commands, remember to be in the environment (run `shell.bash` or `docker.sh`). 
 
@@ -491,6 +513,8 @@ $ swx dm
     import - Import a docker-machine instance into a dm
 ``` 
 
+[Back to the top](#devops)
+
 ### Using trousseau
 > Make sure you are in a `shell.bash` or a `docker.sh` session.
 
@@ -512,6 +536,8 @@ git commit -m 'Added ian@sofwerx.org to recipients'
 ```
 
 Now future trousseau operations will also be encrypted for you to be able to see with your gpg key.
+
+l[Back to the top](#devops)
 
 #### Commands
 
@@ -568,6 +594,8 @@ swx secrets encrypt secrets/ssh/sofwerx
 ```
 
 After doing this, you will need to add `.trousseau` to git and commit your change so that everyone else has access to the updated secrets.
+
+[Back to the top](#devops)
 
 ### Using `swx`
 
@@ -647,6 +675,8 @@ swx environment set VARIABLE VALUE
 swx environment del VARIABLE
 ```
 
+[Back to the top](#devops)
+
 ### terraform
 
 Use [terraform](https://www.terraform.io/) to deploy and converge our cloud resources.
@@ -663,6 +693,8 @@ brew install terraform
 
 Please refer to the [offical documentation](https://www.terraform.io/intro/getting-started/install.html).
 
+[Back to the top](#devops)
+
 #### Tips for using terraform. 
 
 It is very important that we track the same version of terraform between ourselves, and that we upgrade terraform in unison, as resources tend to change between terraform versions.
@@ -671,3 +703,5 @@ I am presently running the latest terraform: `0.10.7`.
 Internally, we use an AWS bucket named `sofwerx-terraform` for the shared `.tfstate` files. You will see how to set those up in the README.md for each environment.
 
 Instead of using `terraform` directly, I strongly suggest using the `swx tf` wrapper instead, as it will ensure that you have the correct environment sourced before running `terraform`.
+
+[Back to the top](#devops)
