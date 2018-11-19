@@ -537,7 +537,7 @@ git commit -m 'Added ian@sofwerx.org to recipients'
 
 Now future trousseau operations will also be encrypted for you to be able to see with your gpg key.
 
-l[Back to the top](#devops)
+[Back to the top](#devops)
 
 #### Commands
 
