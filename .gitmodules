@@ -260,7 +260,7 @@
 	path = cellar/swx-bluerange1/docker-ethminer
 	url = https://github.com/sofwerx/docker-ethminer
 [submodule "local/swx-range3/xmr-stak"]
-	path = local/swx-range3/xmr-stak
+	path = cellar/swx-range3/xmr-stak
 	url = https://github.com/sofwerx/xmr-stak
 [submodule "local/swx-vmhost/docker-traefik"]
 	path = local/swx-vmhost/docker-traefik
@@ -332,13 +332,13 @@
 	path = cellar/swx-blueteam/docker-bimserver
 	url = https://github.com/sofwerx/docker-bimserver
 [submodule "local/swx-range3/docker-gpsd"]
-	path = local/swx-range3/docker-gpsd
+	path = cellar/swx-range3/docker-gpsd
 	url = https://github.com/sofwerx/docker-gpsd
 [submodule "local/swx-range3/docker-traefik"]
-	path = local/swx-range3/docker-traefik
+	path = cellar/swx-range3/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
 [submodule "local/swx-range3/es-gammarf"]
-	path = local/swx-range3/es-gammarf
+	path = cellar/swx-range3/es-gammarf
 	url = https://github.com/sofwerx/es-gammarf
 [submodule "local/swx-tegra0/docker-ethminer"]
 	path = local/swx-tegra0/docker-ethminer
