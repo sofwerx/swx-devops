@@ -326,7 +326,7 @@
 	path = local/ibm-minsky/docker-xmr-miner
 	url = https://github.com/sofwerx/docker-xmr-miner
 [submodule "local/swx-tak/docker-tak"]
-	path = local/swx-tak/docker-tak
+	path = cellar/swx-tak/docker-tak
 	url = https://github.com/sofwerx/docker-tak
 [submodule "aws/swx-blueteam/docker-bimserver"]
 	path = cellar/swx-blueteam/docker-bimserver
