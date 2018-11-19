@@ -8,10 +8,10 @@
 	path = cellar/swx-gpu/synthetic-target-area-of-interest
 	url = https://github.com/sofwerx/synthetic-target-area-of-interest
 [submodule "local/geo/docker-geoserver"]
-	path = local/geo/docker-geoserver
+	path = cellar/geo/docker-geoserver
 	url = https://github.com/sofwerx/docker-geoserver
 [submodule "local/geo/docker-guacamole"]
-	path = local/geo/docker-guacamole
+	path = cellar/geo/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "cellar/swx-gpu/docker-guacamole"]
 	path = cellar/swx-gpu/docker-guacamole
@@ -26,7 +26,7 @@
 	path = cellar/mobile/docker-openstf
 	url = https://github.com/sofwerx/docker-openstf
 [submodule "local/geo/docker-traefik"]
-	path = local/geo/docker-traefik
+	path = cellar/geo/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "local/mobile/docker-traefik"]
 	path = local/mobile/docker-traefik
@@ -149,7 +149,7 @@
 	path = local/swx-pandora/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "local/geo/synthetic-target-area-of-interest"]
-	path = local/geo/synthetic-target-area-of-interest
+	path = cellar/geo/synthetic-target-area-of-interest
 	url = https://github.com/sofwerx/synthetic-target-area-of-interest.git
 [submodule "local/securedrop-system76/docker-guacamole"]
 	path = cellar/securedrop-system76/docker-guacamole
