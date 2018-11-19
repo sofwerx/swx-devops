@@ -389,10 +389,10 @@
 	path = local/icbgamingpc/docker-pigeoncoin
 	url = https://github.com/sofwerx/docker-pigeoncoin
 [submodule "local/swx-demobox/docker-traefik"]
-	path = local/swx-demobox/docker-traefik
+	path = cellar/swx-demobox/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
 [submodule "local/swx-demobox/docker-openstf"]
-	path = local/swx-demobox/docker-openstf
+	path = cellar/swx-demobox/docker-openstf
 	url = https://github.com/sofwerx/docker-openstf.git
 [submodule "aws/swx-blueteam/docker-dtube"]
 	path = cellar/swx-blueteam/docker-dtube
