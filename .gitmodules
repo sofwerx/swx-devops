@@ -179,19 +179,19 @@
 	path = cellar/swx-bluerange0/xmr-stak
 	url = https://github.com/sofwerx/xmr-stak.git
 [submodule "local/swx-bluerange2/docker-elastic"]
-	path = local/swx-bluerange2/docker-elastic
+	path = cellar/swx-bluerange2/docker-elastic
 	url = https://github.com/sofwerx/docker-elastic
 [submodule "local/swx-bluerange2/docker-ethminer"]
-	path = local/swx-bluerange2/docker-ethminer
+	path = cellar/swx-bluerange2/docker-ethminer
 	url = https://github.com/sofwerx/docker-ethminer
 [submodule "local/swx-bluerange2/docker-traefik"]
-	path = local/swx-bluerange2/docker-traefik
+	path = cellar/swx-bluerange2/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik
 [submodule "local/swx-bluerange2/xmr-stak"]
-	path = local/swx-bluerange2/xmr-stak
+	path = cellar/swx-bluerange2/xmr-stak
 	url = https://github.com/sofwerx/xmr-stak
 [submodule "local/swx-bluerange2/es-gdelt"]
-	path = local/swx-bluerange2/es-gdelt
+	path = cellar/swx-bluerange2/es-gdelt
 	url = https://github.com/sofwerx/es-gdelt
 [submodule "aws/swx-blueteam/es-gdelt"]
 	path = cellar/swx-blueteam/es-gdelt
@@ -293,7 +293,7 @@
 	path = local/swx-redrange1/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
 [submodule "local/swx-bluerange2/docker-ravencoin"]
-	path = local/swx-bluerange2/docker-ravencoin
+	path = cellar/swx-bluerange2/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
 [submodule "local/swx-redrange0/docker-ravencoin"]
 	path = local/swx-redrange0/docker-ravencoin
