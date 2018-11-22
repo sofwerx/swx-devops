@@ -22,6 +22,14 @@ volumes:
     driver: local
   pigeoncoin-data:
     driver: local
+  ethereum-mainnet-cachedir:
+    driver: local
+  ethereum-mainnet-dagdir:
+    driver: local
+  ethereum-mainnet-datadir:
+    driver: local
+  ethereum-mainnet-keystore:
+    driver: local
   znc-data:
     driver: local
   plex-config:
@@ -236,4 +244,40 @@ services:
     devices:
       - /dev/sr0
       - /dev/sg1
+
+  mainnet:
+    container_name: mainnet
+    hostname: mainnet
+    extends:
+      file: docker-ethereum/docker-compose.yml
+      service: ethereum
+    build:
+      context: docker-ethereum/
+      dockerfile: Dockerfile.${ARCH}
+    image: sofwerx/ethereum:${ARCH}
+    volumes:
+      - ethereum-mainnet-cachedir:/cachedir
+      - ethereum-mainnet-dagdir:/dagdir
+      - ethereum-mainnet-datadir:/datadir
+      - ethereum-mainnet-keystore:/keystore
+    command: >-
+      geth --cache=2048
+      --datadir=/datadir --keystore=/keystore
+      --ethash.cachedir=/cachedir --ethash.dagdir=/dagdir
+      --ipcpath=/datadir/geth.ipc
+      --metrics
+      --shh --shh.maxmessagesize=1048576 --shh.pow=0.2
+      --rpc --rpcaddr=0.0.0.0 --rpcport=8545
+      --ws --wsaddr=0.0.0.0 --wsport=8546
+    restart: always
+    ports:
+      - "127.0.0.1:8545:8545" # RPC (do not publically expose)
+      - "127.0.0.1:8546:8546" # WS-RPC (do not publically expose)
+      - "30303:30303"
+      - "30303:30303/udp"
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
 
