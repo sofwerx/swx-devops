@@ -545,3 +545,6 @@
 [submodule "local/swx-vmhost/sensorhub"]
 	path = local/swx-vmhost/sensorhub
 	url = https://github.com/sofwerx/sensorhub
+[submodule "local/swx-supermicro0/gogs"]
+	path = local/swx-supermicro0/gogs
+	url = https://github.com/gogs/gogs

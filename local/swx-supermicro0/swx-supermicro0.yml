@@ -49,6 +49,11 @@ volumes:
   gitlab-runner-cache:
     driver: local
 
+  gogs-mysql:
+    driver: local
+  gogs-data:
+    driver: local
+
 services:
 
   traefik:
@@ -393,4 +398,49 @@ services:
 #      - "traefik.frontend.rule=Host:motion45.${DNS_DOMAIN}"
 #      - "traefik.frontend.passHostHeader=true"
 #      - "traefik.frontend.entryPoints=http,https"
+
+  gogs-mysql:
+    image: mariadb:10.4
+    container_name: gogs-mysql
+    hostname: gogs-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${GOGS_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: gogs
+    volumes:
+      - gogs-mysql:/var/lib/mysql
+    networks:
+      - default
+    restart: always
+    healthcheck:
+      test: mysqladmin -h localhost -u root -p$${GOGS_MYSQL_ROOT_PASSWORD} ping
+      timeout: 20s
+      retries: 10
+    command: --character-set-server=utf8 --collation-server=utf8_general_ci
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  gogs:
+    container_name: gogs
+    hostname: gogs
+    build:
+      context: gogs/
+      dockerfile: Dockerfile
+    image: sofwerx/gogs
+    ports:
+      - '62022:22'
+    volumes:
+      - 'gogs-data:/data'
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=gogs"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:gogs.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+
 
