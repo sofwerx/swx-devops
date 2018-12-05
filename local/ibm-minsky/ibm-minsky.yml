@@ -68,6 +68,9 @@ volumes:
   aad-public-uploads:
     driver: local
 
+  ssb-data:
+    driver: local
+
 services:
 
 #  converge:
@@ -522,4 +525,31 @@ services:
     extends:
       file: aad-ui.yml
       service: aad-ui
+
+  ssb:
+    container_name: ssb
+    hostname: ssb
+    build: easy-ssb-pub/
+    environment:
+      HOST: "ssb.${DNS_DOMAIN}"
+      HOME: "/root"
+      DEBUG: "*"
+    ports:
+      - "80:80"
+      - "8008:8008"
+      - "8007:8007"
+    volumes:
+      - /data:/root/.ssb
+    mem_limit: 450M
+    restart: unless-stopped
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      traefik.backend: "ssb"
+      traefik.port: "80"
+      traefik.protocol: "http"
+      traefik.frontend.rule: "Host:ssb.${DNS_DOMAIN}"
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.entryPoints: "http,https"
 
