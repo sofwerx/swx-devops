@@ -540,7 +540,7 @@ services:
       - "8007:8007"
     volumes:
       - /data:/root/.ssb
-    mem_limit: 450M
+    mem_limit: 4500M
     restart: unless-stopped
     networks:
       - default
