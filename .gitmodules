@@ -551,3 +551,6 @@
 [submodule "local/ibm-minsky/easy-ssb-pub"]
 	path = local/ibm-minsky/easy-ssb-pub
 	url = https://github.com/sofwerx/easy-ssb-pub
+[submodule "local/swx-supermicro5/speakeasy"]
+	path = local/swx-supermicro5/speakeasy
+	url = https://github.com/sofwerx/speakeasy
