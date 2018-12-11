@@ -19,6 +19,21 @@ volumes:
   sortoe-static:
     driver: local
 
+  speakeasy_nifi_datafiles:
+    driver: local
+  speakeasy_nifi_scriptfiles:
+    driver: local
+  speakeasy_nifi_certfiles:
+    driver: local
+  speakeasy_nifi_data:
+    driver: local
+  speakeasy_mongodb:
+    driver: local
+  speakeasy_models:
+    driver: local
+  speakeasy_file_share:
+    driver: local
+
 services:
 
   traefik:
@@ -149,4 +164,201 @@ services:
     logging: *default-logging
     labels:
       - "traefik.enable=false"
+
+  speakeasy-install:
+    container_name: speakeasy-install
+    hostname: speakeasy-install
+    image: sofwerx/speakeasy-install
+    build: speakeasy/
+    volumes:
+      - speakeasy_file_share:/var/speakeasy
+      - speakeasy_models:/var/speakeasy/models
+    environment:
+      SPEAKEASY_SHARED: ${SPEAKEASY_SHARED}
+      SPEAKEASY_VERSION: ${SPEAKEASY_VERSION}
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  speakeasy-ui:
+    container_name: speakeasy-ui
+    hostname: speakeasy-ui
+    image: sofwerx/speakeasy-ui:v${SPEAKEASY_VERSION}
+    depends_on:
+      - speakeasy-install
+      - speakeasy-mongo
+    build: speakeasy/ui/
+    restart: always
+    environment:
+      - FLASK_SERVER_NAME=0.0.0.0
+      - FLASK_SERVER_PORT=5000
+      - FLASK_DEBUG=1
+      - FLASK_ENV=development
+      - MONGO_EXPRESS=https://speakeasy-mongo-express.${DNS_DOMAIN}/
+      - MONGO_CONNECT=mongodb://${SPEAKEASY_MONGO_USERNAME}:${SPEAKEASY_MONGO_PASSWORD}@speakeasy-mongo/${SPEAKEASY_MONGO_DATABASE}?authSource=admin
+      - OCR_SERVICE=http://speakeasy-ocr-service.${DNS_DOMAIN}/poc_api/
+      - TFC_SERVICE=http://speakeasy-tfc-service.${DNS_DOMAIN}/poc_api/
+      - NIFI_SERVICE=http://speakeasy-nifi-service.${DNS_DOMAIN}/nifi/
+    ports:
+      - "5000:5000"
+    volumes:
+      - speakeasy_file_share:/var/speakeasy
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=speakeasy-ui"
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=Host:speakeasy.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  speakeasy-mongo:
+    container_name: speakeasy-mongo
+    hostname: speakeasy-mongo
+    image: sofwerx/speakeasy-mongo:v${SPEAKEASY_VERSION}
+    build: speakeasy/mongo/
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${SPEAKEASY_MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${SPEAKEASY_MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${SPEAKEASY_MONGO_DATABASE}
+    volumes:
+      - speakeasy_mongodb:/data/db
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=false"
+
+  speakeasy-mongo-express:
+    container_name: speakeasy-mongo-express
+    hostname: speakeasy-mongo-express
+    image: speakeasy/mongo_express:v${SPEAKEASY_VERSION}
+    depends_on:
+      - speakeasy-mongo
+    build: speakeasy/mongo_express/
+    restart: always
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: ${SPEAKEASY_MONGO_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${SPEAKEASY_MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${SPEAKEASY_MONGO_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${SPEAKEASY_MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: speakeasy-mongo
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=speakeasy-mongo-express"
+      - "traefik.port=8081"
+      - "traefik.frontend.rule=Host:speakeasy-mongo-express.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  speakeasy-tfs-service:
+    container_name: speakeasy-tfs-service  
+    hostname: speakeasy-tfs-service  
+    image: sofwerx/speakeasy-tfs-service:v${SPEAKEASY_VERSION}
+    build: speakeasy/tfs_service/
+    restart: always
+    volumes:
+      - speakeasy_models:/models
+    environment:
+      MODEL_CONFIG_FILE: /models/models.conf
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=speakeasy-tfs-service"
+      - "traefik.port=8500"
+      - "traefik.frontend.rule=Host:speakeasy-tfs-service.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  speakeasy-tfc-service:
+    container_name: speakeasy-tfc-service
+    hostname: speakeasy-tfc-service
+    image: sofwerx/speakeasy-tfc-service:v${SPEAKEASY_VERSION}
+    depends_on:
+      - speakeasy-tfs-service
+    build: speakeasy/tfc_service/
+    restart: always
+    volumes:
+      - speakeasy_models:/models
+    environment:
+      - FLASK_SERVER_NAME=0.0.0.0
+      - FLASK_SERVER_PORT=5020
+      - FLASK_DEBUG=1
+      - TF_SERVER_NAME=speakeasy-tfs-service
+      - TF_SERVER_PORT=8500
+      - ENDE_MODEL_SENTENCE_PIECE=/models/ende/1539080952/assets.extra/wmtende.model
+      - ENDE_MODEL_NAME=ende
+      - ENDE_MODEL_SIGNATURE_NAME=serving_default
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=speakeasy-tfc-service"
+      - "traefik.port=5020"
+      - "traefik.frontend.rule=Host:speakeasy-tfc-service.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  speakeasy-nifi-service:
+    container_name: speakeasy-nifi-service  
+    hostname: speakeasy-nifi-service  
+    image: sofwerx/speakeasy-nifi-service:v${SPEAKEASY_VERSION}
+    build: speakeasy/nifi_service/
+    depends_on:
+      - speakeasy-tfs-service
+    environment:
+      - MONGO_CONNECT=mongodb://${SPEAKEASY_MONGO_USERNAME}:${SPEAKEASY_MONGO_PASSWORD}@speakeasy-mongo/${SPEAKEASY_MONGO_DATABASE}?authSource=admin
+      - TFC_SERVICE=http://speakeasy-tfc-service:5020/poc_api
+      - OCR_SERVICE_CLEAN=http://speakeasy-ocr-service:5010/poc_api/ocr_client/clean
+      - OCR_SERVICE_OCR=http://speakeasy-ocr-service:5010/poc_api/ocr_client/ocr
+    volumes:
+      - speakeasy_nifi_datafiles:/opt/datafiles
+      - speakeasy_nifi_scriptfiles:/opt/scriptfiles
+      - speakeasy_nifi_certfiles:/opt/certfiles
+      - speakeasy_nifi_data:/opt/nifi
+      - speakeasy_file_share:/var/speakeasy
+      - speakeasy_models:/var/speakeasy/models
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=speakeasy-nifi-service"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:speakeasy-nifi-service.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  speakeasy-ocr-service:
+    container_name: speakeasy-ocr-service
+    hostname: speakeasy-ocr-service
+    image: sofwerx/speakeasy-ocr-service:v${SPEAKEASY_VERSION}
+    build: speakeasy/ocr_service/
+    restart: always
+    volumes:
+      - speakeasy_file_share:/var/speakeasy
+      - speakeasy_models:/var/speakeasy/models
+    environment:
+      - FLASK_SERVER_NAME=0.0.0.0
+      - FLASK_SERVER_PORT=5010
+      - FLASK_DEBUG=1
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=speakeasy-ocr-service"
+      - "traefik.port=5010"
+      - "traefik.frontend.rule=Host:speakeasy-ocr-service.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
