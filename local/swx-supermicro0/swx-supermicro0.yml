@@ -54,6 +54,16 @@ volumes:
   gogs-data:
     driver: local
 
+  chedata:
+    driver: local
+  chebackup:
+    driver: local
+  cheinstance:
+    driver: local
+
+  theia-data:
+    driver: local
+
 services:
 
   traefik:
@@ -442,5 +452,39 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+#  che:
+#    container_name: che
+#    hostname: che
+#    image: eclipse/che-server:6.5.0
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - /data/che:/data/
+#    networks:
+#      - default
+#    environment:
+#      CHE_HOST: che.${DNS_DOMAIN}
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=che"
+#      - "traefik.port=8080"
+#      - "traefik.frontend.rule=Host:che.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
 
+#  theia:
+#    container_name: theia
+#    hostname: theia
+#    image: theiaide/theia-full:next
+#    volumes:
+#      - theia-data:/home/project
+#    networks:
+#      - default
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=theia"
+#      - "traefik.port=3000"
+#      - "traefik.frontend.rule=Host:theia.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
 
