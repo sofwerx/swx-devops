@@ -56,6 +56,8 @@ volumes:
     driver: local
   osh-logs:
     driver: local
+  torgi-postgis-data:
+    driver: local
 
 services:
 
@@ -251,6 +253,29 @@ services:
 #      - "traefik.frontend.rule=Host:opensphere.${DNS_DOMAIN};AddPrefix:/opensphere/dist/opensphere"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
+
+  torgi-postgis:
+    # About the postgresql version, it should match in the dockerfile of docker-imposm3
+    image: kartoza/postgis:9.6-2.4
+    hostname: torgi-postgis
+    container_name: torgi-postgis
+    restart: always
+    environment:
+      - POSTGRES_USER=${TORGI_POSTGRES_USER}
+      - POSTGRES_PASS=${TORGI_POSTGRES_PASS}
+      - POSTGRES_DBNAME=${TORGI_POSTGRES_DBNAME}
+      # Uncomment to expose the postgis database on the network
+      - ALLOW_IP_RANGE=192.168.0.0/16
+    logging: *default-logging
+    volumes:
+      - 'torgi-postgis-data:/var/lib/postgresql'
+    # Uncomment to use the postgis database from outside the docker network
+    ports:
+      - "35433:5432"
+    healthcheck:
+        test: "exit 0"
+    labels:
+      - "traefik.enable=false"
 
   osm-postgis:
     # About the postgresql version, it should match in the dockerfile of docker-imposm3
