@@ -335,6 +335,7 @@ services:
       - "traefik.backend=speakeasy-nifi-service"
       - "traefik.port=8080"
       - "traefik.frontend.rule=Host:speakeasy-nifi-service.${DNS_DOMAIN}"
+      - "traefik.frontend.auth.basic=speakeasy:${SPEAKEASY_MONGO_PASSWORD_APR1}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
