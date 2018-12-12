@@ -1,0 +1,73 @@
+This directory contains the files required to create a docker container running pgAdmin.
+
+Building
+========
+
+Whilst you can just use the Dockerfile directly, it requires that various pre-configuration steps are performed, for
+example, the pgAdmin web code must be copied to `./web`, Sphinx documentation source must be copied to `./docs`
+and `requirements.txt` is also expected to be in this directory.
+
+The recommended (and easy) way to build the container is to do:
+
+```console
+cd $PGADMIN_SRC/
+workon pgadmin-venv
+make docker
+```
+
+This will call the build script $PGADMIN_SRC/pkg/docker/build.sh which will prepare a staging directory containing all
+the required files, then build the container and push it to your repo.
+
+Running
+=======
+
+The container will accept the following variables at startup:
+
+PGADMIN_SETUP_EMAIL
+-------------------
+
+This is the email address used when setting up the initial administrator account to login to pgAdmin.
+
+PGADMIN_SETUP_PASSWORD
+----------------------
+
+This is the password used when setting up the initial administrator account to login to pgAdmin.
+
+PGADMIN_ENABLE_TLS
+------------------
+
+Default: unset
+
+If not set, the container will listen on port 8080 for connections in insecure HTTP protocol.
+If set to any value, the container will listen on port 8443 for TLS connections.
+
+When TLS is enabled, a certificate and key must be provided.
+Typically these should be stored on the host file system and mounted from the container.
+The expected paths are `/certs/server.crt` and `/certs/server.key`.
+
+You need to explicitly map these ports with `-p` option to some port at your machine.
+
+Examples
+========
+
+Run a simple container over port 80:
+
+```console
+docker run -p 80:8080 \
+           -e "PGADMIN_SETUP_EMAIL=user@domain.com" \
+           -e "PGADMIN_SETUP_PASSWORD=SuperSecret" \
+           -d pgadmin4
+```
+
+Run a TLS secured container using a shared config/storage directory in /private/var/lib/pgadmin on the host:
+
+```console
+docker run -p 443:8443 \
+           -v "/private/var/lib/pgadmin:/var/lib/pgadmin" \
+           -v "/path/to/certificate.cert:/certs/server.cert" \
+           -v "/path/to/certificate.key:/certs/server.key" \
+           -e "PGADMIN_SETUP_EMAIL=user@domain.com" \
+           -e "PGADMIN_SETUP_PASSWORD=SuperSecret" \
+           -e "PGADMIN_ENABLE_TLS=1" \
+           -d pgadmin4
+```

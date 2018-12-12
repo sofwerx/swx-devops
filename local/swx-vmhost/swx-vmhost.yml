@@ -58,6 +58,8 @@ volumes:
     driver: local
   torgi-postgis-data:
     driver: local
+  torgi-pgadmin-data:
+    driver: local
 
 services:
 
@@ -264,8 +266,6 @@ services:
       - POSTGRES_USER=${TORGI_POSTGRES_USER}
       - POSTGRES_PASS=${TORGI_POSTGRES_PASS}
       - POSTGRES_DBNAME=${TORGI_POSTGRES_DBNAME}
-      # Uncomment to expose the postgis database on the network
-      - ALLOW_IP_RANGE=192.168.0.0/16
     logging: *default-logging
     volumes:
       - 'torgi-postgis-data:/var/lib/postgresql'
@@ -274,8 +274,32 @@ services:
       - "35433:5432"
     healthcheck:
         test: "exit 0"
+    networks:
+      - default
     labels:
       - "traefik.enable=false"
+
+  torgi-pgadmin:
+    container_name: torgi-pgadmin
+    hostname: torgi-pgadmin
+    image: sofwerx/pgadmin4
+    build: docker-pgadmin4/
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${TORGI_POSTGRES_USER}@sofwerx.org
+      PGADMIN_DEFAULT_PASSWORD: ${TORGI_POSTGRES_PASS}
+    volumes:
+       - torgi-pgadmin-data:/root/.pgadmin
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=torgi-pgadmin"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:torgi-pgadmin.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
   osm-postgis:
     # About the postgresql version, it should match in the dockerfile of docker-imposm3
