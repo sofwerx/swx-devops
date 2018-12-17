@@ -33,6 +33,8 @@ volumes:
     driver: local
   speakeasy_file_share:
     driver: local
+  speakeasy-minio-data:
+    driver: local
 
 services:
 
@@ -360,6 +362,28 @@ services:
       - "traefik.backend=speakeasy-ocr-service"
       - "traefik.port=5010"
       - "traefik.frontend.rule=Host:speakeasy-ocr-service.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  speakeasy-minio:
+    image: minio/minio
+    container_name: speakeasy-minio
+    hostname: speakeasy-minio
+    volumes:
+      - speakeasy-minio-data:/export
+    networks:
+      - default
+    command: server /export
+    restart: always
+    environment:
+      MINIO_URL: https://speakeasy-minio.${DNS_DOMAIN}
+      MINIO_ACCESS_KEY: ${SPEAKEASY_MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${SPEAKEASY_MINIO_SECRET_KEY}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=speakeasy-minio"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:speakeasy-minio.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
