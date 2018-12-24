@@ -554,3 +554,6 @@
 [submodule "local/swx-supermicro5/speakeasy"]
 	path = local/swx-supermicro5/speakeasy
 	url = https://github.com/sofwerx/speakeasy
+[submodule "local/swx-vmhost/docker-gstreamer-rtsp-srt"]
+	path = local/swx-vmhost/docker-gstreamer-rtsp-srt
+	url = https://github.com/sofwerx/docker-gstreamer-rtsp-srt
