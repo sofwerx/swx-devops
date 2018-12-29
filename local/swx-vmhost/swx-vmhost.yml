@@ -541,7 +541,7 @@ services:
   splunk:
     container_name: splunk
     hostname: splunk
-    image: splunk/splunk:latest 
+    image: splunk/splunk:7.2.0
     environment:
       SPLUNK_START_ARGS: --accept-license
       SPLUNK_PASSWORD: ${SPLUNK_PASSWORD}
