@@ -663,9 +663,35 @@ services:
       SRT_PORT: 20042
       SRT_PASSPHRASE: ${SRT42_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20042:20042/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi42:
+    container_name: avahi42
+    hostname: avahi42
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt42:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi42
+      SERVICE_NAME: "${SRT42_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20042
     ports:
       - 20042:20042/tcp
-      - 20042:20042/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -685,9 +711,35 @@ services:
       SRT_PORT: 20043
       SRT_PASSPHRASE: ${SRT43_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20043:20043/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi43:
+    container_name: avahi43
+    hostname: avahi43
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt43:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi43
+      SERVICE_NAME: "${SRT43_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20043
     ports:
       - 20043:20043/tcp
-      - 20043:20043/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -707,9 +759,33 @@ services:
       SRT_PORT: 20044
       SRT_PASSPHRASE: ${SRT44_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
     ports:
-      - 20044:20044/tcp
       - 20044:20044/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi44:
+    container_name: avahi44
+    hostname: avahi44
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt44:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi44
+      SERVICE_NAME: "${SRT44_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20044
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -729,9 +805,33 @@ services:
       SRT_PORT: 20045
       SRT_PASSPHRASE: ${SRT45_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
     ports:
-      - 20045:20045/tcp
       - 20045:20045/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi45:
+    container_name: avahi45
+    hostname: avahi45
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt45:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi45
+      SERVICE_NAME: "${SRT45_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20045
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -751,9 +851,35 @@ services:
       SRT_PORT: 20046
       SRT_PASSPHRASE: ${SRT46_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20046:20046/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi46:
+    container_name: avahi46
+    hostname: avahi46
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt46:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi46
+      SERVICE_NAME: "${SRT46_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20046
     ports:
       - 20046:20046/tcp
-      - 20046:20046/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -773,9 +899,35 @@ services:
       SRT_PORT: 20047
       SRT_PASSPHRASE: ${SRT47_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20047:20047/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi47:
+    container_name: avahi47
+    hostname: avahi47
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt47:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi47
+      SERVICE_NAME: "${SRT47_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20047
     ports:
       - 20047:20047/tcp
-      - 20047:20047/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -795,8 +947,9 @@ services:
       SRT_PORT: 20048
       SRT_PASSPHRASE: ${SRT48_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
     ports:
-      - 20048:20048/tcp
       - 20048:20048/udp
     logging: *default-logging
     networks:
@@ -804,22 +957,25 @@ services:
     labels:
       - "traefik.enable=false"
 
-  srt49:
-    container_name: srt49
-    hostname: srt49
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
+  avahi48:
+    container_name: avahi48
+    hostname: avahi48
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt48:
+        condition: service_healthy
     environment:
-      RTSP_URL: ${SRT49_RTSP_URL}
-      RTSP_USER_ID: ${SRT49_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT49_RTSP_USER_PW}
-      SRT_PORT: 20049
-      SRT_PASSPHRASE: ${SRT49_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi48
+      SERVICE_NAME: "${SRT48_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20048
     ports:
-      - 20049:20049/tcp
-      - 20049:20049/udp
+      - 20048:20048/tcp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -839,9 +995,35 @@ services:
       SRT_PORT: 20049
       SRT_PASSPHRASE: ${SRT49_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20049:20049/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi49:
+    container_name: avahi49
+    hostname: avahi49
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt49:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi49
+      SERVICE_NAME: "${SRT49_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20049
     ports:
       - 20049:20049/tcp
-      - 20049:20049/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -861,9 +1043,35 @@ services:
       SRT_PORT: 20050
       SRT_PASSPHRASE: ${SRT50_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20050:20050/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi50:
+    container_name: avahi50
+    hostname: avahi50
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt50:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi50
+      SERVICE_NAME: "${SRT50_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20050
     ports:
       - 20050:20050/tcp
-      - 20050:20050/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -883,9 +1091,33 @@ services:
       SRT_PORT: 20051
       #SRT_PASSPHRASE: ${SRT51_RTSP_USER_PW}
       #SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
     ports:
-      - 20051:20051/tcp
       - 20051:20051/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi51:
+    container_name: avahi51
+    hostname: avahi51
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt51:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi51
+      SERVICE_NAME: "${SRT51_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._udp
+      SERVICE_PORT: 20051
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -905,9 +1137,35 @@ services:
       SRT_PORT: 20052
       SRT_PASSPHRASE: ${SRT52_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20052:20052/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi52:
+    container_name: avahi52
+    hostname: avahi52
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt52:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi52
+      SERVICE_NAME: "${SRT52_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20052
     ports:
       - 20052:20052/tcp
-      - 20052:20052/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -927,9 +1185,35 @@ services:
       SRT_PORT: 20053
       SRT_PASSPHRASE: ${SRT53_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20053:20053/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi53:
+    container_name: avahi53
+    hostname: avahi53
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt53:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi53
+      SERVICE_NAME: "${SRT53_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20053
     ports:
       - 20053:20053/tcp
-      - 20053:20053/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -949,9 +1233,35 @@ services:
       SRT_PORT: 20057
       SRT_PASSPHRASE: ${SRT57_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20057:20057/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi57:
+    container_name: avahi57
+    hostname: avahi57
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt57:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi57
+      SERVICE_NAME: "${SRT57_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20057
     ports:
       - 20057:20057/tcp
-      - 20057:20057/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -971,9 +1281,35 @@ services:
       SRT_PORT: 20058
       SRT_PASSPHRASE: ${SRT58_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20058:20058/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi58:
+    container_name: avahi58
+    hostname: avahi58
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt58:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi58
+      SERVICE_NAME: "${SRT58_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20058
     ports:
       - 20058:20058/tcp
-      - 20058:20058/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
@@ -993,9 +1329,35 @@ services:
       SRT_PORT: 20059
       SRT_PASSPHRASE: ${SRT59_RTSP_USER_PW}
       SRT_KEY_LENGTH: 32
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20059:20059/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  avahi59:
+    container_name: avahi59
+    hostname: avahi59
+    build: docker-avahi-config/
+    image: sofwerx/avahi-config
+    restart: on-failure:5
+    depends_on:
+      srt59:
+        condition: service_healthy
+    environment:
+      REPLACE_WILDCARDS: "yes"
+      SERVICE_FILENAME: avahi59
+      SERVICE_NAME: "${SRT59_RTSP_SERVICE_NAME}"
+      SERVICE_TYPE: _x-srt._tcp
+      SERVICE_PORT: 20059
     ports:
       - 20059:20059/tcp
-      - 20059:20059/udp
+    volumes:
+      - /etc/avahi/services:/etc/avahi/services
     logging: *default-logging
     networks:
       - default
