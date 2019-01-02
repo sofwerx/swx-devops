@@ -387,3 +387,34 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  atn-disc:
+    container_name: "atn-disc"
+    hostname: "atn-disc"
+    build: atn/
+    labels:
+      - "traefik.enable=false"
+
+  atn:
+    container_name: "atn"
+    hostname: "atn"
+    image: "registry.access.redhat.com/rhel6"
+    volumes_from:
+      - atn-disc
+    expose:
+      - "9000"
+    ports:
+      - "9002:9000"
+    environment:
+      - "INSTALL_MEDIA_DIR=/atn"
+    entrypoint:
+      - "/atn/install/dockerTestInstall.sh"
+    labels:
+      - "traefik.enable=false"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=atn"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:atn.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
