@@ -178,6 +178,9 @@ services:
     environment:
       SPEAKEASY_SHARED: ${SPEAKEASY_SHARED}
       SPEAKEASY_VERSION: ${SPEAKEASY_VERSION}
+      SPEAKEASY_MINIO_URL: https://speakeasy-minio.${DNS_DOMAIN}
+      SPEAKEASY_MINIO_ACCESS_KEY: ${SPEAKEASY_MINIO_ACCESS_KEY}
+      SPEAKEASY_MINIO_SECRET_KEY: ${SPEAKEASY_MINIO_SECRET_KEY}
     logging: *default-logging
     labels:
       - "traefik.enable=false"
