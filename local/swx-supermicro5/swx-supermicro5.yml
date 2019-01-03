@@ -326,6 +326,8 @@ services:
       - MONGO_CONNECT=mongodb://${SPEAKEASY_MONGO_USERNAME}:${SPEAKEASY_MONGO_PASSWORD}@speakeasy-mongo/${SPEAKEASY_MONGO_DATABASE}?authSource=admin
       - TFC_SERVICE=http://speakeasy-tfc-service:5020/poc_api
       - OCR_SERVICE_CLEAN=http://speakeasy-ocr-service:5010/poc_api/ocr_client/clean
+      - OCR_SERVICE_KEYWORD=http://speakeasy-ocr-service:5010/poc_api/ocr_client/keyword
+      - OCR_SERVICE_SUMMARY=http://speakeasy-ocr-service:5010/poc_api/ocr_client/summary
       - OCR_SERVICE_OCR=http://speakeasy-ocr-service:5010/poc_api/ocr_client/ocr
     volumes:
       - speakeasy_nifi_datafiles:/opt/datafiles
