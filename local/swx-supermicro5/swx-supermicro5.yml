@@ -181,6 +181,8 @@ services:
       SPEAKEASY_MINIO_URL: https://speakeasy-minio.${DNS_DOMAIN}
       SPEAKEASY_MINIO_ACCESS_KEY: ${SPEAKEASY_MINIO_ACCESS_KEY}
       SPEAKEASY_MINIO_SECRET_KEY: ${SPEAKEASY_MINIO_SECRET_KEY}
+    depends_on:
+      - speakeasy-minio
     logging: *default-logging
     labels:
       - "traefik.enable=false"
