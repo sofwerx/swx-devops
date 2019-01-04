@@ -71,6 +71,9 @@ volumes:
   ssb-data:
     driver: local
 
+  i2p-data:
+    driver: local
+
 services:
 
 #  converge:
@@ -552,4 +555,5 @@ services:
       traefik.frontend.rule: "Host:ssb.${DNS_DOMAIN}"
       traefik.frontend.passHostHeader: "true"
       traefik.frontend.entryPoints: "http,https"
+
 
