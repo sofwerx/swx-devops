@@ -35,6 +35,16 @@ volumes:
     driver: local
   speakeasy-minio-data:
     driver: local
+  argument-mapper-mongo-db:
+    driver: local
+  argument-mapper-mongo-configdb:
+    driver: local
+  argument-mapper-elasticsearch-data:
+    driver: local
+  argument-mapper-server-logs:
+    driver: local
+  argument-mapper-server-config:
+    driver: local
 
 services:
 
@@ -416,12 +426,53 @@ services:
     entrypoint:
       - "/atn/install/dockerTestInstall.sh"
     labels:
-      - "traefik.enable=false"
-    labels:
       - "traefik.enable=true"
       - "traefik.backend=atn"
       - "traefik.port=9000"
       - "traefik.frontend.rule=Host:atn.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  argument-mapper-mongo:
+    image: mongo:3.4
+    container_name: argument-mapper-mongo
+    hostname: argument-mapper-mongo
+    volumes:
+      - argument-mapper-mongo-db:/data/db
+      - argument-mapper-mongo-configdb:/data/configdb
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+    labels:
+      - "traefik.enable=false"
+
+  argument-mapper-elasticsearch:
+    image: elasticsearch:5.6
+    container_name: argument-mapper-elasticsearch
+    hostname: argument-mapper-hostname
+    volumes:
+      - argument-mapper-elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: "curl --fail http://localhost:9200/"
+    labels:
+      - "traefik.enable=false"
+
+  argument-mapper-server:
+    build: argument-mapper/ArgumentMapper/
+    image: local/argument-mapper-server
+    container_name: argument-mapper-server
+    hostname: argument-mapper-server
+    depends_on:
+      - argument-mapper-mongo
+      - argument-mapper-elasticsearch
+    volumes:
+      - argument-mapper-server-logs:/src/server/logs
+      - argument-mapper-server-config:/src/server/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=argument-mapper"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:argument-mapper.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.headers.customRequestHeaders=ssl-client-dn:cn=authorizedUser,o=SOFWERX,c=US||user-info:{'clearances':['TS']}"
       - "traefik.frontend.entryPoints=http,https"
 
