@@ -556,4 +556,20 @@ services:
       traefik.frontend.passHostHeader: "true"
       traefik.frontend.entryPoints: "http,https"
 
+  blockpy:
+    build: docker-blockpy/
+    image: blockpy
+    container_name: blockpy
+    hostname: blockpy
+    restart: unless-stopped
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      traefik.backend: "blockpy"
+      traefik.port: "8000"
+      traefik.protocol: "http"
+      traefik.frontend.rule: "Host:blockpy.${DNS_DOMAIN}"
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.entryPoints: "http,https"
 

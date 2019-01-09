@@ -1,0 +1,12 @@
+version: "2.1"
+
+services:
+
+  blockpy:
+    build: .
+    image: blockpy
+    container_name: blockpy
+    hostname: blockpy
+    ports:
+      - "8000:8000"
+      
