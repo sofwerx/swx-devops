@@ -60,6 +60,8 @@ volumes:
     driver: local
   torgi-pgadmin-data:
     driver: local
+  torgi-pgadmin-storage:
+    driver: local
   ipfs-staging:
     driver: local
   ipfs-data:
@@ -299,6 +301,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${TORGI_POSTGRES_PASS}
     volumes:
        - torgi-pgadmin-data:/root/.pgadmin
+       - torgi-pgadmin-storage:/var/lib/pgadmin/storage
     restart: unless-stopped
     logging: *default-logging
     networks:
@@ -308,6 +311,28 @@ services:
       - "traefik.backend=torgi-pgadmin"
       - "traefik.port=80"
       - "traefik.frontend.rule=Host:torgi-pgadmin.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  torgi-pgadmin-minio:
+    image: minio/minio
+    container_name: pgadmin-minio
+    hostname: pgadmin-minio
+    volumes:
+      - torgi-pgadmin-storage:/var/lib/pgadmin/storage
+    networks:
+      - default
+    command: server /var/lib/pgadmin/storage
+    restart: always
+    environment:
+      MINIO_URL: https://pgadmin-minio.${DNS_DOMAIN}
+      MINIO_ACCESS_KEY: ${TORGI_POSTGRES_USER}@sofwerx.org
+      MINIO_SECRET_KEY: ${TORGI_POSTGRES_PASS}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=pgadmin-minio"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:pgadmin-minio.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
@@ -661,12 +686,33 @@ services:
       RTSP_USER_ID: ${SRT42_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT42_RTSP_USER_PW}
       SRT_PORT: 20042
-      SRT_PASSPHRASE: ${SRT42_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT42_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT42_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
       - 20042:20042/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  srt_tcp_42:
+    container_name: srt_tcp_42
+    hostname: srt_tcp_42
+    build: docker-srt/
+    image: sofwerx/srt-tcp
+    restart: always
+    environment:
+      SRT_URL: srt://srt.${DNS_DOMAIN}:20042
+      SRT_PORT: 20042
+      SRT_PASSPHRASE: ${SRT42_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT42_SRT_KEY_LENGTH}
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20042:20042/tcp
     logging: *default-logging
     networks:
       - default
@@ -709,12 +755,33 @@ services:
       RTSP_USER_ID: ${SRT43_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT43_RTSP_USER_PW}
       SRT_PORT: 20043
-      SRT_PASSPHRASE: ${SRT43_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT43_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT43_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
       - 20043:20043/udp
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
+
+  srt_tcp_43:
+    container_name: srt_tcp_43
+    hostname: srt_tcp_43
+    build: docker-srt/
+    image: sofwerx/srt-tcp
+    restart: always
+    environment:
+      SRT_URL: srt://srt.${DNS_DOMAIN}:20043
+      SRT_PORT: 20043
+      SRT_PASSPHRASE: ${SRT43_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT43_SRT_KEY_LENGTH}
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - 20043:20043/tcp
     logging: *default-logging
     networks:
       - default
@@ -757,8 +824,8 @@ services:
       RTSP_USER_ID: ${SRT44_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT44_RTSP_USER_PW}
       SRT_PORT: 20044
-      SRT_PASSPHRASE: ${SRT44_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT44_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT44_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -803,8 +870,8 @@ services:
       RTSP_USER_ID: ${SRT45_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT45_RTSP_USER_PW}
       SRT_PORT: 20045
-      SRT_PASSPHRASE: ${SRT45_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT45_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT45_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -849,8 +916,8 @@ services:
       RTSP_USER_ID: ${SRT46_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT46_RTSP_USER_PW}
       SRT_PORT: 20046
-      SRT_PASSPHRASE: ${SRT46_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT46_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT46_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -897,8 +964,8 @@ services:
       RTSP_USER_ID: ${SRT47_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT47_RTSP_USER_PW}
       SRT_PORT: 20047
-      SRT_PASSPHRASE: ${SRT47_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT47_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT47_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -945,8 +1012,8 @@ services:
       RTSP_USER_ID: ${SRT48_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT48_RTSP_USER_PW}
       SRT_PORT: 20048
-      SRT_PASSPHRASE: ${SRT48_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT48_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT48_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -993,8 +1060,8 @@ services:
       RTSP_USER_ID: ${SRT49_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT49_RTSP_USER_PW}
       SRT_PORT: 20049
-      SRT_PASSPHRASE: ${SRT49_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT49_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT49_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -1041,8 +1108,8 @@ services:
       RTSP_USER_ID: ${SRT50_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT50_RTSP_USER_PW}
       SRT_PORT: 20050
-      SRT_PASSPHRASE: ${SRT50_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT50_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT50_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -1089,8 +1156,8 @@ services:
       RTSP_USER_ID: ${SRT51_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT51_RTSP_USER_PW}
       SRT_PORT: 20051
-      #SRT_PASSPHRASE: ${SRT51_RTSP_USER_PW}
-      #SRT_KEY_LENGTH: 32
+      #SRT_PASSPHRASE: ${SRT51_SRT_PASSPHRASE}
+      #SRT_KEY_LENGTH: ${SRT51_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -1135,8 +1202,8 @@ services:
       RTSP_USER_ID: ${SRT52_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT52_RTSP_USER_PW}
       SRT_PORT: 20052
-      SRT_PASSPHRASE: ${SRT52_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT52_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT52_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -1183,8 +1250,8 @@ services:
       RTSP_USER_ID: ${SRT53_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT53_RTSP_USER_PW}
       SRT_PORT: 20053
-      SRT_PASSPHRASE: ${SRT53_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT53_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT53_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -1231,8 +1298,8 @@ services:
       RTSP_USER_ID: ${SRT57_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT57_RTSP_USER_PW}
       SRT_PORT: 20057
-      SRT_PASSPHRASE: ${SRT57_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT57_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT57_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -1279,8 +1346,8 @@ services:
       RTSP_USER_ID: ${SRT58_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT58_RTSP_USER_PW}
       SRT_PORT: 20058
-      SRT_PASSPHRASE: ${SRT58_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT58_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT58_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -1327,8 +1394,8 @@ services:
       RTSP_USER_ID: ${SRT59_RTSP_USER_ID}
       RTSP_USER_PW: ${SRT59_RTSP_USER_PW}
       SRT_PORT: 20059
-      SRT_PASSPHRASE: ${SRT59_RTSP_USER_PW}
-      SRT_KEY_LENGTH: 32
+      SRT_PASSPHRASE: ${SRT59_SRT_PASSPHRASE}
+      SRT_KEY_LENGTH: ${SRT59_SRT_KEY_LENGTH}
     healthcheck:
       test: "exit 0"
     ports:
@@ -1363,5 +1430,4 @@ services:
       - default
     labels:
       - "traefik.enable=false"
-
 
