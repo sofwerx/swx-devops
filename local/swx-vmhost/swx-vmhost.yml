@@ -316,8 +316,8 @@ services:
 
   torgi-pgadmin-minio:
     image: minio/minio
-    container_name: pgadmin-minio
-    hostname: pgadmin-minio
+    container_name: torgi-pgadmin-minio
+    hostname: torgi-pgadmin-minio
     volumes:
       - torgi-pgadmin-storage:/var/lib/pgadmin/storage
     networks:
@@ -325,14 +325,14 @@ services:
     command: server /var/lib/pgadmin/storage
     restart: always
     environment:
-      MINIO_URL: https://pgadmin-minio.${DNS_DOMAIN}
+      MINIO_URL: https://torgi-pgadmin-minio.${DNS_DOMAIN}
       MINIO_ACCESS_KEY: ${TORGI_POSTGRES_USER}@sofwerx.org
       MINIO_SECRET_KEY: ${TORGI_POSTGRES_PASS}
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=pgadmin-minio"
+      - "traefik.backend=torgi-pgadmin-minio"
       - "traefik.port=9000"
-      - "traefik.frontend.rule=Host:pgadmin-minio.${DNS_DOMAIN}"
+      - "traefik.frontend.rule=Host:torgi-pgadmin-minio.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
