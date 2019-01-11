@@ -243,6 +243,8 @@ services:
       MONGO_INITDB_DATABASE: ${SPEAKEASY_MONGO_DATABASE}
     volumes:
       - speakeasy_mongodb:/data/db
+    ports:
+      - 27017:27017
     networks:
       - default
     logging: *default-logging
