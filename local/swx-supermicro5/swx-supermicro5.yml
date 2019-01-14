@@ -45,6 +45,8 @@ volumes:
     driver: local
   argument-mapper-server-config:
     driver: local
+  mace-minio-data:
+    driver: local
 
 services:
 
@@ -477,4 +479,27 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.headers.customRequestHeaders=ssl-client-dn:cn=authorizedUser,o=SOFWERX,c=US||user-info:{'clearances':['TS']}"
       - "traefik.frontend.entryPoints=http,https"
+
+  mace-minio:
+    image: minio/minio
+    container_name: mace-minio
+    hostname: mace-minio
+    volumes:
+      - mace-minio-data:/data
+    networks:
+      - default
+    command: server /data
+    restart: always
+    environment:
+      MINIO_URL: https://mace-minio.${DNS_DOMAIN}
+      MINIO_ACCESS_KEY: ${MACE_MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MACE_MINIO_SECRET_KEY}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mace-minio"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:mace-minio.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 
