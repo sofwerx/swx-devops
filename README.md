@@ -190,15 +190,7 @@ This differs based on the virtual machine engine you use with Vagrant (VirtualBo
 
 ### GPG Configuration 
 
-1. Create a `secrets/gnupg` directory:
-
-    ```bash
-    mkdir -p secrets/gnupg
-    ```
-
-Note: While you _can_ use the default `~/.gnupg` config folder, it is recommended to create a `secrets/gnupg` directory to keep your keychain local to this repo directory.
-
-2. Run the `shell.bash` or `docker.sh` to enter the environment:
+1. Run the `shell.bash` or `docker.sh` to enter the environment:
 
     `./shell.bash` OR `./docker.sh` 
     
@@ -226,8 +218,17 @@ gpg --gen-key
 
 2. While the prompt is for 2048 bits, use 4096 instead.
    -  If your `gpg` does not prompt you for the number of bits, then you're using a gnupg newer than 2.0 which will not work with trousseau.
+   
+3. Move your keychain to the `secrets/gnupg` directory:
 
-3. After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
+    ```bash
+    mv ~/.gnupg secrets/gnupg
+    ```
+
+Note: While you _can_ use the default `~/.gnupg` config folder, it is recommended to create a `secrets/gnupg` directory to keep your keychain local to this repo directory.
+
+
+4. After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
 
     ```bash
     gpg --export --armor > gpg/<yourname>@sofwerx.org
@@ -247,7 +248,7 @@ gpg --gen-key
     cat gpg/* | gpg --import
     ```
 
-4. Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
+5. Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
 
 [Back to the top](#devops)
 
