@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
-RUN apt-get update
-RUN apt-get install -y sudo wget
+RUN apt-get update \
+ && apt-get install -y sudo wget
 
 ADD dependencies/ubuntu.sh /ubuntu.sh
 
