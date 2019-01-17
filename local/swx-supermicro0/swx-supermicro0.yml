@@ -261,6 +261,7 @@ services:
         # gitlab_rails['smtp_ca_path'] = "/etc/ssl/certs"
         # gitlab_rails['smtp_ca_file'] = "/etc/ssl/certs/ca-certificates.crt"
         ## Add any other gitlab.rb configuration here, each on its own line
+        gitlab_rails['gitlab_default_projects_features_builds'] = false
     ports:
       - "60122:22"
     volumes:
