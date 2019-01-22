@@ -47,11 +47,25 @@ Now you should be able to run this and see your nvidia card:
 
     docker run -ti --rm --runtime=nvidia nvidia/cuda nvidia-smi
 
-The final remaning step to prepare your docker-engine is to edit your `dockerd` startup script and add this to the end:
+There are 2 ways to make docker add nvidia devices by default.
+
+The first way is to create a `/etc/docker/daemon.json` that looks like this:
+
+    {
+        "runtimes": {
+            "nvidia": {
+                "path": "nvidia-container-runtime",
+                "runtimeArgs": []
+            }
+        }
+    }
+
+
+The second way is to edit your `dockerd` startup script and add this to the end:
 
     --default-runtime=nvidia
 
-On a docker-machine generic driver provisioned ubuntu 16.04 host, I need to edit:
+For this second way, on a docker-machine generic driver provisioned ubuntu 16.04 host, I need to edit:
 
     sudo vi /etc/systemd/system/docker.service.d/10-machine.conf
 
