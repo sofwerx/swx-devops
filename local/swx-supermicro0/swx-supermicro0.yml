@@ -64,6 +64,12 @@ volumes:
   theia-data:
     driver: local
 
+  gitea-data:
+    driver: local
+
+  gitea-mysql:
+    driver: local
+
 services:
 
   traefik:
@@ -450,6 +456,72 @@ services:
       - "traefik.backend=gogs"
       - "traefik.port=3000"
       - "traefik.frontend.rule=Host:gogs.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  gitea-mysql:
+    container_name: gitea-mysql
+    hostname: gitea-mysql
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${GITEA_MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${GITEA_MYSQL_USER}
+      MYSQL_PASSWORD: ${GITEA_MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${GITEA_MYSQL_DATABASE}
+    logging: *default-logging
+    networks:
+      - default
+    restart: always
+    networks:
+      - default
+    volumes:
+      - gitea-mysql:/var/lib/mysql
+    labels:
+      - "traefik.enable=false"
+
+  gitea:
+    container_name: gitea
+    hostname: gitea
+    image: gitea/gitea:latest
+    environment: # https://docs.gitea.io/en-us/config-cheat-sheet/
+      APP_NAME: "Gitea: Git with a cup of tea" # Application name, used in the page title.
+      RUN_MODE: prod # default "dev". For performance and other purposes, change this to prod when deployed to a production environment.
+      SSH_DOMAIN: "gitea.${DNS_DOMAIN}" # Domain name of this server, used for the displayed clone URL in Gitea’s UI.
+      SSH_PORT: 60222 # SSH port displayed in clone URL.
+      DISABLE_SSH: 'false' # Disable SSH feature when it’s not available.
+      HTTP_PORT: 3000 #: HTTP listen port.
+      ROOT_URL: https://gitea.${DNS_DOMAIN} # Overwrite the automatically generated public URL. This is useful if the internal and the external URL don’t match (e.g. in Docker).
+      INSTALL_LOCK: 'false' # Disallow access to the install page.
+      SECRET_KEY: ”” # Global secret key. This should be changed. If this has a value and INSTALL_LOCK is empty, INSTALL_LOCK will automatically set to true.
+      DISABLE_REGISTRATION: 'true' # Disable registration, after which only admin can create accounts for users.
+      REQUIRE_SIGNIN_VIEW: 'true' # Enable this to force users to log in to view any page.
+      USER_UID: 1000
+      USER_GID: 1000
+      DB_TYPE: mysql
+      DB_HOST: gitea-mysql:3306
+      DB_NAME: ${GITEA_MYSQL_DATABASE}
+      DB_USER: ${GITEA_MYSQL_USER}
+      DB_PASSWD: ${GITEA_MYSQL_PASSWORD}
+    restart: always
+    networks:
+      - gitea
+    volumes:
+      - gitea-data:/data
+    ports:
+      - "3000:3000"
+      - '60222:22'
+    logging: *default-logging
+    networks:
+      - default
+    restart: always
+    depends_on:
+      - gitea-mysql
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=gitea"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:gitea.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 

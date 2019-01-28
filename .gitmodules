@@ -17,7 +17,7 @@
 	path = cellar/swx-gpu/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "local/pi-r-squared/docker-guacamole"]
-	path = local/pi-r-squared/docker-guacamole
+	path = cellar/pi-r-squared/docker-guacamole
 	url = https://github.com/sofwerx/docker-guacamole
 [submodule "cellar/osgeo/docker-guacamole"]
 	path = cellar/osgeo/docker-guacamole

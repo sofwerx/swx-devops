@@ -142,7 +142,7 @@ fi
 #   --kubernetes-pod-annotations value                    A toml table/json object of key-value. Value is expected to be a string. When set, this will create pods with the given annotations. Can be overwritten in build with KUBERNETES_POD_ANNOTATION_* varialbes (default: "{}")
 #   --kubernetes-pod_annotations_overwrite_allowed value  Regex to validate 'KUBERNETES_POD_ANNOTATIONS_*' values [$KUBERNETES_POD_ANNOTATIONS_OVERWRITE_ALLOWED]
 
-while [ ! -f /etc/gitlab/config.toml ]; do
+while [ ! -f /etc/gitlab-runner/config.toml ]; do
   gitlab-runner register --non-interactive
   sleep 1
 done

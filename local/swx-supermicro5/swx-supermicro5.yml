@@ -429,6 +429,10 @@ services:
       - "INSTALL_MEDIA_DIR=/atn"
     entrypoint:
       - "/atn/install/dockerTestInstall.sh"
+    restart: always
+    networks:
+      - default
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=atn"
@@ -446,6 +450,10 @@ services:
       - argument-mapper-mongo-configdb:/data/configdb
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+    restart: always
+    networks:
+      - default
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
@@ -457,6 +465,10 @@ services:
       - argument-mapper-elasticsearch-data:/usr/share/elasticsearch/data
     healthcheck:
       test: "curl --fail http://localhost:9200/"
+    restart: always
+    networks:
+      - default
+    logging: *default-logging
     labels:
       - "traefik.enable=false"
 
@@ -471,6 +483,10 @@ services:
     volumes:
       - argument-mapper-server-logs:/src/server/logs
       - argument-mapper-server-config:/src/server/config
+    restart: always
+    networks:
+      - default
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=argument-mapper"
@@ -489,11 +505,14 @@ services:
     networks:
       - default
     command: server /data
-    restart: always
     environment:
       MINIO_URL: https://mace-minio.${DNS_DOMAIN}
       MINIO_ACCESS_KEY: ${MACE_MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MACE_MINIO_SECRET_KEY}
+    restart: always
+    networks:
+      - default
+    logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=mace-minio"
