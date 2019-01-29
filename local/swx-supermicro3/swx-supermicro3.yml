@@ -81,6 +81,28 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  minio-geo:
+    image: minio/minio
+    container_name: minio-geo
+    hostname: minio-geo
+    volumes:
+      - /data/minio/geo:/export
+    networks:
+      - default
+    command: server /export
+    restart: always
+    environment:
+      MINIO_URL: https://minio-geo.${DNS_DOMAIN}
+      MINIO_ACCESS_KEY: ${MINIO_GEO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_GEO_SECRET_KEY}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=minio-geo"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:minio-geo.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
 #  motion43:
 #    build: docker-motion/
 #    image: sofwerx/motion
