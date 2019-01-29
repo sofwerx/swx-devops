@@ -11,7 +11,11 @@ _swx ()
     "swx dm env"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
     "swx dm"*) COMPREPLY=( $( compgen -W "ls env import" -- $cur ) ) ;;
     "swx ssh"*) COMPREPLY=( $( compgen -W "$(swx_dm_ls)" -- $cur ) ) ;;
-    "swx gpg"*) COMPREPLY=( $( compgen -W "prepare remember forget reset" -- $cur ) ) ;;
+    "swx gpg recipient add"*) COMPREPLY=( $cur ) ;;
+    "swx gpg recipient list"*) COMPREPLY=( $cur ) ;;
+    "swx gpg recipient remove"*) COMPREPLY=( $( compgen -W "$(swx_gpg_recipient_list)" -- $cur ) ) ;;
+    "swx gpg recipient"*) COMPREPLY=( $( compgen -W "add list remove" -- $cur ) ) ;;
+    "swx gpg"*) COMPREPLY=( $( compgen -W "prepare remember forget reset recipient" -- $cur ) ) ;;
     "swx environment ls"*) COMPREPLY=( $( compgen -W "" -- $cur ) ) ;;
     "swx environment create"*) COMPREPLY=( $( $cur ) ) ;;
     "swx environment switch"*) COMPREPLY=( $( compgen -W "$(swx_environment_ls)" -- $cur ) ) ;;

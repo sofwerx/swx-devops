@@ -5,12 +5,31 @@ prepare) shift; swx_gpg_prepare $@ ;;
 remember) shift; swx_gpg_remember $@ ;;
 forget) shift; swx_gpg_forget $@ ;;
 reset) shift; swx_gpg_reset $@ ;;
+recipient) shift; swx_gpg_recipient $@ ;;
 *) cat <<EOU 1>&2
 Usage: swx gpg {action}
   prepare  - Prepare your gpg-agent environment
   remember - Remember your passphrase (gpg-agent)
   forget   - Forget your passphrase (gpg-agent)
   reset    - Reset your gpg-agent
+  recipient - Manage trouseau recipients
+EOU
+  return 1
+  ;;
+  esac
+}
+
+swx_gpg_recipient ()
+{
+  case $1 in
+add) shift; swx_gpg_recipient_add $@ ;;
+list) shift; swx_gpg_recipient_list $@ ;;
+remove) shift; swx_gpg_recipient_remove $@ ;;
+*) cat <<EOU 1>&2
+Usage: swx gpg recipient {action}
+  add    - Add trousseau recipients
+  list   - List trousseau recipients
+  remove - Remove trousseau recipients
 EOU
   return 1
   ;;
@@ -42,4 +61,35 @@ swx_gpg_forget ()
   gpg-preset-passphrase --forget $KEYGRIP
 }
 
+# This is equivalent to `trousseau list-recipients`
+swx_gpg_recipient_list ()
+{
+  echo "$( jq -r ._data $TROUSSEAU_STORE | base64 -D | gpg --decrypt --quiet 2>/dev/null | jq '.meta.recipients' )" | jq -r .[]
+}
+
+# All of this to work around the fact that `trousseau remove-recipient` does not work.
+swx_gpg_recipient_remove ()
+{
+  GPG_RECIPIENT_FILTER=$1
+  if swx_gpg_recipient_list | grep $GPG_RECIPIENT_FILTER ; then
+    export OLD_TROUSSEAU_STORE="$TROUSSEAU_STORE"
+    export NEW_TROUSSEAU_STORE="$TROUSSEAU_STORE.$$"
+    export OLD_TROUSSEAU_RECIPIENTS_LIST="$(jq -r ._data $OLD_TROUSSEAU_STORE | base64 -D | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | jq -r .[])"
+    export NEW_TROUSSEAU_RECIPIENTS_ARRAY="$(jq -r ._data $OLD_TROUSSEAU_STORE | base64 -D | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | grep -v $GPG_RECIPIENT_FILTER)"
+    export NEW_TROUSSEAU_RECIPIENTS_LIST="$(jq -r ._data $OLD_TROUSSEAU_STORE | base64 -D | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | jq -r .[] | grep -v $GPG_RECIPIENT_FILTER)"
+    export NEW_RECIPIENTS_ARGUMENTS="$(jq -r ._data $OLD_TROUSSEAU_STORE | base64 -D | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | jq -r .[] | grep -v $GPG_RECIPIENT_FILTER | sed -e 's/^/--recipient /')"
+    cat <<EOF >$NEW_TROUSSEAU_STORE
+{"crypto_type":1,"crypto_algorithm":0,"_data":"$(jq -r ._data $OLD_TROUSSEAU_STORE | base64 -D | gpg --decrypt --quiet 2>/dev/null | jq -c ".meta.recipients = $NEW_TROUSSEAU_RECIPIENTS_ARRAY" | gpg --always-trust --armor --encrypt $NEW_RECIPIENTS_ARGUMENTS | base64)"}
+EOF
+    mv -f $NEW_TROUSSEAU_STORE $TROUSSEAU_STORE
+    unset OLD_TROUSSEAU_STORE NEW_TROUSSEAU_STORE OLD_TROUSSEAU_RECIPIENTS_LIST NEW_TROUSSEAU_RECIPIENTS_ARRAY NEW_TROUSSEAU_RECIPIENTS_LIST NEW_RECIPIENTS_ARGUMENTS
+  else
+    echo "Cannot find pattern '$GPG_RECIPIENT_FILTER' in recipient list"
+  fi
+}
+
+swx_gpg_recipient_add ()
+{
+  \trousseau --gnupg-home $GNUPGHOME --store $TROUSSEAU_STORE add-recipient $1
+}
 
