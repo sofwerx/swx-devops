@@ -59,9 +59,12 @@ Please refer to these links for the most up-to-date installation instructions fo
 1. Clone the [devops](https://github.com/sofwerx/swx-devops.git) repository. 
    - For guidance on cloning a repository click [here](https://help.github.com/articles/cloning-a-repository/).
 
-2. Run `./docker.sh` in the new swx-devops directory. 
+2. Add user to docker group
+	Run `sudo usermod -aG docker <username>` .
 
-3. Verify that you are in the devops environment by typing `swx` .
+3. Run `./docker.sh` in the new swx-devops directory. 
+
+4. Verify that you are in the devops environment by typing `swx` .
 
 [Back to the top](#devops)
 
