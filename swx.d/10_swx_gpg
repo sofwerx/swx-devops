@@ -75,7 +75,7 @@ swx_gpg_recipient_remove ()
     export OLD_TROUSSEAU_STORE="$TROUSSEAU_STORE"
     export NEW_TROUSSEAU_STORE="$TROUSSEAU_STORE.$$"
     export OLD_TROUSSEAU_RECIPIENTS_LIST="$(jq -r ._data $OLD_TROUSSEAU_STORE | openssl enc -base64 -d -A | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | jq -r .[])"
-    export NEW_TROUSSEAU_RECIPIENTS_ARRAY="$(jq -r ._data $OLD_TROUSSEAU_STORE | openssl enc -base64 -d -A | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | grep -v $GPG_RECIPIENT_FILTER)"
+    export NEW_TROUSSEAU_RECIPIENTS_ARRAY="$(echo $(jq -r ._data $OLD_TROUSSEAU_STORE | openssl enc -base64 -d -A | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | grep -v $GPG_RECIPIENT_FILTER) | sed -e 's/\", \]/\" ]/')"
     export NEW_TROUSSEAU_RECIPIENTS_LIST="$(jq -r ._data $OLD_TROUSSEAU_STORE | openssl enc -base64 -d -A | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | jq -r .[] | grep -v $GPG_RECIPIENT_FILTER)"
     export NEW_RECIPIENTS_ARGUMENTS="$(jq -r ._data $OLD_TROUSSEAU_STORE | openssl enc -base64 -d -A | gpg --decrypt --quiet 2>/dev/null | jq .meta.recipients | jq -r .[] | grep -v $GPG_RECIPIENT_FILTER | sed -e 's/^/--recipient /')"
     cat <<EOF >$NEW_TROUSSEAU_STORE
