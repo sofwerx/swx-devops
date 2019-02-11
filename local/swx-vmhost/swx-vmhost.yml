@@ -42,6 +42,10 @@ volumes:
       type: 'none'
       o: 'bind'
       device: '/import/minio/jupyterhub/osm'
+  osm-pgadmin-data:
+    driver: local
+  osm-pgadmin-storage:
+    driver: local
   qgis-logs:
     driver: local
   geoserver-data:
@@ -359,6 +363,51 @@ services:
     labels:
       - "traefik.enable=false"
 
+  osm-pgadmin:
+    container_name: osm-pgadmin
+    hostname: osm-pgadmin
+    image: sofwerx/pgadmin4
+    build: docker-pgadmin4/
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${OSM_POSTGRES_USER}@sofwerx.org
+      PGADMIN_DEFAULT_PASSWORD: ${OSM_POSTGRES_PASS}
+    volumes:
+       - osm-pgadmin-data:/root/.pgadmin
+       - osm-pgadmin-storage:/var/lib/pgadmin/storage
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=osm-pgadmin"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:osm-pgadmin.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  osm-pgadmin-minio:
+    image: minio/minio
+    container_name: osm-pgadmin-minio
+    hostname: osm-pgadmin-minio
+    volumes:
+      - osm-pgadmin-storage:/var/lib/pgadmin/storage
+    networks:
+      - default
+    command: server /var/lib/pgadmin/storage
+    restart: always
+    environment:
+      MINIO_URL: https://osm-pgadmin-minio.${DNS_DOMAIN}
+      MINIO_ACCESS_KEY: ${OSM_POSTGRES_USER}@sofwerx.org
+      MINIO_SECRET_KEY: ${OSM_POSTGRES_PASS}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=osm-pgadmin-minio"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:osm-pgadmin-minio.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
   osm-import:
     build: docker-osm/docker-imposm3
     image: sofwerx/docker-osm:imposm-latest
@@ -632,36 +681,36 @@ services:
       - "traefik.ipns.port=8080"
       - "traefik.ipns.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/ipns"
 
-  qri:
-    container_name: qri
-    hostname: qri
-    restart: always
-    build: docker-qri/
-    image: sofwerx-qri
-    volumes:
-      - qri-data:/data
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=qri"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=http,https"
-      - "traefik.port=2505"
-      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN};Path:/;AddPrefix:/webui"
-      - "traefik.ipfs.port=2503"
-      - "traefik.ipfs.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/json-api"
-      - "traefik.webui.port=2505"
-      - "traefik.webui.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/webui"
+#  qri:
+#    container_name: qri
+#    hostname: qri
+#    restart: always
+#    build: docker-qri/
+#    image: sofwerx-qri
+#    volumes:
+#      - qri-data:/data
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=qri"
+#      - "traefik.frontend.passHostHeader=true"
+#      - "traefik.frontend.entryPoints=http,https"
+#      - "traefik.port=2505"
+#      - "traefik.frontend.rule=Host:ipfs.${DNS_DOMAIN};Path:/;AddPrefix:/webui"
+#      - "traefik.ipfs.port=2503"
+#      - "traefik.ipfs.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/json-api"
+#      - "traefik.webui.port=2505"
+#      - "traefik.webui.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/webui"
 
-  i2p:
-    container_name: i2p
-    hostname: i2p
-    image: sofwerx/i2p:${ARCH}
-    build: docker-i2p/
-    volumes:
-      - "i2p-data:/var/lib/i2p"
+#  i2p:
+#    container_name: i2p
+#    hostname: i2p
+#    image: sofwerx/i2p:${ARCH}
+#    build: docker-i2p/
+#    volumes:
+#      - "i2p-data:/var/lib/i2p"
 #    # Description of ports at https://geti2p.net/ports
 #    ports:
 #      - "2827:2827"           # - BOB port
