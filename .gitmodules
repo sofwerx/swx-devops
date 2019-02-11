@@ -557,7 +557,3 @@
 [submodule "local/swx-vmhost/docker-gstreamer-rtsp-srt"]
 	path = local/swx-vmhost/docker-gstreamer-rtsp-srt
 	url = https://github.com/sofwerx/docker-gstreamer-rtsp-srt
-[submodule "local/swx-vmhost/AAD-API"]
-	path = local/swx-vmhost/AAD-API
-	url = https://github.com/sofwerx/AAD-API.git
-	branch = develop
