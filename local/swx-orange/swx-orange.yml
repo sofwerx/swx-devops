@@ -49,10 +49,10 @@ services:
       HTTPS_PORT: "443"
       EMAIL: "devops@sofwerx.org"
       DNS_DOMAIN: ${DNS_DOMAIN}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_REGION: ${AWS_REGION}
-      AWS_HOSTED_ZONE_ID: ${AWS_HOSTED_ZONE_ID}
+#      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+#      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+#      AWS_REGION: ${AWS_REGION}
+#      AWS_HOSTED_ZONE_ID: ${AWS_HOSTED_ZONE_ID}
     volumes:
       - traefik-ssl:/ssl
       - /var/run/docker.sock:/var/run/docker.sock
@@ -83,7 +83,13 @@ services:
   #
   elasticsearch:
     privileged: true
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
+#    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}
+    build:
+      context: docker-elastic/
+      dockerfile: Dockerfile.elasticsearch
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+    image: sofwerx/elasticsearch
     container_name: elasticsearch
     network_mode: host
     restart: always
