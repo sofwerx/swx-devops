@@ -566,3 +566,6 @@
 [submodule "local/geostuff/docker-traefik"]
 	path = local/geostuff/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/geostuff/docker-geoserver"]
+	path = local/geostuff/docker-geoserver
+	url = https://github.com/sofwerx/docker-geoserver.git

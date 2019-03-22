@@ -1,0 +1,78 @@
+version: '2.1'
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '12m'
+    max-file: '5'
+  driver: json-file
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  traefik-ssl:
+    driver: local
+  geoserver-data:
+    driver: local
+  minio:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/minio'
+  
+
+services:
+
+  geoserver:
+    extends:
+      file: docker-geoserver/docker-compose.yml
+      service: geoserver
+    volumes:
+      - geoserver-data:/geoserver_data/data
+      - minio:/geoserver_data/minio
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    environment:
+      ADMIN_PASSWD: ${GEOSERVER_ADMIN_PASSWD}
+    ports:
+      - 8080:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=geoserver"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:geoserver.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
+
+  traefik:
+    extends:
+      file: docker-traefik/docker-compose.yml
+      service: traefik
+    volumes:
+      - traefik-ssl:/ssl
+    restart: always
+    networks:
+      - default
+    logging: *default-logging
+    environment:
+      REST_PORT: "7080"
+      HTTP_PORT: "3080"
+      HTTPS_PORT: "3443"
+      EMAIL: "devops@sofwerx.org"
+      DNS_DOMAIN: ${DNS_DOMAIN}
+    ports:
+      - 80:80
+      - 443:443
+      - 7080:7080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=7080"
+      - "traefik.frontend.rule=Host:traefik.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
