@@ -563,3 +563,6 @@
 [submodule "local/swx-vmhost/AAD-UI"]
 	path = local/swx-vmhost/AAD-UI
 	url = https://github.com/sofwerx/AAD-UI.git
+[submodule "local/geostuff/docker-traefik"]
+	path = local/geostuff/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
