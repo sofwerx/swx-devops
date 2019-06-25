@@ -569,3 +569,10 @@
 [submodule "local/geostuff/docker-geoserver"]
 	path = local/geostuff/docker-geoserver
 	url = https://github.com/sofwerx/docker-geoserver.git
+[submodule "local/swx-vmhost/docker-traefik-v2"]
+	path = local/swx-vmhost/docker-traefik-v2
+	url = https://github.com/sofwerx/docker-traefik.git
+	branch = v2
+[submodule "local/swx-vmhost/nginx-cac"]
+	path = local/swx-vmhost/nginx-cac
+	url = https://github.com/sofwerx/nginx-cac.git
