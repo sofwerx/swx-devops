@@ -7,7 +7,7 @@ x-logging:
     max-file: '5'
   driver: json-file
 
-networks: 
+networks:
   default:
     driver: bridge
 
@@ -64,6 +64,13 @@ volumes:
     driver: local
   ipfs-cluster-data:
     driver: local
+  nginx-cac-www:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/data/swx-protected-website'
+
 
 #  splunk-etc:
 #    driver: local
@@ -109,6 +116,38 @@ services:
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
+  nginx-cac:
+    extends:
+      file: nginx-cac/docker-compose.yml
+      service: nginx-cac
+    restart: always
+    logging: *default-logging
+    networks:
+      - default
+    ports:
+      - 6443:443
+    volumes:
+      - traefik-ssl:/ssl
+      - nginx-cac-www:/www
+    environment:
+      HOSTNAME: ${NGINX_CAC_HOSTNAME}
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SSL_CERT_PATH: "/ssl/live/${DNS_DOMAIN}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=nginx-cac"
+      - "traefik.port=443"
+      - "traefik.protocol=https"
+      - "traefik.frontend.rule=Host:${NGINX_CAC_HOSTNAME}.${DNS_DOMAIN}"
+#      - "traefik.frontend.entryPoints=https"
+#      - "traefik.frontend.redirect=https"
+#      - "traefik.frontend.redirect.permanent=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.passTLSClientCert.pem=true"
+      - "traefik.frontend.passTLSClientCert.infos.sans=true"
+#                  vvv deprecated vvv
+      - "traefik.frontend.passTLSCert=true"
+
 
   neo4j:
     extends:
@@ -116,7 +155,7 @@ services:
       service: neo4j
     image: neo4j:latest
     restart: always
-    networks: 
+    networks:
       - default
     ports:
       - 7687:7687
@@ -154,24 +193,24 @@ services:
       - "traefik.frontend.entryPoints=http,https"
 
 
-  underground:
-    extends:
-      file: underground/docker-compose.yml
-      service: underground
-    image: sofwerx/underground
-    container_name: underground
-    hostname: underground
-    restart: always
-    networks:
-      - default
-    logging: *default-logging
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=underground"
-      - "traefik.port=3000"
-      - "traefik.frontend.rule=Host:underground.${DNS_DOMAIN}"
-      - "traefik.frontend.passHostHeader=false"
-      - "traefik.frontend.entryPoints=http,https"
+#  underground:
+#    extends:
+#      file: underground/docker-compose.yml
+#      service: underground
+#    image: sofwerx/underground
+#    container_name: underground
+#    hostname: underground
+#    restart: always
+#    networks:
+#      - default
+#    logging: *default-logging
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.backend=underground"
+#      - "traefik.port=3000"
+#      - "traefik.frontend.rule=Host:underground.${DNS_DOMAIN}"
+#      - "traefik.frontend.passHostHeader=false"
+#      - "traefik.frontend.entryPoints=http,https"
 
   pocket-node:
     extends:
@@ -518,13 +557,14 @@ services:
       - "traefik.frontend.rule=Host:django-geopackage-server.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
-  rml:
-    build:
-      context: dockerRML/
-      dockerfile: Dockerfile.GPU
-      args:
-        ARCH: ${ARCH}
-    image: sofwerx/rml:${ARCH}-GPU
+#
+#  rml:
+#    build:
+#      context: dockerRML/
+#      dockerfile: Dockerfile.GPU
+#      args:
+#        ARCH: ${ARCH}
+#    image: sofwerx/rml:${ARCH}-GPU
 
   osh-core:
     extends:
@@ -586,761 +626,761 @@ services:
       - "traefik.ipns.frontend.rule=Host:ipfs.${DNS_DOMAIN};PathPrefix:/ipns"
 
 
-  srt42:
-    container_name: srt42
-    hostname: srt42
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT42_RTSP_URL}
-      RTSP_USER_ID: ${SRT42_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT42_RTSP_USER_PW}
-      SRT_PORT: 20042
-      SRT_PASSPHRASE: ${SRT42_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT42_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20042:20042/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt_tcp_42:
-    container_name: srt_tcp_42
-    hostname: srt_tcp_42
-    build: docker-srt/
-    image: sofwerx/srt-tcp
-    restart: always
-    environment:
-      SRT_URL: srt://srt.${DNS_DOMAIN}:20042
-      SRT_PORT: 20042
-      SRT_PASSPHRASE: ${SRT42_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT42_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20042:20042/tcp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi42:
-    container_name: avahi42
-    hostname: avahi42
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt42:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi42
-      SERVICE_NAME: "${SRT42_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20042
-    ports:
-      - 20042:20042/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt43:
-    container_name: srt43
-    hostname: srt43
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT43_RTSP_URL}
-      RTSP_USER_ID: ${SRT43_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT43_RTSP_USER_PW}
-      SRT_PORT: 20043
-      SRT_PASSPHRASE: ${SRT43_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT43_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20043:20043/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt_tcp_43:
-    container_name: srt_tcp_43
-    hostname: srt_tcp_43
-    build: docker-srt/
-    image: sofwerx/srt-tcp
-    restart: always
-    environment:
-      SRT_URL: srt://srt.${DNS_DOMAIN}:20043
-      SRT_PORT: 20043
-      SRT_PASSPHRASE: ${SRT43_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT43_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20043:20043/tcp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi43:
-    container_name: avahi43
-    hostname: avahi43
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt43:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi43
-      SERVICE_NAME: "${SRT43_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20043
-    ports:
-      - 20043:20043/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt44:
-    container_name: srt44
-    hostname: srt44
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT44_RTSP_URL}
-      RTSP_USER_ID: ${SRT44_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT44_RTSP_USER_PW}
-      SRT_PORT: 20044
-      SRT_PASSPHRASE: ${SRT44_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT44_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20044:20044/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi44:
-    container_name: avahi44
-    hostname: avahi44
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt44:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi44
-      SERVICE_NAME: "${SRT44_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20044
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt45:
-    container_name: srt45
-    hostname: srt45
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT45_RTSP_URL}
-      RTSP_USER_ID: ${SRT45_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT45_RTSP_USER_PW}
-      SRT_PORT: 20045
-      SRT_PASSPHRASE: ${SRT45_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT45_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20045:20045/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi45:
-    container_name: avahi45
-    hostname: avahi45
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt45:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi45
-      SERVICE_NAME: "${SRT45_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20045
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt46:
-    container_name: srt46
-    hostname: srt46
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT46_RTSP_URL}
-      RTSP_USER_ID: ${SRT46_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT46_RTSP_USER_PW}
-      SRT_PORT: 20046
-      SRT_PASSPHRASE: ${SRT46_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT46_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20046:20046/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi46:
-    container_name: avahi46
-    hostname: avahi46
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt46:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi46
-      SERVICE_NAME: "${SRT46_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20046
-    ports:
-      - 20046:20046/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt47:
-    container_name: srt47
-    hostname: srt47
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT47_RTSP_URL}
-      RTSP_USER_ID: ${SRT47_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT47_RTSP_USER_PW}
-      SRT_PORT: 20047
-      SRT_PASSPHRASE: ${SRT47_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT47_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20047:20047/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi47:
-    container_name: avahi47
-    hostname: avahi47
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt47:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi47
-      SERVICE_NAME: "${SRT47_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20047
-    ports:
-      - 20047:20047/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt48:
-    container_name: srt48
-    hostname: srt48
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT48_RTSP_URL}
-      RTSP_USER_ID: ${SRT48_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT48_RTSP_USER_PW}
-      SRT_PORT: 20048
-      SRT_PASSPHRASE: ${SRT48_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT48_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20048:20048/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi48:
-    container_name: avahi48
-    hostname: avahi48
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt48:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi48
-      SERVICE_NAME: "${SRT48_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20048
-    ports:
-      - 20048:20048/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt49:
-    container_name: srt49
-    hostname: srt49
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT49_RTSP_URL}
-      RTSP_USER_ID: ${SRT49_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT49_RTSP_USER_PW}
-      SRT_PORT: 20049
-      SRT_PASSPHRASE: ${SRT49_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT49_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20049:20049/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi49:
-    container_name: avahi49
-    hostname: avahi49
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt49:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi49
-      SERVICE_NAME: "${SRT49_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20049
-    ports:
-      - 20049:20049/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt50:
-    container_name: srt50
-    hostname: srt50
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT50_RTSP_URL}
-      RTSP_USER_ID: ${SRT50_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT50_RTSP_USER_PW}
-      SRT_PORT: 20050
-      SRT_PASSPHRASE: ${SRT50_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT50_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20050:20050/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi50:
-    container_name: avahi50
-    hostname: avahi50
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt50:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi50
-      SERVICE_NAME: "${SRT50_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20050
-    ports:
-      - 20050:20050/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt51:
-    container_name: srt51
-    hostname: srt51
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT51_RTSP_URL}
-      RTSP_USER_ID: ${SRT51_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT51_RTSP_USER_PW}
-      SRT_PORT: 20051
-      #SRT_PASSPHRASE: ${SRT51_SRT_PASSPHRASE}
-      #SRT_KEY_LENGTH: ${SRT51_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20051:20051/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi51:
-    container_name: avahi51
-    hostname: avahi51
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt51:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi51
-      SERVICE_NAME: "${SRT51_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._udp
-      SERVICE_PORT: 20051
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt52:
-    container_name: srt52
-    hostname: srt52
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT52_RTSP_URL}
-      RTSP_USER_ID: ${SRT52_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT52_RTSP_USER_PW}
-      SRT_PORT: 20052
-      SRT_PASSPHRASE: ${SRT52_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT52_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20052:20052/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi52:
-    container_name: avahi52
-    hostname: avahi52
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt52:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi52
-      SERVICE_NAME: "${SRT52_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20052
-    ports:
-      - 20052:20052/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt53:
-    container_name: srt53
-    hostname: srt53
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT53_RTSP_URL}
-      RTSP_USER_ID: ${SRT53_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT53_RTSP_USER_PW}
-      SRT_PORT: 20053
-      SRT_PASSPHRASE: ${SRT53_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT53_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20053:20053/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi53:
-    container_name: avahi53
-    hostname: avahi53
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt53:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi53
-      SERVICE_NAME: "${SRT53_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20053
-    ports:
-      - 20053:20053/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt57:
-    container_name: srt57
-    hostname: srt57
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT57_RTSP_URL}
-      RTSP_USER_ID: ${SRT57_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT57_RTSP_USER_PW}
-      SRT_PORT: 20057
-      SRT_PASSPHRASE: ${SRT57_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT57_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20057:20057/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi57:
-    container_name: avahi57
-    hostname: avahi57
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt57:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi57
-      SERVICE_NAME: "${SRT57_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20057
-    ports:
-      - 20057:20057/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt58:
-    container_name: srt58
-    hostname: srt58
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT58_RTSP_URL}
-      RTSP_USER_ID: ${SRT58_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT58_RTSP_USER_PW}
-      SRT_PORT: 20058
-      SRT_PASSPHRASE: ${SRT58_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT58_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20058:20058/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi58:
-    container_name: avahi58
-    hostname: avahi58
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt58:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi58
-      SERVICE_NAME: "${SRT58_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20058
-    ports:
-      - 20058:20058/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  srt59:
-    container_name: srt59
-    hostname: srt59
-    build: docker-gstreamer-rtsp-srt/
-    image: sofwerx/gstreamer-rtsp-srt
-    restart: always
-    environment:
-      RTSP_URL: ${SRT59_RTSP_URL}
-      RTSP_USER_ID: ${SRT59_RTSP_USER_ID}
-      RTSP_USER_PW: ${SRT59_RTSP_USER_PW}
-      SRT_PORT: 20059
-      SRT_PASSPHRASE: ${SRT59_SRT_PASSPHRASE}
-      SRT_KEY_LENGTH: ${SRT59_SRT_KEY_LENGTH}
-    healthcheck:
-      test: "exit 0"
-    ports:
-      - 20059:20059/udp
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
-
-  avahi59:
-    container_name: avahi59
-    hostname: avahi59
-    build: docker-avahi-config/
-    image: sofwerx/avahi-config
-    restart: on-failure:5
-    depends_on:
-      srt59:
-        condition: service_healthy
-    environment:
-      REPLACE_WILDCARDS: "yes"
-      SERVICE_FILENAME: avahi59
-      SERVICE_NAME: "${SRT59_RTSP_SERVICE_NAME}"
-      SERVICE_TYPE: _x-srt._tcp
-      SERVICE_PORT: 20059
-    ports:
-      - 20059:20059/tcp
-    volumes:
-      - /etc/avahi/services:/etc/avahi/services
-    logging: *default-logging
-    networks:
-      - default
-    labels:
-      - "traefik.enable=false"
+#  srt42:
+#    container_name: srt42
+#    hostname: srt42
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT42_RTSP_URL}
+#      RTSP_USER_ID: ${SRT42_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT42_RTSP_USER_PW}
+#      SRT_PORT: 20042
+#      SRT_PASSPHRASE: ${SRT42_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT42_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20042:20042/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt_tcp_42:
+#    container_name: srt_tcp_42
+#    hostname: srt_tcp_42
+#    build: docker-srt/
+#    image: sofwerx/srt-tcp
+#    restart: always
+#    environment:
+#      SRT_URL: srt://srt.${DNS_DOMAIN}:20042
+#      SRT_PORT: 20042
+#      SRT_PASSPHRASE: ${SRT42_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT42_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20042:20042/tcp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi42:
+#    container_name: avahi42
+#    hostname: avahi42
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt42:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi42
+#      SERVICE_NAME: "${SRT42_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20042
+#    ports:
+#      - 20042:20042/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt43:
+#    container_name: srt43
+#    hostname: srt43
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT43_RTSP_URL}
+#      RTSP_USER_ID: ${SRT43_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT43_RTSP_USER_PW}
+#      SRT_PORT: 20043
+#      SRT_PASSPHRASE: ${SRT43_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT43_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20043:20043/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt_tcp_43:
+#    container_name: srt_tcp_43
+#    hostname: srt_tcp_43
+#    build: docker-srt/
+#    image: sofwerx/srt-tcp
+#    restart: always
+#    environment:
+#      SRT_URL: srt://srt.${DNS_DOMAIN}:20043
+#      SRT_PORT: 20043
+#      SRT_PASSPHRASE: ${SRT43_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT43_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20043:20043/tcp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi43:
+#    container_name: avahi43
+#    hostname: avahi43
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt43:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi43
+#      SERVICE_NAME: "${SRT43_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20043
+#    ports:
+#      - 20043:20043/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt44:
+#    container_name: srt44
+#    hostname: srt44
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT44_RTSP_URL}
+#      RTSP_USER_ID: ${SRT44_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT44_RTSP_USER_PW}
+#      SRT_PORT: 20044
+#      SRT_PASSPHRASE: ${SRT44_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT44_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20044:20044/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi44:
+#    container_name: avahi44
+#    hostname: avahi44
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt44:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi44
+#      SERVICE_NAME: "${SRT44_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20044
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt45:
+#    container_name: srt45
+#    hostname: srt45
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT45_RTSP_URL}
+#      RTSP_USER_ID: ${SRT45_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT45_RTSP_USER_PW}
+#      SRT_PORT: 20045
+#      SRT_PASSPHRASE: ${SRT45_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT45_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20045:20045/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi45:
+#    container_name: avahi45
+#    hostname: avahi45
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt45:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi45
+#      SERVICE_NAME: "${SRT45_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20045
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt46:
+#    container_name: srt46
+#    hostname: srt46
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT46_RTSP_URL}
+#      RTSP_USER_ID: ${SRT46_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT46_RTSP_USER_PW}
+#      SRT_PORT: 20046
+#      SRT_PASSPHRASE: ${SRT46_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT46_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20046:20046/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi46:
+#    container_name: avahi46
+#    hostname: avahi46
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt46:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi46
+#      SERVICE_NAME: "${SRT46_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20046
+#    ports:
+#      - 20046:20046/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt47:
+#    container_name: srt47
+#    hostname: srt47
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT47_RTSP_URL}
+#      RTSP_USER_ID: ${SRT47_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT47_RTSP_USER_PW}
+#      SRT_PORT: 20047
+#      SRT_PASSPHRASE: ${SRT47_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT47_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20047:20047/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi47:
+#    container_name: avahi47
+#    hostname: avahi47
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt47:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi47
+#      SERVICE_NAME: "${SRT47_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20047
+#    ports:
+#      - 20047:20047/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt48:
+#    container_name: srt48
+#    hostname: srt48
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT48_RTSP_URL}
+#      RTSP_USER_ID: ${SRT48_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT48_RTSP_USER_PW}
+#      SRT_PORT: 20048
+#      SRT_PASSPHRASE: ${SRT48_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT48_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20048:20048/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi48:
+#    container_name: avahi48
+#    hostname: avahi48
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt48:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi48
+#      SERVICE_NAME: "${SRT48_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20048
+#    ports:
+#      - 20048:20048/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt49:
+#    container_name: srt49
+#    hostname: srt49
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT49_RTSP_URL}
+#      RTSP_USER_ID: ${SRT49_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT49_RTSP_USER_PW}
+#      SRT_PORT: 20049
+#      SRT_PASSPHRASE: ${SRT49_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT49_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20049:20049/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi49:
+#    container_name: avahi49
+#    hostname: avahi49
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt49:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi49
+#      SERVICE_NAME: "${SRT49_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20049
+#    ports:
+#      - 20049:20049/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt50:
+#    container_name: srt50
+#    hostname: srt50
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT50_RTSP_URL}
+#      RTSP_USER_ID: ${SRT50_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT50_RTSP_USER_PW}
+#      SRT_PORT: 20050
+#      SRT_PASSPHRASE: ${SRT50_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT50_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20050:20050/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi50:
+#    container_name: avahi50
+#    hostname: avahi50
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt50:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi50
+#      SERVICE_NAME: "${SRT50_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20050
+#    ports:
+#      - 20050:20050/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt51:
+#    container_name: srt51
+#    hostname: srt51
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT51_RTSP_URL}
+#      RTSP_USER_ID: ${SRT51_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT51_RTSP_USER_PW}
+#      SRT_PORT: 20051
+#      #SRT_PASSPHRASE: ${SRT51_SRT_PASSPHRASE}
+#      #SRT_KEY_LENGTH: ${SRT51_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20051:20051/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi51:
+#    container_name: avahi51
+#    hostname: avahi51
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt51:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi51
+#      SERVICE_NAME: "${SRT51_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._udp
+#      SERVICE_PORT: 20051
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt52:
+#    container_name: srt52
+#    hostname: srt52
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT52_RTSP_URL}
+#      RTSP_USER_ID: ${SRT52_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT52_RTSP_USER_PW}
+#      SRT_PORT: 20052
+#      SRT_PASSPHRASE: ${SRT52_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT52_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20052:20052/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi52:
+#    container_name: avahi52
+#    hostname: avahi52
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt52:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi52
+#      SERVICE_NAME: "${SRT52_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20052
+#    ports:
+#      - 20052:20052/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt53:
+#    container_name: srt53
+#    hostname: srt53
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT53_RTSP_URL}
+#      RTSP_USER_ID: ${SRT53_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT53_RTSP_USER_PW}
+#      SRT_PORT: 20053
+#      SRT_PASSPHRASE: ${SRT53_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT53_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20053:20053/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi53:
+#    container_name: avahi53
+#    hostname: avahi53
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt53:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi53
+#      SERVICE_NAME: "${SRT53_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20053
+#    ports:
+#      - 20053:20053/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt57:
+#    container_name: srt57
+#    hostname: srt57
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT57_RTSP_URL}
+#      RTSP_USER_ID: ${SRT57_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT57_RTSP_USER_PW}
+#      SRT_PORT: 20057
+#      SRT_PASSPHRASE: ${SRT57_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT57_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20057:20057/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi57:
+#    container_name: avahi57
+#    hostname: avahi57
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt57:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi57
+#      SERVICE_NAME: "${SRT57_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20057
+#    ports:
+#      - 20057:20057/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt58:
+#    container_name: srt58
+#    hostname: srt58
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT58_RTSP_URL}
+#      RTSP_USER_ID: ${SRT58_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT58_RTSP_USER_PW}
+#      SRT_PORT: 20058
+#      SRT_PASSPHRASE: ${SRT58_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT58_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20058:20058/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi58:
+#    container_name: avahi58
+#    hostname: avahi58
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt58:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi58
+#      SERVICE_NAME: "${SRT58_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20058
+#    ports:
+#      - 20058:20058/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  srt59:
+#    container_name: srt59
+#    hostname: srt59
+#    build: docker-gstreamer-rtsp-srt/
+#    image: sofwerx/gstreamer-rtsp-srt
+#    restart: always
+#    environment:
+#      RTSP_URL: ${SRT59_RTSP_URL}
+#      RTSP_USER_ID: ${SRT59_RTSP_USER_ID}
+#      RTSP_USER_PW: ${SRT59_RTSP_USER_PW}
+#      SRT_PORT: 20059
+#      SRT_PASSPHRASE: ${SRT59_SRT_PASSPHRASE}
+#      SRT_KEY_LENGTH: ${SRT59_SRT_KEY_LENGTH}
+#    healthcheck:
+#      test: "exit 0"
+#    ports:
+#      - 20059:20059/udp
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
+#
+#  avahi59:
+#    container_name: avahi59
+#    hostname: avahi59
+#    build: docker-avahi-config/
+#    image: sofwerx/avahi-config
+#    restart: on-failure:5
+#    depends_on:
+#      srt59:
+#        condition: service_healthy
+#    environment:
+#      REPLACE_WILDCARDS: "yes"
+#      SERVICE_FILENAME: avahi59
+#      SERVICE_NAME: "${SRT59_RTSP_SERVICE_NAME}"
+#      SERVICE_TYPE: _x-srt._tcp
+#      SERVICE_PORT: 20059
+#    ports:
+#      - 20059:20059/tcp
+#    volumes:
+#      - /etc/avahi/services:/etc/avahi/services
+#    logging: *default-logging
+#    networks:
+#      - default
+#    labels:
+#      - "traefik.enable=false"
 
 #  glo:
 #    extends:
