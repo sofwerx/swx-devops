@@ -1,6 +1,18 @@
 # devops
 > This project contains documentation and infrastructure as code for our internal devops efforts.  The following are instructions on how to prepare your computer to have access to the devops environment that runs on the [SOFWERX](https://www.sofwerx.org) server.
 
+## The Easy Button:
+
+Install Docker, git, and gpg on your desktop system.
+
+Clone this repository.
+
+Send one of the Nerd Herd your public key (gpg --export --armor > <youremailaddress>).
+
+From the directory you cloned the repo into (swx-devops), run ./docker.sh
+
+*This method does NOT require all of the software installation decribed below*
+
 ### Legend
   - [Installation](#installation)
     * [Docker](#docker)
