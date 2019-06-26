@@ -44,7 +44,7 @@ swx_sftp ()
       local ssh_port="$(jq -r .Driver.SSHPort ${config_json})"
       local ssh_key_path="$(jq -r .Driver.SSHKeyPath ${config_json})"
       set -x
-      sftp -i "$ssh_key_path" -p "$ssh_port" "${ssh_user}@${ip_address}"
+      sftp -i "$ssh_key_path" -oPort="$ssh_port" "${ssh_user}@${ip_address}"
       set +x
     else
       echo "Cannot find docker-machine config file ${config_json} for dm ${ssh_host}"
