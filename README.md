@@ -7,7 +7,7 @@ Install Docker, git, and gpg on your desktop system.
 
 Clone this repository.
 
-Send one of the Nerd Herd your public key (gpg --export --armor > <youremailaddress>).
+Send one of the Nerd Herd your public key (gpg --export --armor > youremailaddress).
 
 From the directory you cloned the repo into (swx-devops), run ./docker.sh
 
