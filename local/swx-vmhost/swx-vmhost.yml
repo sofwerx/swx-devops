@@ -14,6 +14,10 @@ networks:
 volumes:
   traefik-ssl:
     driver: local
+  swx-web-server-data:
+    driver: local
+  swx-web-db-data:
+    driver: local
   neo4j-data:
     driver: local
   minio:
@@ -148,6 +152,47 @@ services:
 #                  vvv deprecated vvv
       - "traefik.frontend.passTLSCert=true"
 
+  swx-web-db:
+    extends:
+      file: web-sofwerx/docker-compose.yml
+      service: swx-web-db
+    restart: always
+    volumes:
+      - traefik-ssl:/ssl
+      - swx-web-db-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${SWX_WEB_DB_PASSWD}
+    logging: *default-logging
+    networks:
+      - default
+    ports:
+      - 8306:3306
+    labels:
+      - "traefik.enable=false"
+
+  swx-web-server:
+    extends:
+      file: web-sofwerx/docker-compose.yml
+      service: swx-web-server
+    restart: always
+    volumes:
+      - traefik-ssl:/ssl
+      - swx-web-server-data:/var/www
+    logging: *default-logging
+    networks:
+      - default
+    ports:
+      - 8343:443
+      - 8388:80
+    logging: *default-logging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=swx-web-server"
+      - "traefik.port=8343"
+      - "traefik.protocol=https"
+      - "traefik.frontend.rule=Host:swx-web.${DNS_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=http,https"
 
   neo4j:
     extends:
