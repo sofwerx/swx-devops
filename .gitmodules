@@ -488,12 +488,6 @@
 [submodule "local/swx-supermicro4/docker-aletheios-cicd"]
 	path = local/swx-supermicro4/docker-aletheios-cicd
 	url = https://github.com/sofwerx/docker-aletheios-cicd
-[submodule "local/swx-supermicro0/docker-jira-postgres"]
-	path = local/swx-supermicro0/docker-jira-postgres
-	url = https://github.com/sofwerx/docker-jira-postgres
-[submodule "local/swx-supermicro0/docker-jira"]
-	path = local/swx-supermicro0/docker-jira
-	url = https://github.com/sofwerx/docker-jira
 [submodule "local/swx-vmhost/mapserver-docker"]
 	path = local/swx-vmhost/mapserver-docker
 	url = https://github.com/sofwerx/mapserver-docker
@@ -506,9 +500,6 @@
 [submodule "local/swx-vmhost/safehouse"]
 	path = local/swx-vmhost/safehouse
 	url = https://github.com/sofwerx/safehouse
-[submodule "local/swx-supermicro0/docker-confluence"]
-	path = local/swx-supermicro0/docker-confluence
-	url = https://github.com/sofwerx/docker-confluence
 [submodule "local/swx-vmhost/docker-jupyterhub"]
 	path = local/swx-vmhost/docker-jupyterhub
 	url = https://github.com/sofwerx/docker-jupyterhub
