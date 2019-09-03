@@ -161,7 +161,9 @@ services:
       - traefik-ssl:/ssl
       - swx-web-db-data:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${SWX_WEB_DB_PASSWD}
+      MYSQL_ROOT_PASSWORD: ${SWX_WEB_DB_PASSWD}
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SSL_CERT_PATH: "/ssl/live/${DNS_DOMAIN}"
     logging: *default-logging
     networks:
       - default
@@ -178,19 +180,19 @@ services:
     volumes:
       - traefik-ssl:/ssl
       - swx-web-server-data:/var/www
+    environment:
+      DNS_DOMAIN: ${DNS_DOMAIN}
+      SSL_CERT_PATH: "/ssl/live/${DNS_DOMAIN}"
     logging: *default-logging
     networks:
       - default
-    ports:
-      - 8343:443
-      - 8388:80
     logging: *default-logging
     labels:
       - "traefik.enable=true"
       - "traefik.backend=swx-web-server"
-      - "traefik.port=8343"
-      - "traefik.protocol=https"
-      - "traefik.frontend.rule=Host:swx-web.${DNS_DOMAIN}"
+      - "traefik.port=80"
+      - "traefik.protocol=http"
+      - "traefik.frontend.rule=Host:swxweb.${DNS_DOMAIN}"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.frontend.entryPoints=http,https"
 
