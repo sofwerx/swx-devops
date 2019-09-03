@@ -1,7 +1,26 @@
 # devops
 > This project contains documentation and infrastructure as code for our internal devops efforts.  The following are instructions on how to prepare your computer to have access to the devops environment that runs on the [SOFWERX](https://www.sofwerx.org) server.
 
-## The Easy Button:
+---
+### Legend
+  - [Installation - The Easy Button](#installation-the-easy-button)
+  - [Using the Environment](#using-the-environment)
+    * [Project Environments](#project-environments)
+    * [Docker-Machine](#docker-machine-and-dm)
+    * [AWS](#aws)
+    * [SWX](#information-about-swx)
+    * [Trousseau](#using-trousseau)
+    * [Terraform](#terraform)
+  - [Installation - The Long Way](#installation-the long-way)
+    * [Docker](#docker)
+    * [Vagrant](#vagrant)
+    * [Windows](#windows)
+  - [Security](#security)
+    * [Docker](#with-docker)
+    * [Manual Setup](#manual-if-not-using-docker)
+    * [Trousseau](#trousseau)
+
+# Installation (The Easy Button)
 
 Install Docker, git, and gpg on your desktop system.
 
@@ -13,319 +32,20 @@ From the directory you cloned the repo into (swx-devops), run ./docker.sh
 
 *This method does NOT require all of the software installation decribed below*
 
-### Legend
-  - [Installation](#installation)
-    * [Docker](#docker)
-    * [Vagrant](#vagrant)
-    * [Windows](#windows)
-  - [Security](#security)
-    * [Docker](#with-docker)
-    * [Manual Setup](#manual-if-not-using-docker)
-    * [Trousseau](#trousseau)
-  - [Using the Environment](#using-the-environment)
-    * [Project Environments](#project-environments)
-    * [Docker-Machine](#docker-machine-and-dm)
-    * [AWS](#aws)
-    * [SWX](#information-about-swx)
-    * [Trousseau](#using-trousseau)
-    * [Terraform](#terraform)
-
-# Installation
-
-There are a number of tools that will need to be installed:
-
-- [awscli](#awscli)
-- [docker](#docker)
-- [docker-compose](#docker)
-- [docker-machine (optional)](#docker)
-- [gnupg 2.0](#gnupg)
-- [terraform](#terraform)
-- [trousseau](#trousseau)
-
-The easiest way to gain access to the devops environment is by using Docker.  This project uses Docker heavily. You will find `docker-compose.yml` files in the environment directories.
-
-[Back to the top](#devops) 
-
-## Docker
-
-### Mac
-
-[HomeBrew](https://brew.sh) makes it easy to update:
-   
-   ```bash
-   brew install docker docker-machine docker-compose docker-machine-driver-xhyve
-   ```
-
-For more information see: [Docker for Mac](https://docs.docker.com/docker-for-mac/install/).
-
-### Other Operating Systems
-
-Please refer to these links for the most up-to-date installation instructions for Docker:
-
-- [Docker](https://docs.docker.com/engine/installation/)
-- [docker-machine](https://docs.docker.com/machine/install-machine/#installing-machine-directly)
-- [docker-compose](https://docs.docker.com/compose/install/)
-
-
-### After Docker installation
-1. Clone the [devops](https://github.com/sofwerx/swx-devops.git) repository. 
-   - For guidance on cloning a repository click [here](https://help.github.com/articles/cloning-a-repository/).
-
-2. Add user to docker group
-	Run `sudo usermod -aG docker <username>` .
-
-3. Run `./docker.sh` in the new swx-devops directory. 
-
-4. Verify that you are in the devops environment by typing `swx` .
-
-[Back to the top](#devops)
-
-## Vagrant
-> Only use if Docker is not applicable. 
-
-### Linux
-
-1. Install [Vagrant](https://www.vagrantup.com/) and [install a local virtual machine (VM)](https://www.vagrantup.com/docs/installation/).
-
-2. There is a `Vagrantfile` that prepares a Ubuntu environment using the `./dependencies/ubuntu.sh` script:
-
-    ```bash
-    vagrant up
-    ```
-    ```bash
-    vagrant ssh
-    ```
-
-### Windows
-> For Windows, you need to install Windows Subsystem for Linux.
-
-#### On 64-bit Windows 10 Anniversary Update or later (build 1607+)
-
-Please refer to the documentation below for the most up-to-date instructions:
-- [About the Windows Subsystyem for Linux ](https://msdn.microsoft.com/en-us/commandline/wsl/about)
-- [Instructions for installing the Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/install-win10)
-
-This runs Linux binaries natively without having to run a VM for a Linux kernel.
-
-1. Enable the Windows Subsystem for Linux:
-
-    ```
-    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-    ```
-
-2. After selecting Ubuntu as your favorite Linux distribution, and following the prompts and rebooting, open a Command Prompt and run `bash`:
-
-    ```
-    C:\> bash
-    ```
-
-3. Now you can `cd` into the directory where you cloned this git repository, and run:
-
-    ```
-    bash$ ./dependencies/ubuntu.sh
-    ```
-
-Note: Windows Subsystem for Linux:
-- It is not possible to run a Linux docker-engine without a Linux kernel.
-- You are installing docker-engine natively on Windows so that you have a local Hyper-V Linux VM to run that kernel.
-
-4. Once you install a local docker-engine with volume share access to this working directory, then you can proceed. The key here is having a local docker-engine installed that has volume mount access to this directory.
-
-[Back to the top](#devops)
-
-# Security
-
-## Secrets
-
-This git repository stores the secrets for the above Project Environments in the `.trousseau` file in this git repository.
-
-This file is `gpg` encrypted using `trousseau`. To use these secrets, you will need to have your gpg public key listed in the `gpg/` folder.
-
-The `secrets/` folder is in `.gitignore` for a reason: this holds unencrypted files that contain credentials.
-
-No files under `secrets/` should ever be committed to this git repo. Any secrets will be pulled out of `trousseau` by the `swx` commands as necessary.
-
-### With Docker
-
-If using Docker, just make the `secrets/gnupg` in the repo directory and run `./docker.sh`.
-
-### Manual (if not using Docker)
-
-#### gnupg
-
-You need a gnupg key for `trousseau` below.
-
-The reason for gnupg 2.0 is trousseau reads directly from `pubring.gpg`, and is no longer supported in gnupg 2.1 and newer.
-
-#### Mac
-
-There is a `gpg` built-in to MacOS in `/usr/bin/gpg`, and that is incompatible with `trousseau`.
-
-1. Install `gpg` v2.0 to /usr/local/bin (until we can submit a PR to fix this in `trousseau`).
-
-- If you happened to `brew install gnupg` already, just unlink first.
-
-    ```
-    brew unlink gnupg
-    ```
-
-2. To install the `gpg` command on a Mac, install `gnupg@2.0` with HomeBrew:
-
-    ```bash
-    brew install gnupg@2.0
-    ```
-    ```bash
-    brew link --force gnupg@2.0
-    ```
-
-- If you also install `pinentry`, you will get a nice pop-up dialog box for your gpg passphrase:
-
-    ```bash
-    brew install pinentry
-    ```
-
-#### Ubuntu 16.04
-
-Try running:
-
-    ./dependencies/ubuntu.sh
-
-That should install the correct versions of all of your dependencies.
-
-#### Other Operating Systems
-
-For general compatiblity and ease of developer station convergence, this project has a Vagrantfile that defines a Vagrant machine to run an Ubuntu virtual machine and install the dependencies.
-
-[Install Vagrant for your operating system](https://www.vagrantup.com/downloads.html).
-
-The biggest challenge managing Vagrant persistence will be syncing or sharing a folder between your host and the virtual machine.
-This differs based on the virtual machine engine you use with Vagrant (VirtualBox, VMWare Workstation, VMWare Fusion, Parallels, xhyve, etc).
-
-[Back to the top](#devops)
-
-### GPG Configuration 
-
-1. Run the `shell.bash` or `docker.sh` to enter the environment:
-
-    `./shell.bash` OR `./docker.sh` 
-    
-This prepares your gnupg keychain and environment.
-
-### GPG Verification and Key Creation
-> The correct version is critical to running the program. If your keys are not configured correctly, problems will arise. 
-
-#### Verification
-
-To verify the correct version of gpg was installed
-
-```bash
-gpg --version
-```
-
-The version should be 2.0, nothing higher. 
-
-#### After installing gnupg
-
-1. Generate a private/public keypair
-```bash
-gpg --gen-key
-```
-
-2. While the prompt is for 2048 bits, use 4096 instead.
-   -  If your `gpg` does not prompt you for the number of bits, then you're using a gnupg newer than 2.0 which will not work with trousseau.
-   
-3. Move your keychain to the `secrets/gnupg` directory:
-
-    ```bash
-    mv ~/.gnupg secrets/gnupg
-    ```
-
-Note: While you _can_ use the default `~/.gnupg` config folder, it is recommended to create a `secrets/gnupg` directory to keep your keychain local to this repo directory.
-
-
-4. After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
-
-    ```bash
-    gpg --export --armor > gpg/<yourname>@sofwerx.org
-    ```
-
-    ```bash
-    git add gpg/<yourname>@sofwerx.org
-    git commit -m 'adding gpg/<yourname>@sofwerx.org public key'
-    git push
-    ```    
-    
-- The convention in this repository is that the filename must be your email address, to make trousseau management easier.
-
-- You can import all of our public keys at any time by running:
-
-    ```bash
-    cat gpg/* | gpg --import
-    ```
-
-5. Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
-
-[Back to the top](#devops)
-
-### trousseau
-
-[Trousseau](https://github.com/oleiade/trousseau) uses gnupg to encrypt a JSON file for a number of administrators that stores "key=value" secrets.
-
-Trousseau can use various cloud storage platforms to share these encrypted secrets between administrators.
-
-The result of any trousseau commands will alter the `.trousseau` file in the current project.
-This file is under git management, and is entirely safe as the contents of the file are encrypted.
-This is far easier than dealing with a shared s3 bucket or other shared repository.
-
-#### Installing trousseau
-
-1. To install the `trousseau` command, download pre-built binaries from [the releases page](https://github.com/oleiade/trousseau/releases).
-
-2. To build from the Go source follow these build instructions:
-
-    ```bash
-    mkdir ~/go/bin
-    export GOPATH=~/go
-    export PATH=~/go/bin:$PATH
-    go get github.com/tools/godep
-    go get github.com/urfave/cli
-    go get github.com/oleiade/trousseau
-    cd $GOPATH/src/github.com/oleiade/trousseau
-    make
-    cp $GOPATH/go/bin/trousseau/usr/local/bin/trousseau
-    ```
-    
-3. To build from the Go source using the `swx` command follow these steps from your `swx-devops` clone directory:
-
-    ```bash
-    $ ./shell.bash
-    $ swx secrets install
-    ```
-
-[Back to the top](#devops)
-
 # Using the Environment
 
 ## Project Environments
 
 These are the tools and projects that are available in the devops environment.
 
-#### Non-cloud resources
+#### Non-cloud resources (not exhaustive)
 - [Dev](local/dev/README.md) - Your local `dev` environment
-- [Geo](local/geo/README.md) - Our `geo` mintpc in our Data Science pit
 - [IBM Minsky](local/ibm-minsky) - The IBM Minsky box (ppc64le)
-- [icbgamingpc](local/icbgamingpc) - Ian's home gaming rig
-- [Mobile](local/mobile) - A mint box setup to run OpenSTF
 - [Orange](local/swx-orange) - Our tranquilpc 8-blade docker swarm server in our Data Science pit
-- [Osgeo](local/osgeo) - A mint box setup to run OSGEO and guacamole
-- [swx-pandora](local/swx-pandora) - Pandora-FMS box
 - [swx-vmhost](local/swx-vmhost) - The pop-os based System76 Silverback server
-- [pi-r-squared](local/pi-r-squared/README.md) - A shared raspberry-pi docker host in our Data Science pit
-
 
 #### Cloud based resources
-- [Tor-vpin](https://github.com/sofwerx/tor-dfpk/tree/7fa2708a215b91ff0491c45c282a678a290b4256) - private tor network deploy for warfighter nomination
-
+- [Tor-vpin](https://github.com/sofwerx/tor-dfpk/tree/7fa2708a215b91ff0491c45c282a678a290b4256) - private tor network deploy for Digital Force Protection Kit
 
 #### Archived resources
 - [swx-gpu](cellar/swx-gpu/README.md) - An IBM Minsky ppc64le GPU server in our datacenter~~ (eval returned)
@@ -721,3 +441,279 @@ Internally, we use an AWS bucket named `sofwerx-terraform` for the shared `.tfst
 Instead of using `terraform` directly, I strongly suggest using the `swx tf` wrapper instead, as it will ensure that you have the correct environment sourced before running `terraform`.
 
 [Back to the top](#devops)
+
+# Installation (The Long Way)
+## Disregard these installation instructions if using "The Easy Button" above.
+
+There are a number of tools that will need to be installed:
+
+- [awscli](#awscli)
+- [docker](#docker)
+- [docker-compose](#docker)
+- [docker-machine (optional)](#docker)
+- [gnupg 2.0](#gnupg)
+- [terraform](#terraform)
+- [trousseau](#trousseau)
+
+The easiest way to gain access to the devops environment is by using Docker.  This project uses Docker heavily. You will find `docker-compose.yml` files in the environment directories.
+
+[Back to the top](#devops) 
+
+## Docker
+
+### Mac
+
+[HomeBrew](https://brew.sh) makes it easy to update:
+   
+   ```bash
+   brew install docker docker-machine docker-compose docker-machine-driver-xhyve
+   ```
+
+For more information see: [Docker for Mac](https://docs.docker.com/docker-for-mac/install/).
+
+### Other Operating Systems
+
+Please refer to these links for the most up-to-date installation instructions for Docker:
+
+- [Docker](https://docs.docker.com/engine/installation/)
+- [docker-machine](https://docs.docker.com/machine/install-machine/#installing-machine-directly)
+- [docker-compose](https://docs.docker.com/compose/install/)
+
+
+### After Docker installation
+1. Clone the [devops](https://github.com/sofwerx/swx-devops.git) repository. 
+   - For guidance on cloning a repository click [here](https://help.github.com/articles/cloning-a-repository/).
+
+2. Add user to docker group
+	Run `sudo usermod -aG docker <username>` .
+
+3. Run `./docker.sh` in the new swx-devops directory. 
+
+4. Verify that you are in the devops environment by typing `swx` .
+
+[Back to the top](#devops)
+
+## Vagrant
+> Only use if Docker is not applicable. 
+
+### Linux
+
+1. Install [Vagrant](https://www.vagrantup.com/) and [install a local virtual machine (VM)](https://www.vagrantup.com/docs/installation/).
+
+2. There is a `Vagrantfile` that prepares a Ubuntu environment using the `./dependencies/ubuntu.sh` script:
+
+    ```bash
+    vagrant up
+    ```
+    ```bash
+    vagrant ssh
+    ```
+
+### Windows
+> For Windows, you need to install Windows Subsystem for Linux.
+
+#### On 64-bit Windows 10 Anniversary Update or later (build 1607+)
+
+Please refer to the documentation below for the most up-to-date instructions:
+- [About the Windows Subsystyem for Linux ](https://msdn.microsoft.com/en-us/commandline/wsl/about)
+- [Instructions for installing the Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/install-win10)
+
+This runs Linux binaries natively without having to run a VM for a Linux kernel.
+
+1. Enable the Windows Subsystem for Linux:
+
+    ```
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+    ```
+
+2. After selecting Ubuntu as your favorite Linux distribution, and following the prompts and rebooting, open a Command Prompt and run `bash`:
+
+    ```
+    C:\> bash
+    ```
+
+3. Now you can `cd` into the directory where you cloned this git repository, and run:
+
+    ```
+    bash$ ./dependencies/ubuntu.sh
+    ```
+
+Note: Windows Subsystem for Linux:
+- It is not possible to run a Linux docker-engine without a Linux kernel.
+- You are installing docker-engine natively on Windows so that you have a local Hyper-V Linux VM to run that kernel.
+
+4. Once you install a local docker-engine with volume share access to this working directory, then you can proceed. The key here is having a local docker-engine installed that has volume mount access to this directory.
+
+[Back to the top](#devops)
+
+# Security
+
+## Secrets
+
+This git repository stores the secrets for the above Project Environments in the `.trousseau` file in this git repository.
+
+This file is `gpg` encrypted using `trousseau`. To use these secrets, you will need to have your gpg public key listed in the `gpg/` folder.
+
+The `secrets/` folder is in `.gitignore` for a reason: this holds unencrypted files that contain credentials.
+
+No files under `secrets/` should ever be committed to this git repo. Any secrets will be pulled out of `trousseau` by the `swx` commands as necessary.
+
+### With Docker
+
+If using Docker, just make the `secrets/gnupg` in the repo directory and run `./docker.sh`.
+
+### Manual (if not using Docker)
+
+#### gnupg
+
+You need a gnupg key for `trousseau` below.
+
+The reason for gnupg 2.0 is trousseau reads directly from `pubring.gpg`, and is no longer supported in gnupg 2.1 and newer.
+
+#### Mac
+
+There is a `gpg` built-in to MacOS in `/usr/bin/gpg`, and that is incompatible with `trousseau`.
+
+1. Install `gpg` v2.0 to /usr/local/bin (until we can submit a PR to fix this in `trousseau`).
+
+- If you happened to `brew install gnupg` already, just unlink first.
+
+    ```
+    brew unlink gnupg
+    ```
+
+2. To install the `gpg` command on a Mac, install `gnupg@2.0` with HomeBrew:
+
+    ```bash
+    brew install gnupg@2.0
+    ```
+    ```bash
+    brew link --force gnupg@2.0
+    ```
+
+- If you also install `pinentry`, you will get a nice pop-up dialog box for your gpg passphrase:
+
+    ```bash
+    brew install pinentry
+    ```
+
+#### Ubuntu 16.04
+
+Try running:
+
+    ./dependencies/ubuntu.sh
+
+That should install the correct versions of all of your dependencies.
+
+#### Other Operating Systems
+
+For general compatiblity and ease of developer station convergence, this project has a Vagrantfile that defines a Vagrant machine to run an Ubuntu virtual machine and install the dependencies.
+
+[Install Vagrant for your operating system](https://www.vagrantup.com/downloads.html).
+
+The biggest challenge managing Vagrant persistence will be syncing or sharing a folder between your host and the virtual machine.
+This differs based on the virtual machine engine you use with Vagrant (VirtualBox, VMWare Workstation, VMWare Fusion, Parallels, xhyve, etc).
+
+[Back to the top](#devops)
+
+### GPG Configuration 
+
+1. Run the `shell.bash` or `docker.sh` to enter the environment:
+
+    `./shell.bash` OR `./docker.sh` 
+    
+This prepares your gnupg keychain and environment.
+
+### GPG Verification and Key Creation
+> The correct version is critical to running the program. If your keys are not configured correctly, problems will arise. 
+
+#### Verification
+
+To verify the correct version of gpg was installed
+
+```bash
+gpg --version
+```
+
+The version should be 2.0, nothing higher. 
+
+#### After installing gnupg
+
+1. Generate a private/public keypair
+```bash
+gpg --gen-key
+```
+
+2. While the prompt is for 2048 bits, use 4096 instead.
+   -  If your `gpg` does not prompt you for the number of bits, then you're using a gnupg newer than 2.0 which will not work with trousseau.
+   
+3. Move your keychain to the `secrets/gnupg` directory:
+
+    ```bash
+    mv ~/.gnupg secrets/gnupg
+    ```
+
+Note: While you _can_ use the default `~/.gnupg` config folder, it is recommended to create a `secrets/gnupg` directory to keep your keychain local to this repo directory.
+
+
+4. After doing this, please export your public key into this repo under the `gpg/` folder with a Github Pull-Request so that everyone has access to it.
+
+    ```bash
+    gpg --export --armor > gpg/<yourname>@sofwerx.org
+    ```
+
+    ```bash
+    git add gpg/<yourname>@sofwerx.org
+    git commit -m 'adding gpg/<yourname>@sofwerx.org public key'
+    git push
+    ```    
+    
+- The convention in this repository is that the filename must be your email address, to make trousseau management easier.
+
+- You can import all of our public keys at any time by running:
+
+    ```bash
+    cat gpg/* | gpg --import
+    ```
+
+5. Best practice is to publish your gnupg public key on some of the public key servers as well, but that's not important so long as we have access to your public key in the repository.
+
+[Back to the top](#devops)
+
+### trousseau
+
+[Trousseau](https://github.com/oleiade/trousseau) uses gnupg to encrypt a JSON file for a number of administrators that stores "key=value" secrets.
+
+Trousseau can use various cloud storage platforms to share these encrypted secrets between administrators.
+
+The result of any trousseau commands will alter the `.trousseau` file in the current project.
+This file is under git management, and is entirely safe as the contents of the file are encrypted.
+This is far easier than dealing with a shared s3 bucket or other shared repository.
+
+#### Installing trousseau
+
+1. To install the `trousseau` command, download pre-built binaries from [the releases page](https://github.com/oleiade/trousseau/releases).
+
+2. To build from the Go source follow these build instructions:
+
+    ```bash
+    mkdir ~/go/bin
+    export GOPATH=~/go
+    export PATH=~/go/bin:$PATH
+    go get github.com/tools/godep
+    go get github.com/urfave/cli
+    go get github.com/oleiade/trousseau
+    cd $GOPATH/src/github.com/oleiade/trousseau
+    make
+    cp $GOPATH/go/bin/trousseau/usr/local/bin/trousseau
+    ```
+    
+3. To build from the Go source using the `swx` command follow these steps from your `swx-devops` clone directory:
+
+    ```bash
+    $ ./shell.bash
+    $ swx secrets install
+    ```
+
+[Back to the top](#devops)
+
