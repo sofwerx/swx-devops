@@ -83,18 +83,43 @@ swx dm env rcloud-dev-00
 
 - This acts similar to a `eval $(docker-machine env {machinename})`.
 
-To create a dm, first create a machine with `docker-machine`, then use `swx dm import` to export it:
+To create a dm, first install docker on the target system, then create a machine with `docker-machine`
+and use `swx dm import` to export it:
+
+```bash
+sudo curl -sSL https://get.docker.com | sh
+```
+
+For Raspberry Pi:
+```bash
+sudo usermod -aG docker pi
+sudo systemctl enable docker
+sudo systemctl start docker
+```
+Also, edit /etc/os-release and set ID=debian (and then REBOOT)
 
 ```bash
 docker-machine create -d generic \
 --generic-ip-address 192.168.14.194 \ 
 --generic-ssh-key ${devops}/secrets/ssh/sofwerx \
 --generic-ssh-user pi \ 
---engine-storage-driver overlay2 swx-pi
+--engine-storage-driver overlay2 <name>
+```
+or
+```bash
+docker-machine --debug create --driver none --url tcp://192.168.12.140 <name>
 ```
 
+Create a directory under local/ for the new server, put the docker-machine name into a file called ```.dm```, then in that directory run
 ```bash
-swx dm import swx-pi
+swx dm import <name>
+swx environment migrate
+```
+
+This should report successful creation of a trousseau data store.
+
+```bash
+swx dm import <name>
 ```
 
 Then `git add .trousseau ; git commit` to save the newly added dm secret.
@@ -443,6 +468,7 @@ Instead of using `terraform` directly, I strongly suggest using the `swx tf` wra
 [Back to the top](#devops)
 
 # Installation (The Long Way)
+
 ## Disregard these installation instructions if using "The Easy Button" above.
 
 There are a number of tools that will need to be installed:

@@ -11,10 +11,10 @@ if [ -d "${devops}/secrets/docker/machines" ]; then
     fi
     ln -nsf "secrets/docker/machines" "${devops}/.docker"
   fi
-else
-  if [ -d ~/.docker/machine/machines ] ; then
-    export MACHINE_STORAGE_PATH=~/.docker/machine/machines
-  fi
+#else
+#  if [ -d ~/.docker/machine/machines ] ; then
+#    export MACHINE_STORAGE_PATH=~/.docker/machine/machines
+#  fi
 fi
 
 # Install dmport if it has not been yet
