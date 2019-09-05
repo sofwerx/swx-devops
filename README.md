@@ -28,6 +28,8 @@ Clone this repository.
 
 Send one of the Nerd Herd your public key (gpg --export --armor > youremailaddress).
 
+Under swx-devops, create a directory called ```secrets/gnupg``` (if it doesn't already exist), and copy the contents of your ~/.gnupg into it.
+
 From the directory you cloned the repo into (swx-devops), run ./docker.sh
 
 *This method does NOT require all of the software installation decribed below*
