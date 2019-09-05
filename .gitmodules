@@ -163,9 +163,6 @@
 [submodule "local/swx-brangepandora/docker-traefik"]
 	path = local/swx-brangepandora/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
-[submodule "local/swx-brangepandora/docker-pandorafms"]
-	path = local/swx-brangepandora/docker-pandorafms
-	url = https://github.com/sofwerx/docker-pandorafms.git
 [submodule "local/ibm-minsky/docker-ravencoin"]
 	path = local/ibm-minsky/docker-ravencoin
 	url = https://github.com/sofwerx/docker-ravencoin
