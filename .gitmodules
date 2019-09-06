@@ -366,3 +366,12 @@
 [submodule "local/swx-vmhost/nginx-cac"]
 	path = local/swx-vmhost/nginx-cac
 	url = https://github.com/sofwerx/nginx-cac.git
+[submodule "local/rpi-blacksea/docker-lirc"]
+	path = local/rpi-blacksea/docker-lirc
+	url = https://github.com/sofwerx/docker-lirc.git
+[submodule "local/rpi-blacksea/clockwerx2"]
+	path = local/rpi-blacksea/clockwerx2
+	url = https://github.com/sofwerx/clockwerx2.git
+[submodule "local/rpi-blacksea/docker-traefik"]
+	path = local/rpi-blacksea/docker-traefik
+	url = https://github.com/sofwerx/docker-traefik.git
