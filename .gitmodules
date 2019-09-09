@@ -375,3 +375,6 @@
 [submodule "local/rpi-blacksea/docker-traefik"]
 	path = local/rpi-blacksea/docker-traefik
 	url = https://github.com/sofwerx/docker-traefik.git
+[submodule "local/swx-vmhost/web-sofwerx"]
+	path = local/swx-vmhost/web-sofwerx
+	url = https://github.com/sofwerx/web-sofwerx.git
