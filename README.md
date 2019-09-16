@@ -34,6 +34,10 @@ that runs on the [SOFWERX](https://www.sofwerx.org) servers.
 - Public keys are stored in the gpg/ folder in the swx-devops GitHub repo,
 and each server's gpg/ folder is populated from there.
 
+*If you wish to ssh into the VM, you will need to configure both the VirtualBox network adapter and
+the /etc/ssh/sshd_config file to allow this. Please see VirtualBox and Debian Linux documentation
+for futher information.*
+
 ## Initialize Environment
 #### At a shell window or terminal/ssh command line:
 
