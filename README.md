@@ -33,6 +33,7 @@ that runs on the [SOFWERX](https://www.sofwerx.org) servers.
 - Within SWX: send your public key to one of the Nerd Herd
 - Public keys are stored in the gpg/ folder in the swx-devops GitHub repo,
 and each server's gpg/ folder is populated from there.
+- ```git clone git@github.com:sofwerx/swx-devops.git``` OR ```git clone https://github.com/sofwerx/swx-devops.git```
 
 *If you wish to ssh into the VM, you will need to configure both the VirtualBox network adapter and
 the /etc/ssh/sshd_config file to allow this. Please see VirtualBox and Debian Linux documentation
